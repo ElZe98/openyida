@@ -1,4 +1,4 @@
-# 通过 Open Code / ClaudeCode 等 AI 工具 + 宜搭快速生成应用
+# 通过 Open Code / ClaudeCode 等 AI 编程工具 + 宜搭快速生成应用
 
 > 非常稳定、支持数据存储、生成后可二次加工 🚀
 
@@ -9,7 +9,7 @@
 
   git clone https://github.com/openyida/openyida.git
 
-# 2. 使用代码编辑器打开项目，打开 AI Coding 工具，输入：执行安装脚本，等待 Skills 安装完成
+# 2. 使用代码编辑器打开项目，打开自己的 AI 编程工具，输入：执行安装脚本，等待 Skills 安装完成（[yida-skills](https://github.com/openyida/yida-skills)）
 # 3. 一句话生成应用：帮我搭建一个生日祝福小游戏应用
 # 4. 根据需求文档生成应用：帮我搭建个人薪资计算器应用
 
