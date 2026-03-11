@@ -67,8 +67,6 @@ AI 生成灯谜图片，用户猜答案，猜错了有 AI 幽默提示。
 - **亮点**：宜搭 × DEAP 打通，调用宜搭表单 API 触发后端自动生成 AI 图片
 - 🔗 [在线体验](https://ding.aliwork.com/s/93ED6?isRenderNav=false&corpid=ding8196cd9a2b2405da24f2f5cc6abecb85)
 
-![看图猜灯谜](https://img.alicdn.com/imgextra/i4/O1CN01qQO6PD27ZxBwW7HuO_!!6000000007812-2-tps-5084-2610.png)
-
 ![看图猜灯谜-2](https://img.alicdn.com/imgextra/i3/O1CN01dCoscP25jSAtAB9o3_!!6000000007562-2-tps-2144-1156.png)
 
 ---
