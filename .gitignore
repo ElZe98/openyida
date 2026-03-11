@@ -3,35 +3,23 @@
 # dependencies
 node_modules/
 
-# production
-dist/
-tmp/
-lib/
-es/
-
 # misc
 .idea/
 .happypack
 .DS_Store
 *.swp
 *.dia~
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-@mf-types/
-
-
 pnpm-lock.yaml
 yarn.lock
-
-yida.custom.json
-
-yarn.lock
-pnpm-lock.yaml
-.cookies.json
-schema.json
-.cache
 package-lock.json
-.aone_copilot
+.cache/*
+!.cache/.gitkeep
+pages/dist/*
+pages/src/*
+!pages/dist/.gitkeep
+!pages/src/.gitkeep
+.claude/*
+!.claude/CLAUDE.md
