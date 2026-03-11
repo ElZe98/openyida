@@ -1,18 +1,28 @@
-# Build Yida Apps Fast with Claude Code
+# OpenYiDA — AI-Powered Yida Application Development
 
-> Stable, supports data storage, can be customized after generation 🚀
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/openyida/openyida)](https://github.com/openyida/openyida/stargazers)
 
-## Introduction
+Build production-ready Yida applications using natural language with Claude Code and AI coding tools. Fully automated from creation to deployment with data persistence support.
 
-This project demonstrates how to use **Claude Code** and other AI coding tools to automatically create, develop, and deploy Yida applications through natural language descriptions - no manual operation on the Yida platform required.
+## Overview
 
-## Environment
+OpenYiDA provides a complete skill-based framework for developing Yida (宜搭) applications through AI-driven automation. Describe your application in plain language, and the system handles everything from scaffolding to deployment.
+
+**Key Features:**
+
+- **Fully Automated** — From app creation to deployment in minutes
+- **Data Persistence** — Built-in form and storage support
+- **Customizable** — Full access to generated source code for further development
+- **Production-Ready** — Enterprise-grade Yida platform integration
+
+## Prerequisites
 
 | Dependency | Version | Purpose |
-| --- | --- | --- |
-| Node.js | 20+ | JSX compilation & publish scripts |
-| Python | 3.12+ | Login management (Playwright) |
-| playwright | latest | QR login & Cookie persistence |
+|------------|---------|---------|
+| Node.js | 20+ | JSX compilation & publish pipeline |
+| Python | 3.12+ | Login automation (Playwright) |
+| playwright | latest | QR authentication & session management |
 
 ```bash
 # Install Python dependencies
@@ -24,87 +34,87 @@ cd .claude/skills/yida-publish/scripts && npm install
 
 ## Quick Start
 
-Just one sentence, and AI will automatically build the application:
+Describe your application need in natural language:
 
 ```
 Create a personal salary calculator app for me
 ```
 
-AI will automatically execute:
+The AI will execute the complete workflow:
 
 ```
-Create App → Check Login → Create Page → Analyze Requirements → Write Code → Publish
+Create App → Verify Login → Create Page → Analyze Requirements → Generate Code → Deploy
 ```
 
-**For Group Yida, update the domain in config.json**: `https://yida-group.alibaba-inc.com`
+> **Note:** For Alibaba Group Yida environment, update the domain in `config.json`: `https://yida-group.alibaba-inc.com`
 
 ---
 
-## Demo Showcase
+## Demo Applications
 
-### 💰 Tool - Personal Salary Calculator
+### 💰 Personal Salary Calculator
 
-- 🔗 [Try it](https://ding.aliwork.com/APP_ICUBVUPDEJ3MIFJ0701X/custom/FORM-5776BEF941604870A814608C4CE0D23C146W?isRenderNav=false&corpid=ding9a0954b4f9d9d40ef5bf40eda33b7ba0)
+A comprehensive salary calculation tool with tax optimization.
+
+- 🔗 [Live Demo](https://ding.aliwork.com/APP_ICUBVUPDEJ3MIFJ0701X/custom/FORM-5776BEF941604870A814608C4CE0D23C146W?isRenderNav=false&corpid=ding9a0954b4f9d9d40ef5bf40eda33b7ba0)
 
 ![Salary Calculator](https://gw.alicdn.com/imgextra/i2/O1CN017TeJuE1reVH2Dj7b7_!!6000000005656-2-tps-5114-2468.png)
 
 ---
 
-### 🌐 Landing Page - Smart Collaboration
+### 🌐 Enterprise Landing Page
 
-Enterprise product showcase page, generate a complete Landing Page with one sentence.
+AI-generated product showcase with responsive design.
 
-- 🔗 [Try it](https://ding.aliwork.com/s/63E1E?isRenderNav=false&corpid=ding8196cd9a2b2405da24f2f5cc6abecb85&ddtab=true)
+- 🔗 [Live Demo](https://ding.aliwork.com/s/63E1E?isRenderNav=false&corpid=ding8196cd9a2b2405da24f2f5cc6abecb85&ddtab=true)
 
 ![Smart Collaboration](https://gw.alicdn.com/imgextra/i1/O1CN01EZtvfs1cxXV00UaXi_!!6000000003667-2-tps-5118-2470.png)
 
 ---
 
-### 🏮 Event - Lantern Riddles
+### 🏮 Interactive Lantern Riddles
 
-AI generates lantern riddle images, users guess answers, get humorous AI hints on wrong guesses.
+AI-powered game with automatic riddle image generation via Yida × DEAP integration.
 
-- **Highlight**: Yida × DEAP integration, call Yida form API to trigger backend AI image generation
-- 🔗 [Try it](https://ding.aliwork.com/s/93ED6?isRenderNav=false&corpid=ding8196cd9a2b2405da24f2f5cc6abecb85)
+- 🔗 [Live Demo](https://ding.aliwork.com/s/93ED6?isRenderNav=false&corpid=ding8196cd9a2b2405da24f2f5cc6abecb85)
 
 ![Lantern Riddles](https://img.alicdn.com/imgextra/i3/O1CN01dCoscP25jSAtAB9o3_!!6000000007562-2-tps-2144-1156.png)
 
 ---
 
-### 🎂 Organizational Care - Birthday Wishes Game
+### 🎂 Birthday Wishes Game
 
-Click to blow out candles, make a wish, send a personalized birthday card.
+Interactive celebration tool with confetti effects and personalized cards.
 
-- **How to play**: Enter birthday person's name → click to blow out all candles within 15 seconds → write a blessing → confetti celebration
-- 🔗 [Try it](https://ding.aliwork.com/s/0D49?corpid=ding8196cd9a2b2405da24f2f5cc6abecb85&isRenderNav=false)
+- 🔗 [Live Demo](https://ding.aliwork.com/s/0D49?corpid=ding8196cd9a2b2405da24f2f5cc6abecb85&isRenderNav=false)
 
 ---
 
-## Yida-AI-Skill Package
+## Skill Package
 
-This project provides a complete Yida development skill package that can be fully automated with local AI coding tools:
+The framework includes modular skills for different aspects of Yida development:
 
 | Skill | Description |
-| --- | --- |
-| **`yida-app`** | Complete app development workflow orchestration (main entry) |
-| **`yida-login`** | Login management (Cookie persistence + QR login) |
-| **`yida-logout`** | Logout, clear Cookie cache |
-| **`yida-create-app`** | Create Yida app, get appType |
-| **`yida-create-page`** | Create custom display page, get pageId |
-| **`yida-create-form-page`** | Create form page, supports 18 field types |
-| **`yida-custom-page`** | Custom page JSX development guide & API reference |
-| **`yida-publish`** | Compile JSX source and publish to Yida |
-| **`get-schema`** | Get complete Schema structure of existing forms |
+|-------|-------------|
+| **`yida-app`** | Main orchestration — coordinates the full development pipeline |
+| **`yida-login`** | Session management with QR authentication and cookie persistence |
+| **`yida-logout`** | Clear authentication session |
+| **`yida-create-app`** | Initialize new Yida application |
+| **`yida-create-page`** | Create custom display pages |
+| **`yida-create-form-page`** | Form page builder with 18 field types |
+| **`yida-custom-page`** | JSX development guide with API reference |
+| **`yida-publish`** | Compile and deploy to Yida platform |
+| **`get-schema`** | Extract existing form schema for analysis |
 
-### Skill Collaboration Flow
+### Workflow
 
 ```
-yida-app (orchestration)
-  ├── yida-login ─────── Login check & QR login
-  ├── yida-create-app ── Create app → appType
-  ├── yida-create-page ─ Create page → formUuid
-  ├── y JSX guideida-custom-page ─ & API
-  └── yida-publish ───── Babel compile → Schema build → Publish
+yida-app (orchestrator)
+  ├── yida-login ─────── Authentication & session handling
+  ├── yida-create-app ── Application initialization
+  ├── yida-create-page ─ Page scaffolding
+  ├── yida-custom-page ─ Code generation
+  └── yida-publish ───── Build & deployment
 ```
 
 ---
@@ -113,38 +123,37 @@ yida-app (orchestration)
 
 ```
 openyida/
-├── src/                                 # Page source code
-│   ├── salary-calculator.js             # 💰 Personal salary calculator
-│   ├── salary-calculator.compile.js     #    └─ Compiled output
-│   ├── demo.js                          # 🏮 Lantern riddles
-│   ├── demo.compile.js                  #    └─ Compiled output
-│   ├── birthday-game.js                 # 🎂 Birthday wishes game
-│   └── birthday-game.compile.js         #    └─ Compiled output
-├── RD/                                  # Requirements docs
-│   ├── salary-calculator.md             # 💰 Salary calculator requirements & config
-│   ├── birthday-game.md                 # 🎂 Birthday game requirements & config
-│   └── GLR.md                           # 🏮 Lantern riddles requirements & config
-└── .claude/skills/                      # Yida-AI-Skill package
-    ├── yida-app/                        #   Complete workflow orchestration
-    ├── yida-login/                      #   Login management
-    ├── yida-logout/                     #   Logout
-    ├── yida-create-app/                 #   Create app
-    ├── yida-create-page/                #   Create custom page
-    ├── yida-create-form-page/           #   Create form page
-    ├── yida-custom-page/                #   JSX guide
-    ├── yida-publish/                    #   Compile & publish
-    └── get-schema/                      #   Get form Schema
+├── src/                           # Application source code
+│   ├── salary-calculator.js       # Salary calculator
+│   ├── salary-calculator.compile.js
+│   ├── demo.js                   # Lantern riddles game
+│   ├── demo.compile.js
+│   ├── birthday-game.js          # Birthday wishes
+│   └── birthday-game.compile.js
+├── RD/                            # Requirements & specifications
+├── .claude/skills/               # AI skill package
+│   ├── yida-app/
+│   ├── yida-login/
+│   ├── yida-logout/
+│   ├── yida-create-app/
+│   ├── yida-create-page/
+│   ├── yida-create-form-page/
+│   ├── yida-custom-page/
+│   ├── yida-publish/
+│   └── get-schema/
+├── config.json
+└── LICENSE
 ```
 
 ---
 
 ## Contributing
 
-Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) to learn how to contribute.
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License - See [LICENSE](LICENSE)
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
