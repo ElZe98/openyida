@@ -15,6 +15,13 @@
 
 ```
 
+> **Windows 用户**：请使用 PowerShell 执行安装脚本：
+> ```powershell
+> # 如提示执行策略限制，先运行以下命令（仅当前会话生效）
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+> .\install-skills.ps1
+> ```
+
 
 ## 依赖环境
 
