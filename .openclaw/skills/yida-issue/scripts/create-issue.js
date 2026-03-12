@@ -144,7 +144,7 @@ ${description}
 - 相关版本：
 
 ---
-> 此 Issue 由 [yida-issue skill](https://github.com/openyida/yida-skills) 自动创建，路由到 **${repoLabel}**。`;
+> 此 Issue 由 [yida-issue skill](https://github.com/openyida/openyida/tree/main/.openclaw/skills/yida-issue) 自动创建，路由到 **${repoLabel}**。`;
   }
 
   return `## 需求描述
@@ -164,7 +164,7 @@ ${description}
 中
 
 ---
-> 此 Issue 由 [yida-issue skill](https://github.com/openyida/yida-skills) 自动创建，路由到 **${repoLabel}**。`;
+> 此 Issue 由 [yida-issue skill](https://github.com/openyida/openyida/tree/main/.openclaw/skills/yida-issue) 自动创建，路由到 **${repoLabel}**。`;
 }
 
 // ── 参数解析 ──────────────────────────────────────────────────────────
