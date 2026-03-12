@@ -12,6 +12,9 @@
 "use strict";
 
 const { execSync } = require("child_process");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
 // ── 路由规则 ──────────────────────────────────────────────────────────
 
@@ -280,32 +283,34 @@ function main() {
     process.exit(1);
   }
 
-  // 创建 Issue
+  // 创建 Issue（用临时文件传 body，避免 shell 转义导致换行符丢失）
   console.log("🚀 正在创建 Issue...");
+  const bodyTempFile = path.join(os.tmpdir(), `yida-issue-body-${Date.now()}.md`);
   try {
+    fs.writeFileSync(bodyTempFile, body, "utf-8");
     const label = issueType === "bug" ? "bug" : "enhancement";
-    const result = execSync(
-      `gh issue create --repo "${targetRepo}" --title "${title.replace(/"/g, '\\"')}" --body "${body.replace(/"/g, '\\"').replace(/\n/g, "\\n")}" --label "${label}"`,
-      { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }
-    );
-    const issueUrl = result.trim();
-    console.log(`✅ Issue 创建成功：${issueUrl}`);
-  } catch (error) {
-    // gh 可能因为 label 不存在而失败，降级为不带 label 创建
     try {
       const result = execSync(
-        `gh issue create --repo "${targetRepo}" --title "${title.replace(/"/g, '\\"')}" --body "${body.replace(/"/g, '\\"').replace(/\n/g, "\\n")}"`,
+        `gh issue create --repo "${targetRepo}" --title "${title.replace(/"/g, '\\"')}" --body-file "${bodyTempFile}" --label "${label}"`,
         { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }
       );
-      const issueUrl = result.trim();
-      console.log(`✅ Issue 创建成功：${issueUrl}`);
-    } catch (fallbackError) {
-      console.error(`❌ 创建 Issue 失败：${fallbackError.message}`);
-      console.error("请确认：");
-      console.error("  1. gh CLI 已登录（gh auth login）");
-      console.error("  2. 你有对应仓库的访问权限");
-      process.exit(1);
+      console.log(`✅ Issue 创建成功：${result.trim()}`);
+    } catch {
+      // label 不存在时降级为不带 label 创建
+      const result = execSync(
+        `gh issue create --repo "${targetRepo}" --title "${title.replace(/"/g, '\\"')}" --body-file "${bodyTempFile}"`,
+        { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }
+      );
+      console.log(`✅ Issue 创建成功：${result.trim()}`);
     }
+  } catch (error) {
+    console.error(`❌ 创建 Issue 失败：${error.message}`);
+    console.error("请确认：");
+    console.error("  1. gh CLI 已登录（gh auth login）");
+    console.error("  2. 你有对应仓库的访问权限");
+    process.exit(1);
+  } finally {
+    try { fs.unlinkSync(bodyTempFile); } catch {}
   }
 }
 
