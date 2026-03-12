@@ -1,4 +1,4 @@
-# 通过 Open Code / ClaudeCode 等 AI 编程工具 + 宜搭快速生成应用
+# 通过 OpenCode / ClaudeCode 等 AI 编程工具 + 宜搭快速生成应用
 
 > 非常稳定、支持数据存储、生成后可二次加工 🚀
 
