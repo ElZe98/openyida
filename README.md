@@ -67,6 +67,15 @@ AI 生成灯谜图片，用户猜答案，猜错了有 AI 幽默提示。
 7. 重新登录
 8. 退出登录
 
+## 贡献者
+
+感谢所有为 OpenYida 做出贡献的开发者！
+
+### 贡献者
+<p align="left">
+  <a href="https://github.com/yize"><img src="https://avatars.githubusercontent.com/u/1011681?v=4&s=48" width="48" height="48" alt="yize" title="yize"/></a>
+</p>
+
 ## License
 
 [MIT](./LICENSE) © 2026 天晟
