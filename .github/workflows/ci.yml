@@ -23,13 +23,14 @@ jobs:
 
     - name: Validate JavaScript syntax
       run: |
-        for file in .claude/skills/*/scripts/*.js; do
+        for file in .claude/skills/skills/*/scripts/*.js; do
+          [ -f "$file" ] || continue
           node --check "$file" || exit 1
         done
 
     - name: Validate JSON files
       run: |
-        find . -name "*.json" -path "./.claude/skills/*" | while read -r file; do
+        find . -name "*.json" -path "./.claude/skills/skills/*" | while read -r file; do
           node -e "JSON.parse(require('fs').readFileSync(process.argv[1]))" -- "$file" || exit 1
           echo "  ✅ $file"
         done
