@@ -452,3 +452,93 @@ describe("Skill 未安装时的错误提示", () => {
     expect(stderr).toContain("未找到 skill 脚本");
   });
 });
+
+// ── 头像 URL 版本参数修复测试（Issue #31）────────────────────────────
+//
+// workflow 中使用 re.sub(r'\?v=\d+', '?v=4', avatar_url) 修复版本参数。
+// 以下测试用 JS 等价逻辑验证该正则替换的正确性。
+
+/**
+ * 模拟 workflow 中的头像 URL 版本参数修复逻辑（Python re.sub 的 JS 等价实现）
+ */
+function fixAvatarUrlVersion(avatarUrl) {
+  return avatarUrl.replace(/\?v=\d+/, "?v=4");
+}
+
+/**
+ * 模拟 workflow 中完整的头像 URL 构建逻辑
+ */
+function buildAvatarUrl(avatarUrl) {
+  const avatarUrlV4 = fixAvatarUrlVersion(avatarUrl);
+  return `${avatarUrlV4}&s=48`;
+}
+
+describe("头像 URL 版本参数修复（Issue #31）", () => {
+  test("v=3 的旧版头像 URL 被替换为 v=4", () => {
+    const input = "https://avatars.githubusercontent.com/u/1578814?v=3";
+    expect(fixAvatarUrlVersion(input)).toBe(
+      "https://avatars.githubusercontent.com/u/1578814?v=4"
+    );
+  });
+
+  test("v=4 的头像 URL 保持不变", () => {
+    const input = "https://avatars.githubusercontent.com/u/1011681?v=4";
+    expect(fixAvatarUrlVersion(input)).toBe(
+      "https://avatars.githubusercontent.com/u/1011681?v=4"
+    );
+  });
+
+  test("v=1 的旧版头像 URL 被替换为 v=4", () => {
+    const input = "https://avatars.githubusercontent.com/u/12345?v=1";
+    expect(fixAvatarUrlVersion(input)).toBe(
+      "https://avatars.githubusercontent.com/u/12345?v=4"
+    );
+  });
+
+  test("不含版本参数的 URL 保持不变", () => {
+    const input = "https://avatars.githubusercontent.com/u/12345";
+    expect(fixAvatarUrlVersion(input)).toBe(
+      "https://avatars.githubusercontent.com/u/12345"
+    );
+  });
+
+  test("v=3 的 URL 构建后包含正确的 v=4&s=48 参数", () => {
+    const input = "https://avatars.githubusercontent.com/u/1578814?v=3";
+    const result = buildAvatarUrl(input);
+    expect(result).toBe("https://avatars.githubusercontent.com/u/1578814?v=4&s=48");
+    expect(result).not.toContain("v=3");
+  });
+
+  test("v=4 的 URL 构建后包含正确的 v=4&s=48 参数", () => {
+    const input = "https://avatars.githubusercontent.com/u/1011681?v=4";
+    const result = buildAvatarUrl(input);
+    expect(result).toBe("https://avatars.githubusercontent.com/u/1011681?v=4&s=48");
+  });
+
+  test("构建的头像 URL 不包含 v=3", () => {
+    const testCases = [
+      "https://avatars.githubusercontent.com/u/111?v=3",
+      "https://avatars.githubusercontent.com/u/222?v=3",
+      "https://avatars.githubusercontent.com/u/333?v=1",
+    ];
+    testCases.forEach((url) => {
+      const result = buildAvatarUrl(url);
+      expect(result).not.toContain("v=3");
+      expect(result).not.toContain("v=1");
+      expect(result).toContain("v=4");
+      expect(result).toContain("&s=48");
+    });
+  });
+
+  test("README 中已有的 v=4 头像 URL 格式正确", () => {
+    // 验证 README 中初始贡献者头像 URL 格式符合规范
+    const readmePath = require("path").resolve(__dirname, "../README.md");
+    const readmeContent = require("fs").readFileSync(readmePath, "utf-8");
+    const avatarUrls = readmeContent.match(/src="https:\/\/avatars\.githubusercontent\.com[^"]+"/g) || [];
+    avatarUrls.forEach((srcAttr) => {
+      // 所有头像 URL 应该包含 v=4 而不是 v=3
+      expect(srcAttr).not.toContain("v=3");
+      expect(srcAttr).toContain("v=4");
+    });
+  });
+});

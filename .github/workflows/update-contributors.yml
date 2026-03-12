@@ -96,7 +96,9 @@ jobs:
 
               print(f"  ✨ 新贡献者: {login}")
               # 构建头像 HTML（与现有格式完全一致）
-              avatar_48 = f"{avatar_url}&s=48"
+              # 强制将版本参数替换为 v=4，修复旧账号可能返回 v=3 的问题（issue #31）
+              avatar_url_v4 = re.sub(r'\?v=\d+', '?v=4', avatar_url)
+              avatar_48 = f"{avatar_url_v4}&s=48"
               new_html_parts.append(
                   f'<a href="{html_url}"><img src="{avatar_48}" width="48" height="48" alt="{login}" title="{login}"/></a>'
               )
