@@ -840,3 +840,91 @@ describe("--help 包含新增命令", () => {
     expect(stdout).toContain("--rollback");
   });
 });
+
+// ── skills 路径修正回归测试 ───────────────────────────────────────────
+//
+// 验证 skills 实际路径为 .claude/skills/skills/<name>（而非 .claude/skills/<name>）
+// 对应 PR #49 修复：bin/yida.js 中 getSkillScript / config / doctor 路径修正
+
+describe("skills 路径修正回归测试", () => {
+  test("config 命令：skills 安装在 .claude/skills/skills/ 下时正确识别", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "yida-skills-path-"));
+    fs.mkdirSync(path.join(tmpDir, ".git"));
+    fs.writeFileSync(
+      path.join(tmpDir, "config.json"),
+      JSON.stringify({ loginUrl: "https://www.aliwork.com/workPlatform", defaultBaseUrl: "https://www.aliwork.com" })
+    );
+    // 正确路径：.claude/skills/skills/<name>
+    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "skills", "yida-login"), { recursive: true });
+    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "skills", "yida-create-app"), { recursive: true });
+
+    const { stdout } = runCli(["config"], { cwd: tmpDir });
+    expect(stdout).toContain("yida-login");
+    expect(stdout).toContain("yida-create-app");
+    expect(stdout).toContain("2 个");
+
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+
+  test("config 命令：skills 仅在旧路径 .claude/skills/<name> 下时显示未安装", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "yida-skills-oldpath-"));
+    fs.mkdirSync(path.join(tmpDir, ".git"));
+    fs.writeFileSync(
+      path.join(tmpDir, "config.json"),
+      JSON.stringify({ loginUrl: "https://www.aliwork.com/workPlatform", defaultBaseUrl: "https://www.aliwork.com" })
+    );
+    // 旧路径（错误路径）：.claude/skills/<name>，不应被识别
+    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "yida-login"), { recursive: true });
+
+    const { stdout } = runCli(["config"], { cwd: tmpDir });
+    // 旧路径下的 skill 不应被识别为已安装
+    expect(stdout).toContain("未安装");
+
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+
+  test("doctor 命令：skills 安装在 .claude/skills/skills/ 下时显示已安装", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "yida-doctor-skills-"));
+    fs.mkdirSync(path.join(tmpDir, ".git"));
+    fs.writeFileSync(
+      path.join(tmpDir, "config.json"),
+      JSON.stringify({ loginUrl: "https://www.aliwork.com/workPlatform", defaultBaseUrl: "https://www.aliwork.com" })
+    );
+    // 正确路径：.claude/skills/skills/<name>
+    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "skills", "yida-login"), { recursive: true });
+
+    const { stdout } = runCli(["doctor"], { cwd: tmpDir });
+    expect(stdout).toContain("Skills 已安装");
+
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+
+  test("doctor 命令：skills 未安装时显示未安装提示", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "yida-doctor-noskills-"));
+    fs.mkdirSync(path.join(tmpDir, ".git"));
+    fs.writeFileSync(
+      path.join(tmpDir, "config.json"),
+      JSON.stringify({ loginUrl: "https://www.aliwork.com/workPlatform", defaultBaseUrl: "https://www.aliwork.com" })
+    );
+    // 不创建 skills 目录
+
+    const { stdout } = runCli(["doctor"], { cwd: tmpDir });
+    expect(stdout).toContain("Skills 未安装");
+
+    fs.rmSync(tmpDir, { recursive: true });
+  });
+
+  test("skill 未安装时错误提示包含 git clone --branch main（不含 git submodule）", () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "yida-errmsg-"));
+    fs.mkdirSync(path.join(tmpDir, ".git"));
+    fs.writeFileSync(
+      path.join(tmpDir, "config.json"),
+      JSON.stringify({ defaultBaseUrl: "https://www.aliwork.com" })
+    );
+
+    const { stderr } = runCli(["create-app", "测试应用"], { cwd: tmpDir });
+    expect(stderr).toContain("git clone");
+    expect(stderr).toContain("--branch main");
+    expect(stderr).not.toContain("git submodule");
+  });
+});
