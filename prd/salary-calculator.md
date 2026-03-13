@@ -1,14 +1,5 @@
 # 个人薪资计算器 需求文档
 
-## 应用配置
-
-| 配置项 | 值 |
-| --- | --- |
-| appType | APP_BOB7ITTURFJPVSL2T6Z6 |
-| corpId |  |
-| baseUrl | https://www.aliwork.com |
-
-
 ## 功能需求
 
 专业级薪资结构分析工具，帮助职场人精准估算收入结构，包含：

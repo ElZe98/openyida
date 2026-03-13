@@ -24,4 +24,3 @@ pages/src/*
 .claude/*
 !.claude/CLAUDE.md
 !.claude/skills
-prd/*
