@@ -380,8 +380,8 @@ describe("yida config 命令", () => {
       path.join(tmpDir, "config.json"),
       JSON.stringify({ defaultBaseUrl: "https://www.aliwork.com" })
     );
-    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "yida-login"), { recursive: true });
-    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "yida-logout"), { recursive: true });
+    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "skills", "yida-login"), { recursive: true });
+    fs.mkdirSync(path.join(tmpDir, ".claude", "skills", "skills", "yida-logout"), { recursive: true });
 
     const { stdout } = runCli(["config"], { cwd: tmpDir });
     expect(stdout).toContain("yida-login");
