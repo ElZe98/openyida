@@ -5,8 +5,8 @@
 ## 快速开始
 
 ```bash
-# 1. 克隆仓库（含 Skills 子模块）
-git clone --recurse-submodules https://github.com/openyida/openyida.git
+# 1. 克隆仓库
+git clone https://github.com/openyida/openyida.git
 
 # 2. 安装 Skills（无需 Node 环境，自动检测网络，国内自动使用加速源）
 # Mac / Linux：
@@ -18,14 +18,6 @@ bash install-skills.sh
 # 4. 一句话生成应用：帮我搭建一个生日祝福小游戏应用
 # 5. 根据需求文档生成应用：帮我搭建个人薪资计算器应用
 ```
-
-> **已克隆但未带子模块？** 执行以下命令补充初始化：
-> ```bash
-> git submodule update --init --recursive
-> # 然后再运行安装脚本：
-> bash install-skills.sh        # Mac / Linux
-> .\install-skills.ps1          # Windows（PowerShell）
-> ```
 
 > **国内网络访问 GitHub 较慢？** 安装脚本会自动检测并切换加速源，也可手动指定：
 > ```bash

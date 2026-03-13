@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# install-skills.sh - 安装 yida-skills 子模块
+# install-skills.sh - 安装 yida-skills
 #
 # 兼容：macOS / Linux（sh/bash/zsh）
 # Windows 用户请使用：install-skills.ps1
@@ -15,6 +15,7 @@ SKILLS_DIR=".claude/skills"
 GITHUB_URL="https://github.com/openyida/yida-skills.git"
 # ghproxy.com 是社区维护的 GitHub 加速代理，国内访问 GitHub 时使用
 GHPROXY_URL="https://ghproxy.com/https://github.com/openyida/yida-skills.git"
+BRANCH="main"
 
 echo "🔧 正在安装 yida-skills..."
 
@@ -47,33 +48,19 @@ else
 fi
 
 if [ "$USE_PROXY" = "1" ]; then
-  SUBMODULE_URL="${GHPROXY_URL}"
+  CLONE_URL="${GHPROXY_URL}"
 else
-  SUBMODULE_URL="${GITHUB_URL}"
+  CLONE_URL="${GITHUB_URL}"
 fi
 
 # ── 安装 Skills ───────────────────────────────────────────────────────
 
-# 方式一：通过 git submodule 初始化（推荐，已克隆仓库时使用）
-if [ -f ".gitmodules" ]; then
-  echo "📦 检测到 .gitmodules，通过 git submodule 初始化..."
-  if [ "$USE_PROXY" = "1" ]; then
-    # 临时将 github.com 重写为 ghproxy 加速地址
-    git -c url."https://ghproxy.com/https://github.com/".insteadOf="https://github.com/" \
-      submodule update --init --recursive
-  else
-    git submodule update --init --recursive
-  fi
-  echo "✅ Skills 安装完成：${SKILLS_DIR}/skills/"
-  exit 0
-fi
-
-# 方式二：直接 clone（未使用 submodule 时的备用方案）
 if [ -d "${SKILLS_DIR}" ]; then
-  echo "📦 ${SKILLS_DIR} 已存在，跳过克隆"
+  echo "📦 ${SKILLS_DIR} 已存在，拉取最新代码（branch: ${BRANCH}）..."
+  git -C "${SKILLS_DIR}" fetch origin "${BRANCH}" && git -C "${SKILLS_DIR}" checkout "${BRANCH}" && git -C "${SKILLS_DIR}" pull origin "${BRANCH}"
 else
-  echo "📦 克隆 yida-skills 到 ${SKILLS_DIR}..."
-  git clone "${SUBMODULE_URL}" "${SKILLS_DIR}"
+  echo "📦 克隆 yida-skills（branch: ${BRANCH}）到 ${SKILLS_DIR}..."
+  git clone --branch "${BRANCH}" --depth 1 "${CLONE_URL}" "${SKILLS_DIR}"
 fi
 
 echo "✅ Skills 安装完成：${SKILLS_DIR}/skills/"

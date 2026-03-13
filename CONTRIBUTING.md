@@ -17,12 +17,12 @@ Welcome! We're excited that you're interested in contributing. Please read this 
 git clone git@github.com:your-username/openyida.git
 cd openyida
 
-# 安装 Skills（无需 Node 环境）
-# Mac / Linux（自动检测网络，国内自动使用加速源）：
+# 安装 Skills（无需 Node 环境，自动检测网络，国内自动使用加速源）
+# Mac / Linux：
 bash install-skills.sh
 # Mac / Linux（强制使用国内加速源）：
-bash install-skills.sh --cn
-# Windows（PowerShell，自动检测网络）：
+# bash install-skills.sh --cn
+# Windows（PowerShell）：
 # .\install-skills.ps1
 # Windows（强制使用国内加速源）：
 # .\install-skills.ps1 --cn

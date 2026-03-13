@@ -23,4 +23,3 @@ pages/src/*
 !pages/src/.gitkeep
 .claude/*
 !.claude/CLAUDE.md
-!.claude/skills

@@ -1,4 +1,0 @@
-[submodule ".claude/skills"]
-	path = .claude/skills
-	url = https://github.com/openyida/yida-skills.git
-	branch = main

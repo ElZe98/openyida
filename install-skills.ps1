@@ -1,4 +1,4 @@
-# install-skills.ps1 - 安装 yida-skills 子模块（Windows PowerShell）
+# install-skills.ps1 - 安装 yida-skills（Windows PowerShell）
 #
 # 兼容：Windows PowerShell 5.1+ / PowerShell Core 7+
 # Mac/Linux 用户请使用：install-skills.sh
@@ -19,6 +19,7 @@ $SkillsDir = ".claude\skills"
 $GithubUrl = "https://github.com/openyida/yida-skills.git"
 # ghproxy.com 是社区维护的 GitHub 加速代理，国内访问 GitHub 时使用
 $GhproxyUrl = "https://ghproxy.com/https://github.com/openyida/yida-skills.git"
+$Branch = "main"
 
 Write-Host "🔧 正在安装 yida-skills..." -ForegroundColor Cyan
 
@@ -50,7 +51,7 @@ if ($Mode -eq "--cn") {
     # 自动检测：尝试连接 GitHub，超时 3 秒
     Write-Host "🔍 检测网络环境..." -ForegroundColor Cyan
     try {
-        $response = Invoke-WebRequest -Uri "https://github.com" -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+        Invoke-WebRequest -Uri "https://github.com" -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop | Out-Null
         Write-Host "🌐 GitHub 可直连，使用原始地址" -ForegroundColor Green
         $UseProxy = $false
     } catch {
@@ -59,29 +60,18 @@ if ($Mode -eq "--cn") {
     }
 }
 
-$SubmoduleUrl = if ($UseProxy) { $GhproxyUrl } else { $GithubUrl }
+$CloneUrl = if ($UseProxy) { $GhproxyUrl } else { $GithubUrl }
 
 # ── 安装 Skills ───────────────────────────────────────────────────────
 
-# 方式一：通过 git submodule 初始化（推荐，已克隆仓库时使用）
-if (Test-Path ".gitmodules") {
-    Write-Host "📦 检测到 .gitmodules，通过 git submodule 初始化..." -ForegroundColor Yellow
-    if ($UseProxy) {
-        # 临时将 github.com 重写为 ghproxy 加速地址
-        git -c "url.https://ghproxy.com/https://github.com/.insteadOf=https://github.com/" submodule update --init --recursive
-    } else {
-        git submodule update --init --recursive
-    }
-    Write-Host "✅ Skills 安装完成：$SkillsDir\skills\" -ForegroundColor Green
-    exit 0
-}
-
-# 方式二：直接 clone（未使用 submodule 时的备用方案）
 if (Test-Path $SkillsDir) {
-    Write-Host "📦 $SkillsDir 已存在，跳过克隆" -ForegroundColor Yellow
+    Write-Host "📦 $SkillsDir 已存在，拉取最新代码（branch: $Branch）..." -ForegroundColor Yellow
+    git -C $SkillsDir fetch origin $Branch
+    git -C $SkillsDir checkout $Branch
+    git -C $SkillsDir pull origin $Branch
 } else {
-    Write-Host "📦 克隆 yida-skills 到 $SkillsDir..." -ForegroundColor Yellow
-    git clone $SubmoduleUrl $SkillsDir
+    Write-Host "📦 克隆 yida-skills（branch: $Branch）到 $SkillsDir..." -ForegroundColor Yellow
+    git clone --branch $Branch --depth 1 $CloneUrl $SkillsDir
 }
 
 Write-Host "✅ Skills 安装完成：$SkillsDir\skills\" -ForegroundColor Green
