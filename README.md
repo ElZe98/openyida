@@ -8,14 +8,23 @@
 # 1. 克隆仓库（含 Skills 子模块）
 git clone --recurse-submodules https://github.com/openyida/openyida.git
 
-# 2. 使用代码编辑器打开项目，打开自己的 AI 编程工具
-# 3. 一句话生成应用：帮我搭建一个生日祝福小游戏应用
-# 4. 根据需求文档生成应用：帮我搭建个人薪资计算器应用
+# 2. 安装 Skills（无需 Node 环境）
+# Mac / Linux：
+bash install-skills.sh
+# Windows（PowerShell）：
+.\install-skills.ps1
+
+# 3. 使用代码编辑器打开项目，打开自己的 AI 编程工具
+# 4. 一句话生成应用：帮我搭建一个生日祝福小游戏应用
+# 5. 根据需求文档生成应用：帮我搭建个人薪资计算器应用
 ```
 
 > **已克隆但未带子模块？** 执行以下命令补充初始化：
 > ```bash
 > git submodule update --init --recursive
+> # 然后再运行安装脚本：
+> bash install-skills.sh        # Mac / Linux
+> .\install-skills.ps1          # Windows（PowerShell）
 > ```
 
 

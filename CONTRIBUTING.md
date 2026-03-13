@@ -17,8 +17,16 @@ Welcome! We're excited that you're interested in contributing. Please read this 
 git clone git@github.com:your-username/openyida.git
 cd openyida
 
-# Install dependencies
+# 安装 Skills（无需 Node 环境）
+# Mac / Linux：
+bash install-skills.sh
+# Windows（PowerShell）：
+# .\install-skills.ps1
+
+# 安装 Python 依赖
 pip install playwright && playwright install chromium
+
+# 安装 Node 依赖（发布页面时需要）
 cd .claude/skills/skills/yida-publish-page/scripts && npm install
 ```
 
