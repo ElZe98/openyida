@@ -50,8 +50,8 @@ function getSkillScript(skillName, scriptFile) {
     console.error(`\n请先运行安装脚本：`);
     console.error(`  Mac/Linux：bash install-skills.sh`);
     console.error(`  Windows：  .\\install-skills.ps1`);
-    console.error(`\n或通过 git submodule 手动初始化：`);
-    console.error(`  git submodule update --init --recursive`);
+    console.error(`\n或手动克隆 yida-skills：`);
+    console.error(`  git clone --branch main --depth 1 https://github.com/openyida/yida-skills.git .claude/skills`);
     process.exit(1);
   }
 

@@ -20,7 +20,7 @@
 ├── prd/
 │   └── <项目名>.md              # 需求文档（含应用配置、字段设计）
 └── .claude/
-    └── skills/                  # AI 技能目录（git submodule → openyida/yida-skills）
+    └── skills/                  # AI 技能目录（通过 install-skills.sh 安装，来源：openyida/yida-skills）
 ```
 
 ---

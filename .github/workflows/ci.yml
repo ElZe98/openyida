@@ -13,8 +13,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        submodules: true
+
+    - name: Install Skills
+      run: bash install-skills.sh --global
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
