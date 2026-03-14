@@ -8,7 +8,7 @@
 # 1. 克隆仓库
 git clone https://github.com/openyida/openyida.git
 
-# 2. 安装 Skills（无需 Node 环境，自动检测网络，国内自动使用加速源）
+# 2. 安装 Skills（自动检测环境，缺少 Node/Python 会自动安装，国内自动使用加速源）
 # Mac / Linux：
 bash install-skills.sh
 # Windows（PowerShell）：
@@ -31,7 +31,7 @@ bash install-skills.sh
 | 依赖 | 版本要求 | 用途 |
 |------|----------|------|
 | Node.js | ≥ 16 | yida-publish、yida-create-* 系列脚本 |
-| Python | ≥ 3.8 | yida-login、yida-logout |
+| Python | ≥ 3.10 | yida-login、yida-logout |
 | Playwright | latest | 登录态管理 |
 
 ---
