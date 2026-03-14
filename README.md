@@ -1,15 +1,26 @@
 ## 快速开始
 
-### 第一步：克隆仓库
+### 第一步：安装 CLI 工具
+
+```bash
+npm install -g openyida
+```
+
+安装后可使用 `openyida` 或 `yida` 命令：
+
+```bash
+openyida doctor   # 检查环境依赖
+openyida login    # 扫码登录宜搭
+```
+
+### 第二步：安装 Skills
+
+克隆项目并安装 yida-skills（AI 技能包）。脚本会**自动检测并安装**缺少的 Node.js / Python，国内网络自动切换阿里云加速源。
 
 ```bash
 git clone https://github.com/openyida/openyida.git
 cd openyida
 ```
-
-### 第二步：安装 Skills
-
-脚本会**自动检测并安装**缺少的 Node.js / Python，国内网络自动切换阿里云加速源。
 
 **Mac / Linux：**
 ```bash
