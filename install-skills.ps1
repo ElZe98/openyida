@@ -47,6 +47,9 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
         if (Get-Command node -ErrorAction SilentlyContinue) {
             Write-Host "✅ Node.js 安装完成：$(node --version)" -ForegroundColor Green
+            Write-Host "📦 配置 npm 淘宝镜像源..." -ForegroundColor Cyan
+            npm config set registry https://registry.npmmirror.com
+            Write-Host "✅ npm 镜像源已设置为淘宝镜像（npmmirror.com）" -ForegroundColor Green
         } else {
             Write-Host "💡 Node.js 已安装，请重新打开终端后再运行此脚本" -ForegroundColor Yellow
             exit 1
@@ -78,6 +81,10 @@ if (-not (Get-Command python3 -ErrorAction SilentlyContinue) -and -not (Get-Comm
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
         if (Get-Command python -ErrorAction SilentlyContinue) {
             Write-Host "✅ Python 安装完成：$(python --version)" -ForegroundColor Green
+            Write-Host "📦 配置 pip 阿里云镜像源..." -ForegroundColor Cyan
+            python -m pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+            python -m pip config set global.trusted-host mirrors.aliyun.com
+            Write-Host "✅ pip 镜像源已设置为阿里云（mirrors.aliyun.com）" -ForegroundColor Green
         } else {
             Write-Host "💡 Python 已安装，请重新打开终端后再运行此脚本" -ForegroundColor Yellow
             exit 1
