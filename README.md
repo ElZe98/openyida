@@ -46,6 +46,16 @@ bash install-skills.sh
 | Node.js | ≥ 16 | yida-publish、yida-create-* 系列脚本 |
 | Python | ≥ 3.10 | yida-login、yida-logout |
 | Playwright | latest | 登录态管理 |
+
+### CLI 工具（可选）
+
+如需在任意目录使用 `openyida` / `yida` 命令（如 `openyida doctor` 检查环境），可通过 npm 全局安装：
+
+```bash
+npm install -g openyida
+```
+
+> 💡 `login`、`publish` 等依赖 Skills 的命令，仍需在克隆的项目目录下运行。
 ---
 
 ## DEMO 展示
