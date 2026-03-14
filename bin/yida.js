@@ -103,7 +103,7 @@ function runPythonScript(scriptPath, args = []) {
 // ── CLI 配置 ──────────────────────────────────────────────────────────
 
 program
-  .name("yida")
+  .name("yida / openyida")
   .description("OpenYida CLI - 宜搭命令行工具")
   .version("0.1.0");
 
