@@ -42,16 +42,25 @@ if ! command -v node > /dev/null 2>&1; then
     echo "📦 检测到 Homebrew，正在自动安装 Node.js..."
     brew install node
     echo "✅ Node.js 安装完成：$(node --version)"
+    echo "📦 配置 npm 淘宝镜像源..."
+    npm config set registry https://registry.npmmirror.com
+    echo "✅ npm 镜像源已设置为淘宝镜像（npmmirror.com）"
   elif command -v apt-get > /dev/null 2>&1; then
     echo "📦 检测到 apt，正在自动安装 Node.js（阿里云镜像）..."
     curl -fsSL https://mirrors.aliyun.com/nodesource/setup_lts.x | sudo -E bash -
     sudo apt-get install -y nodejs
     echo "✅ Node.js 安装完成：$(node --version)"
+    echo "📦 配置 npm 淘宝镜像源..."
+    npm config set registry https://registry.npmmirror.com
+    echo "✅ npm 镜像源已设置为淘宝镜像（npmmirror.com）"
   elif command -v yum > /dev/null 2>&1; then
     echo "📦 检测到 yum，正在自动安装 Node.js（阿里云镜像）..."
     curl -fsSL https://mirrors.aliyun.com/nodesource/setup_lts.x | sudo bash -
     sudo yum install -y nodejs
     echo "✅ Node.js 安装完成：$(node --version)"
+    echo "📦 配置 npm 淘宝镜像源..."
+    npm config set registry https://registry.npmmirror.com
+    echo "✅ npm 镜像源已设置为淘宝镜像（npmmirror.com）"
   else
     echo "💡 请手动安装 Node.js（≥ 16）：https://nodejs.org"
     echo "   或使用 nvm：https://github.com/nvm-sh/nvm"
@@ -76,14 +85,26 @@ if ! command -v python3 > /dev/null 2>&1; then
     echo "📦 检测到 Homebrew，正在自动安装 Python..."
     brew install python
     echo "✅ Python 安装完成：$(python3 --version)"
+    echo "📦 配置 pip 阿里云镜像源..."
+    pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+    pip3 config set global.trusted-host mirrors.aliyun.com
+    echo "✅ pip 镜像源已设置为阿里云（mirrors.aliyun.com）"
   elif command -v apt-get > /dev/null 2>&1; then
     echo "📦 检测到 apt，正在自动安装 Python..."
     sudo apt-get install -y python3 python3-pip
     echo "✅ Python 安装完成：$(python3 --version)"
+    echo "📦 配置 pip 阿里云镜像源..."
+    pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+    pip3 config set global.trusted-host mirrors.aliyun.com
+    echo "✅ pip 镜像源已设置为阿里云（mirrors.aliyun.com）"
   elif command -v yum > /dev/null 2>&1; then
     echo "📦 检测到 yum，正在自动安装 Python..."
     sudo yum install -y python3 python3-pip
     echo "✅ Python 安装完成：$(python3 --version)"
+    echo "📦 配置 pip 阿里云镜像源..."
+    pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+    pip3 config set global.trusted-host mirrors.aliyun.com
+    echo "✅ pip 镜像源已设置为阿里云（mirrors.aliyun.com）"
   else
     echo "💡 请手动安装 Python（≥ 3.10）：https://www.python.org"
     echo "   安装完成后重新运行此脚本"
