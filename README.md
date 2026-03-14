@@ -1,39 +1,51 @@
-# 通过 OpenCode / ClaudeCode 等 AI 编程工具 + 宜搭快速生成应用
-
-> 非常稳定、支持数据存储、生成后可二次加工 🚀
-
 ## 快速开始
 
+### 第一步：克隆仓库
+
 ```bash
-# 1. 克隆仓库
 git clone https://github.com/openyida/openyida.git
-
-# 2. 安装 Skills（无需 Node 环境，自动检测网络，国内自动使用加速源）
-# Mac / Linux：
-bash install-skills.sh
-# Windows（PowerShell）：
-.\install-skills.ps1
-
-# 3. 使用代码编辑器打开项目，打开自己的 AI 编程工具
-# 4. 一句话生成应用：帮我搭建一个生日祝福小游戏应用
-# 5. 根据需求文档生成应用：帮我搭建个人薪资计算器应用
+cd openyida
 ```
 
-> **国内网络访问 GitHub 较慢？** 安装脚本会自动检测并切换加速源，也可手动指定：
+### 第二步：安装 Skills
+
+脚本会**自动检测并安装**缺少的 Node.js / Python，国内网络自动切换阿里云加速源。
+
+**Mac / Linux：**
+```bash
+bash install-skills.sh
+```
+
+**Windows（PowerShell）：**
+```powershell
+.\install-skills.ps1
+```
+
+> 💡 **国内网络访问 GitHub 较慢？** 可手动强制使用国内加速源：
 > ```bash
-> bash install-skills.sh --cn   # Mac / Linux 强制使用国内加速源
-> .\install-skills.ps1 --cn     # Windows 强制使用国内加速源
+> bash install-skills.sh --cn    # Mac / Linux
+> .\install-skills.ps1 --cn      # Windows
 > ```
 
+### 第三步：开始使用
+
+用 Cursor / VS Code 等编辑器打开项目，启动 AI 编程工具后直接对话：
+
+- `帮我搭建一个生日祝福小游戏应用`
+- `帮我搭建个人薪资计算器应用`
+
+---
 
 ## 依赖环境
 
+> 安装脚本会自动处理以下依赖，通常无需手动安装。
+
 | 依赖 | 版本要求 | 用途 |
 |------|----------|------|
+| Git | 任意版本 | 克隆仓库、安装 Skills |
 | Node.js | ≥ 16 | yida-publish、yida-create-* 系列脚本 |
-| Python | ≥ 3.8 | yida-login、yida-logout |
+| Python | ≥ 3.10 | yida-login、yida-logout |
 | Playwright | latest | 登录态管理 |
-
 ---
 
 ## DEMO 展示

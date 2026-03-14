@@ -13,7 +13,7 @@ param(
     [string]$Mode = ""
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 $SkillsDir = ".claude\skills"
 $GithubUrl = "https://github.com/openyida/yida-skills.git"
@@ -29,13 +29,87 @@ if (-not (Test-Path "config.json") -and -not (Test-Path ".git")) {
     exit 1
 }
 
-# 检查 git 是否可用
-try {
-    git --version | Out-Null
-} catch {
+# ── 环境依赖检查与自动安装 ────────────────────────────────────────────
+
+# 检查 git
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Write-Host "❌ 未找到 git，请先安装 Git for Windows：https://git-scm.com/download/win" -ForegroundColor Red
     exit 1
 }
+
+# 检查并安装 Node.js
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Host "⚠️  未找到 Node.js（yida-publish 等脚本需要 Node.js ≥ 16）" -ForegroundColor Yellow
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Write-Host "📦 检测到 winget，正在自动安装 Node.js LTS..." -ForegroundColor Cyan
+        winget install OpenJS.NodeJS.LTS --accept-source-agreements --accept-package-agreements
+        # 刷新环境变量
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+        if (Get-Command node -ErrorAction SilentlyContinue) {
+            Write-Host "✅ Node.js 安装完成：$(node --version)" -ForegroundColor Green
+            Write-Host "📦 配置 npm 淘宝镜像源..." -ForegroundColor Cyan
+            npm config set registry https://registry.npmmirror.com
+            Write-Host "✅ npm 镜像源已设置为淘宝镜像（npmmirror.com）" -ForegroundColor Green
+        } else {
+            Write-Host "💡 Node.js 已安装，请重新打开终端后再运行此脚本" -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Host "💡 请手动安装 Node.js（≥ 16）：https://nodejs.org" -ForegroundColor Yellow
+        Write-Host "   安装完成后重新运行此脚本" -ForegroundColor Yellow
+        exit 1
+    }
+} else {
+    $nodeVersionRaw = node --version
+    $nodeVersion = $nodeVersionRaw -replace "^v", ""
+    $nodeMajor = [int]($nodeVersion -split "\.")[0]
+    if ($nodeMajor -lt 16) {
+        Write-Host "⚠️  Node.js 版本过低（当前 $nodeVersionRaw，要求 ≥ 16）" -ForegroundColor Yellow
+        Write-Host "💡 请升级 Node.js：https://nodejs.org" -ForegroundColor Yellow
+    } else {
+        Write-Host "✅ Node.js $nodeVersionRaw" -ForegroundColor Green
+    }
+}
+
+# 检查并安装 Python
+if (-not (Get-Command python3 -ErrorAction SilentlyContinue) -and -not (Get-Command python -ErrorAction SilentlyContinue)) {
+    Write-Host "⚠️  未找到 Python（yida-login / yida-logout 需要 Python ≥ 3.10）" -ForegroundColor Yellow
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Write-Host "📦 检测到 winget，正在自动安装 Python..." -ForegroundColor Cyan
+        winget install Python.Python.3.12 --accept-source-agreements --accept-package-agreements
+        # 刷新环境变量
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+        if (Get-Command python -ErrorAction SilentlyContinue) {
+            Write-Host "✅ Python 安装完成：$(python --version)" -ForegroundColor Green
+            Write-Host "📦 配置 pip 阿里云镜像源..." -ForegroundColor Cyan
+            python -m pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+            python -m pip config set global.trusted-host mirrors.aliyun.com
+            Write-Host "✅ pip 镜像源已设置为阿里云（mirrors.aliyun.com）" -ForegroundColor Green
+        } else {
+            Write-Host "💡 Python 已安装，请重新打开终端后再运行此脚本" -ForegroundColor Yellow
+            exit 1
+        }
+    } else {
+        Write-Host "💡 请手动安装 Python（≥ 3.10）：https://www.python.org" -ForegroundColor Yellow
+        Write-Host "   安装完成后重新运行此脚本" -ForegroundColor Yellow
+        exit 1
+    }
+} else {
+    $pythonCmd = if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" } else { "python" }
+    $pythonVersionRaw = & $pythonCmd --version 2>&1
+    $pythonVersion = ($pythonVersionRaw -replace "Python ", "").Trim()
+    $versionParts = $pythonVersion -split "\."
+    $pythonMajor = [int]$versionParts[0]
+    $pythonMinor = [int]$versionParts[1]
+    if ($pythonMajor -lt 3 -or ($pythonMajor -eq 3 -and $pythonMinor -lt 10)) {
+        Write-Host "⚠️  Python 版本过低（当前 $pythonVersion，要求 ≥ 3.10）" -ForegroundColor Yellow
+        Write-Host "💡 请升级 Python：https://www.python.org" -ForegroundColor Yellow
+    } else {
+        Write-Host "✅ Python $pythonVersion" -ForegroundColor Green
+    }
+}
+
+Write-Host ""
 
 # ── 判断使用哪个源 ────────────────────────────────────────────────────
 
