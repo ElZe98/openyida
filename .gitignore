@@ -19,7 +19,9 @@ package-lock.json
 !.cache/.gitkeep
 pages/dist/*
 pages/src/*
+prd/*
 !pages/dist/.gitkeep
-!pages/src/.gitkeep
+!pages/src/demo-*
+!prd/demo-*
 .claude/*
 !.claude/CLAUDE.md

@@ -75,6 +75,7 @@ cd .claude/skills/skills/yida-publish-page/scripts && npm install
 | `yida-create-page` | `node .claude/skills/skills/yida-create-page/scripts/create-page.js <appType> "<页面名>"` | 创建自定义页面，获取 pageId |
 | `yida-create-form-page` | `node .claude/skills/skills/yida-create-form-page/scripts/create-form-page.js create <appType> "<表单名>" <字段JSON>` | 创建/更新表单页面 |
 | `yida-get-schema` | `node .claude/skills/skills/yida-get-schema/scripts/get-schema.js <appType> <formUuid>` | 获取表单 Schema，确认字段 ID |
+| `yida-page-config` | `node .claude/skills/yida-page-config/scripts/verify-short-url.js <appType> <formUuid> <url>` | 页面公开访问/组织内分享配置（URL 验证、配置保存） |
 | `yida-custom-page` | 详见 `.claude/skills/skills/yida-custom-page/SKILL.md` | 编写自定义页面 JSX 代码（React 16 规范、状态管理、27 个 API） |
 | `yida-publish-page` | `node .claude/skills/skills/yida-publish-page/scripts/publish.js <appType> <formUuid> <源文件路径>` | 编译并发布自定义页面 |
 
