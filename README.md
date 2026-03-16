@@ -113,6 +113,12 @@ npx clawhub@latest install nicky1108/yida-app
 
 ---
 
+## OpenYida 社区
+
+钉钉扫描加入 OpenYida 社区
+
+![扫描加入 OpenYida 社区](https://img.alicdn.com/imgextra/i4/O1CN01RAlxmO1qF1cxRguyj_!!6000000005465-2-tps-350-356.png)
+
 ## 贡献者
 
 感谢所有为 OpenYida 做出贡献的开发者！

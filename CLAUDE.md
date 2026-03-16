@@ -9,16 +9,16 @@
 ```
 项目根目录/
 ├── CLAUDE.md                    # 本文档
-├── README_zh.md                 # 项目说明
+├── README.md                    # 项目说明
 ├── config.json                  # 全局配置（loginUrl、defaultBaseUrl）
 ├── .cache/
 │   ├── cookies.json             # 登录态缓存（运行时自动生成）
-│   └── <项目名>-schema.json     # 表单 Schema ID 缓存（运行时生成）
+│   └── <项目名>-schema.json      # 表单 Schema ID 缓存（运行时生成）
 ├── pages/
-│   ├── src/<项目名>.js          # 自定义页面 JSX 源码
-│   └── dist/<项目名>.js         # 编译后产物（自动生成）
+│   ├── src/<项目名>.js           # 自定义页面 JSX 源码
+│   └── dist/<项目名>.js          # 编译后产物（自动生成）
 ├── prd/
-│   └── <项目名>.md              # 需求文档（含应用配置、字段设计）
+│   └── <项目名>.md               # 需求文档（含应用配置、字段设计）
 └── .claude/
     └── skills/                  # AI 技能目录（通过 install-skills.sh 安装，来源：openyida/yida-skills）
 ```
