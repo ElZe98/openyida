@@ -1,11 +1,4 @@
 ## 应用配置
-
-| 配置项 | 值 |
-| --- | --- |
-| appType | APP_T34QUOYN4PBGMB587WLP |
-| corpId |  |
-| baseUrl | https://www.aliwork.com |
-
 构建专业级"个人薪资计算器"工具页，帮助职场人精准估算收入结构。
 
   ## 核心定位

@@ -1,14 +1,5 @@
 # 生日祝福小游戏 需求文档
 
-## 应用配置
-
-| 配置项 | 值 |
-| --- | --- |
-| appType | APP_FFNK0PARL15DZ4IXYCOQ |
-| corpId |  |
-| baseUrl | https://www.aliwork.com |
-
-
 ## 功能需求
 
 ### 核心功能

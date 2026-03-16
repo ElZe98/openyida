@@ -8,19 +8,31 @@
 
 ```
 项目根目录/
-├── CLAUDE.md                    # 本文档
-├── README_zh.md                 # 项目说明
+├── CLAUDE.md                    # AI 开发指南（本文档）- 包含项目结构、开发流程、技能速查等
+├── README.md                    # 项目说明
 ├── config.json                  # 全局配置（loginUrl、defaultBaseUrl）
-├── .cache/
-│   ├── cookies.json             # 登录态缓存（运行时自动生成）
-│   └── <项目名>-schema.json     # 表单 Schema ID 缓存（运行时生成）
+├── package.json                 # Node.js 项目配置
+├── install-skills.sh            # 技能安装脚本（macOS/Linux）
+├── install-skills.ps1           # 技能安装脚本（Windows）
+├── bin/
+│   └── yida.js                  # CLI 入口，和 AI 开发无关，忽略
+├── tests/                       # 测试目录，和 AI 开发无关，忽略
+│   ├── cli.test.js
+│   └── install.test.js
+├── .cache/                      # 临时缓存文件（运行时自动生成）
+│   ├── .gitkeep
+│   └── cookies.json             # 登录态缓存（运行时自动生成）
 ├── pages/
-│   ├── src/<项目名>.js          # 自定义页面 JSX 源码
-│   └── dist/<项目名>.js         # 编译后产物（自动生成）
-├── prd/
-│   └── <项目名>.md              # 需求文档（含应用配置、字段设计）
-└── .claude/
-    └── skills/                  # AI 技能目录（通过 install-skills.sh 安装，来源：openyida/yida-skills）
+│   ├── src/                     # 自定义页面 JSX 源码
+│   │   └── <项目名>.js           # 可学习 demo-* 文件的代码
+│   └── dist/                    # 编译后产物（自动生成）
+│       └── .gitkeep
+├── prd/                         # 需求文档目录
+│   └── <项目名>.md               # 需求文档（含应用配置、字段设计）
+├── .claude/
+│   └── skills/                  # AI 技能目录（通过 install-skills.sh / install-skills.ps1 安装）
+└── .github/                     # 和 AI 开发无关，忽略
+
 ```
 
 ---
