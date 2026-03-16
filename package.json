@@ -1,6 +1,6 @@
 {
   "name": "openyida",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "OpenYida CLI - 宜搭命令行工具",
   "bin": {
     "yida": "./bin/yida.js",
