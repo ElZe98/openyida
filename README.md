@@ -1,40 +1,22 @@
+---
+
 ## 快速开始
 
-### 第一步：克隆仓库
+### 第一步：安装技能
 
-```bash
-git clone https://github.com/openyida/openyida.git
-cd openyida
-```
+目前还未发布到市场，先手动下载 yida-skills.zip，然后：
 
-### 第二步：安装 Skills
+悟空 (Wukong): 直接上传技能，选择 yida-skills.zip
+OpenCode: 手动解压到 ~/.opencode/skills/
+Claude Code: 手动解压到 ~/.claudecode/skills/
+Cursor: 手动解压到 ~/.cursor/skills/
+Qoder: 手动解压到 ~/.qoder/skills/
+iFlow: 手动解压到 ~/.iflow/skills/
+Aone Copilot: 手动解压到 ~/.aone-copilot/skills/
 
-用 VS Code 等代码编辑器打开项目，启动 AI 编程工具后直接对话：
+### 第二步：使用
 
-- `帮我安装技能`
-
-**或使用命令行**
-
-**Mac / Linux：**
-```bash
-bash install-skills.sh
-```
-
-**Windows（PowerShell）：**
-```powershell
-.\install-skills.ps1
-```
-脚本会**自动检测并安装**缺少的 Node.js / Python，国内网络自动切换阿里云加速源。
-
-> 💡 **国内网络访问 GitHub 较慢？** 可手动强制使用国内加速源：
-> ```bash
-> bash install-skills.sh --cn    # Mac / Linux
-> .\install-skills.ps1 --cn      # Windows
-> ```
-
-### 第三步：开始使用
-
-用 VS Code 等代码编辑器打开项目，启动 AI 编程工具后直接对话：
+直接对话：
 
 - `帮我创建一个访客系统应用`
 - `帮我搭建一个生日祝福小游戏应用`
@@ -44,24 +26,10 @@ bash install-skills.sh
 
 ## 依赖环境
 
-> 安装脚本会自动处理以下依赖，通常无需手动安装。
-
 | 依赖 | 版本要求 | 用途 |
 |------|----------|------|
-| Git | 任意版本 | 克隆仓库、安装 Skills |
-| Node.js | ≥ 16 | yida-publish、yida-create-* 系列脚本 |
-| Python | ≥ 3.10 | yida-login、yida-logout |
-| Playwright | latest | 登录态管理 |
+| Node.js | ≥ 16 | yidacli 运行环境 |
 
-### CLI 工具（可选）
-
-如需在任意目录使用 `openyida` / `yida` 命令（如 `openyida doctor` 检查环境），可通过 npm 全局安装：
-
-```bash
-npm install -g openyida
-```
-
-> 💡 `login`、`publish` 等依赖 Skills 的命令，仍需在克隆的项目目录下运行。
 ---
 
 ## DEMO 展示
@@ -94,7 +62,7 @@ AI 生成灯谜图片，用户猜答案，猜错了有 AI 幽默提示。
 
 ---
 
-## 常用问法([yida-skills](https://github.com/openyida/yida-skills))
+## 常用问法([openyida-skills](https://github.com/openyida/openyida-skills))
 
 1. 帮我搭建一个 xxx 应用
 2. 根据需求文档生成应用
@@ -106,18 +74,35 @@ AI 生成灯谜图片，用户猜答案，猜错了有 AI 幽默提示。
 8. 重新登录
 9. 退出登录
 
----
+## 项目架构
 
-## OpenClaw / Claude Code
-
-通过 [yida-app](https://clawhub.ai/nicky1108/yida-app) 在 OpenClaw / Claude Code 中使用。
-
-安装：
-```bash
-npx clawhub@latest install nicky1108/yida-app
 ```
-
----
+openyida/
+├── openyida-skills/      # AI Skills 定义
+│   ├── SKILL.md          # 总入口技能（宜搭 AI 应用开发指南）
+│   ├── skills/           # 子技能目录
+│   │   ├── yida-login/         # 登录态管理
+│   │   ├── yida-logout/        # 退出登录
+│   │   ├── yida-create-app/    # 创建应用
+│   │   ├── yida-create-page/   # 创建自定义页面
+│   │   ├── yida-create-form-page/ # 创建/更新表单
+│   │   ├── yida-get-schema/    # 获取表单 Schema
+│   │   ├── yida-custom-page/   # 自定义页面代码规范
+│   │   ├── yida-publish-page/  # 发布页面
+│   │   └── yida-page-config/   # 页面访问配置
+│   └── reference/        # API 参考文档
+├── openyida-cli/         # CLI 工具源码（npm 包 yidacli）
+│   ├── src/              # 核心逻辑
+│   ├── bin/              # 可执行入口
+│   ├── scripts/          # 构建 / 发布脚本
+│   └── tests/            # 单元测试
+├── openyida/             # 用户工作区（运行时生成）
+│   ├── pages/src/        # 自定义页面源码
+│   ├── pages/dist/       # 编译产物（自动生成）
+│   ├── prd/              # 需求文档
+│   └── .cache/           # 登录态 & Schema 缓存
+└── package.json          # 根包（openyida / yida 命令入口）
+```
 
 ## OpenYida 社区
 
