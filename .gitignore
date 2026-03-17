@@ -29,6 +29,7 @@ yida-cli/tests/coverage/
 # 登录态 & Schema 缓存（敏感信息，不入库）
 openyida/.cache/*
 !openyida/.cache/.gitkeep
+!openyida/.cache/demo-*
 
 # 自定义页面编译产物
 openyida/pages/dist/*
