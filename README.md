@@ -2,15 +2,21 @@
 
 ### 第一步：安装技能
 
-目前还未发布到市场，先手动下载 yida-skills.zip，然后：
+**目前 skills 还未发布到市场，先手动下载 yida-skills.zip，然后：**
 
-悟空 (Wukong): 直接上传技能，选择 yida-skills.zip
-OpenCode: 手动解压到 ~/.opencode/skills/
-Claude Code: 手动解压到 ~/.claudecode/skills/
-Cursor: 手动解压到 ~/.cursor/skills/
-Qoder: 手动解压到 ~/.qoder/skills/
-iFlow: 手动解压到 ~/.iflow/skills/
-Aone Copilot: 手动解压到 ~/.aone-copilot/skills/
+* 悟空 (Wukong): 直接上传技能，选择 yida-skills.zip
+
+* OpenCode: 手动解压到 ~/.opencode/skills/
+
+* Claude Code: 手动解压到 ~/.claudecode/skills/
+
+* Cursor: 手动解压到 ~/.cursor/skills/
+
+* Qoder: 手动解压到 ~/.qoder/skills/
+
+* iFlow: 手动解压到 ~/.iflow/skills/
+
+* Aone Copilot: 手动解压到 ~/.aone-copilot/skills/
 
 ### 第二步：使用
 
