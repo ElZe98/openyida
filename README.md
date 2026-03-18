@@ -1,38 +1,38 @@
 ## 快速开始
 
-### 第一步：安装技能
+```bash
+npm install -g openyida
+```
 
-**下载技能包**：[yida-skills.zip](https://github.com/openyida/yida-skills/releases/download/v1.0.0/yida-skills.zip)
+**安装即用，零配置。** 安装后在 Claude Code / OpenCode / Aone Copilot 中直接对话：
 
-**安装方式**：
-
-- **悟空 (Wukong)**：直接上传技能，选择下载的 yida-skills.zip
-
-- **OpenCode**：解压到 `~/.opencode/skills/`
-
-- **Claude Code**：解压到 `~/.claudecode/skills/`
-
-* Cursor: 手动解压到 ~/.cursor/skills/
-
-* Qoder: 手动解压到 ~/.qoder/skills/
-
-* iFlow: 手动解压到 ~/.iflow/skills/
-
-* Aone Copilot: 手动解压到 ~/.aone-copilot/skills/
-
-### 第二步：使用
-
-**1. 悟空**
-
-直接对话即可：
-
-- `帮我创建一个访客系统应用`
-- `帮我搭建一个生日祝福小游戏应用`
+- `帮我用宜搭创建一个 IPD 系统，需要管理芯片生产全流程`
+- `帮我搭建一个 CRM`
 - `帮我搭建个人薪资计算器应用`
 
-**2. 其他 AI 编程工具**
+---
 
-在任意地方创建一个空文件夹，用 AI 编程工具打开该文件夹，开始对话即可。
+## 支持的 AI 编程工具
+
+- [Claude Code](https://claude.ai/code)
+- [OpenCode](https://opencode.ai)
+- [Aone Copilot](https://copilot.code.alibaba-inc.com)
+- [Cursor](https://cursor.com/)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- 悟空
+
+---
+
+## 与其他 AI 搭建平台的区别
+
+| 维度 | OpenYida | 其他 AI 搭建平台 |
+|------|----------|------------------|
+| 目标用户 | 开发者（懂代码的人） | 业务人员（非开发者） |
+| 交互方式 | 自然语言 + AI 对话 | 可视化拖拽 + 配置面板 |
+| 产出物 | 宜搭应用（可二次编辑，支持完备低代码能力） | 配置（黑盒运行） |
+| 部署方式 | 宜搭平台 | SaaS 平台绑定 |
+| AI 模型 | 按需选择，选择最适合的模型 | 平台指定，无法更换 |
+| 安全合规 | 宜搭具备完善的安全和合规能力 | 依赖平台能力（纯代码应用需重新审查） |
 
 ---
 
@@ -40,8 +40,25 @@
 
 | 依赖 | 版本要求 | 用途 |
 |------|----------|------|
-| Node.js | ≥ 16 | yidacli 运行环境 |
+| Node.js | ≥ 16 | CLI 运行、页面发布 |
+| Python | ≥ 3.10 | 登录态管理（扫码登录） |
+| Playwright | latest | 浏览器自动化 |
 
+### CLI 命令一览
+
+```bash
+openyida login            # 扫码登录宜搭
+openyida logout           # 退出登录
+openyida create-app       # 创建宜搭应用
+openyida create-page      # 创建自定义页面
+openyida create-form      # 创建表单页面
+openyida publish          # 发布页面
+openyida get-schema       # 获取表单 Schema
+openyida config           # 查看/校验/回滚配置
+openyida doctor           # 检查环境依赖
+openyida completion       # 输出 shell 自动补全脚本
+openyida shell            # 进入交互式 REPL 模式
+```
 ---
 
 ## DEMO 展示
@@ -76,8 +93,6 @@ AI 生成灯谜图片，用户猜答案，猜错了有 AI 幽默提示。
 
 ## 常用问法
 
-> 技能定义详见 [openyida-skills](https://github.com/openyida/openyida-skills) 仓库
-
 1. 帮我搭建一个 xxx 应用
 2. 根据需求文档生成应用
 3. 帮我创建一个 xxx 表单页面
@@ -88,22 +103,18 @@ AI 生成灯谜图片，用户猜答案，猜错了有 AI 幽默提示。
 8. 重新登录
 9. 退出登录
 
-## 项目架构
+---
 
+## OpenClaw
+
+通过 [yida-app](https://clawhub.ai/nicky1108/yida-app) 在 OpenClaw 中使用。
+
+安装：
+```bash
+npx clawhub@latest install nicky1108/yida-app
 ```
-openyida/
-├── yida-cli/         # CLI 工具源码（npm 包 @openyida/yidacli）
-│   ├── src/              # 核心逻辑
-│   ├── bin/              # 可执行入口
-│   ├── scripts/          # 构建 / 发布脚本
-│   └── tests/            # 单元测试
-├── openyida/             # 用户工作区（运行时生成）
-│   ├── pages/src/        # 自定义页面源码
-│   ├── pages/dist/       # 编译产物（自动生成）
-│   ├── prd/              # 需求文档
-│   └── .cache/           # 登录态 & Schema 缓存
-└── package.json          # 根包（openyida / yida 命令入口）
-```
+
+---
 
 ## OpenYida 社区
 
@@ -117,7 +128,7 @@ openyida/
 
 ### 贡献者
 <p align="left">
-  <a href="https://github.com/yize"><img src="https://avatars.githubusercontent.com/u/1011681?v=4&s=48" width="48" height="48" alt="yize" title="yize"/></a> <a href="https://github.com/alex-mm"><img src="https://avatars.githubusercontent.com/u/3302053?v=4&s=48" width="48" height="48" alt="alex-mm" title="alex-mm"/></a> <a href="https://github.com/nicky1108"><img src="https://avatars.githubusercontent.com/u/4279283?v=4&s=48" width="48" height="48" alt="nicky1108" title="nicky1108"/></a>
+  <a href="https://github.com/yize"><img src="https://avatars.githubusercontent.com/u/1578814?v=4&s=48" width="48" height="48" alt="yize" title="yize"/></a> <a href="https://github.com/alex-mm"><img src="https://avatars.githubusercontent.com/u/3302053?v=4&s=48" width="48" height="48" alt="alex-mm" title="alex-mm"/></a> <a href="https://github.com/nicky1108"><img src="https://avatars.githubusercontent.com/u/4279283?v=4&s=48" width="48" height="48" alt="nicky1108" title="nicky1108"/></a>
 </p>
 
 ## License
