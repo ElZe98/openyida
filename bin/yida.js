@@ -8,7 +8,7 @@
  * 命令列表：
  *   openyida env                                        检测当前 AI 工具环境和登录态
  *   openyida copy [--force]                             复制 project 工作目录到当前 AI 工具环境
- *   openyida login                                      登录态管理
+ *   openyida login [--qr]                               登录态管理（--qr 使用终端二维码扫码）
  *   openyida logout                                     退出登录
  *   openyida create-app "<名称>" [desc] [icon] [color]  创建应用
  *   openyida create-page <appType> "<页面名>"            创建自定义页面
@@ -142,6 +142,10 @@ async function main() {
       if (args[0] === '--check-only') {
         const result = checkLoginOnly();
         console.log(JSON.stringify(result, null, 2));
+      } else if (args[0] === '--qr') {
+        const { qrLogin } = require('../lib/qr-login');
+        const result = await qrLogin();
+        console.log(JSON.stringify(result));
       } else {
         const result = ensureLogin();
         console.log(JSON.stringify(result));
