@@ -1,6 +1,6 @@
 {
   "name": "openyida",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.0",
   "description": "OpenYida CLI - 宜搭低代码 AI 开发工具（安装即用，零配置）",
   "bin": {
     "openyida": "./bin/yida.js",
@@ -8,7 +8,9 @@
   },
   "files": [
     "bin/",
-    "skills/",
+    "lib/",
+    "project/",
+    "yida-skills/",
     "scripts/",
     "config.json",
     "README.md",
@@ -17,15 +19,15 @@
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "postinstall": "node scripts/postinstall.js",
-    "prepublishOnly": "node scripts/prepublish.js",
-    "postpublish": "node scripts/postpublish.js"
+    "postinstall": "node scripts/postinstall.js"
   },
   "keywords": ["yida", "aliwork", "dingtalk", "cli", "openyida", "low-code", "ai"],
   "author": "OpenYida Contributors",
   "license": "MIT",
   "dependencies": {
-    "commander": "^12.0.0"
+    "@babel/standalone": "^7.15.1",
+    "playwright": "^1.40.0",
+    "uglify-js": "^3.19.3"
   },
   "devDependencies": {
     "jest": "^29.0.0"

@@ -19,7 +19,6 @@ npm install -g openyida
 - [Aone Copilot](https://copilot.code.alibaba-inc.com)
 - [Cursor](https://cursor.com/)
 - [Visual Studio Code](https://code.visualstudio.com/)
-- 悟空
 
 ---
 
@@ -41,24 +40,25 @@ npm install -g openyida
 | 依赖 | 版本要求 | 用途 |
 |------|----------|------|
 | Node.js | ≥ 16 | CLI 运行、页面发布 |
-| Python | ≥ 3.10 | 登录态管理（扫码登录） |
-| Playwright | latest | 浏览器自动化 |
 
 ### CLI 命令一览
 
 ```bash
-openyida login            # 扫码登录宜搭
-openyida logout           # 退出登录
-openyida create-app       # 创建宜搭应用
-openyida create-page      # 创建自定义页面
-openyida create-form      # 创建表单页面
-openyida publish          # 发布页面
-openyida get-schema       # 获取表单 Schema
-openyida config           # 查看/校验/回滚配置
-openyida doctor           # 检查环境依赖
-openyida completion       # 输出 shell 自动补全脚本
-openyida shell            # 进入交互式 REPL 模式
+openyida env                  # 检测当前 AI 工具环境和登录态
+openyida login                # 登录宜搭（优先缓存，否则扫码）
+openyida logout               # 退出登录 / 切换账号
+openyida copy                 # 初始化 project 工作目录到当前 AI 工具环境
+openyida create-app           # 创建宜搭应用
+openyida create-page          # 创建自定义展示页面
+openyida create-form          # 创建 / 更新表单页面
+openyida get-schema           # 获取表单 Schema
+openyida publish              # 编译并发布自定义页面
+openyida verify-short-url     # 验证短链接 URL 是否可用
+openyida save-share-config    # 保存公开访问 / 分享配置
+openyida get-page-config      # 查询页面公开访问 / 分享配置
+openyida update-form-config   # 更新表单配置
 ```
+
 ---
 
 ## DEMO 展示

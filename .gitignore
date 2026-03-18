@@ -19,12 +19,6 @@ package-lock.json
 # AI 工具配置（保留 CLAUDE.md）
 .claude/*
 !.claude/CLAUDE.md
-
-# ── yida-cli 构建产物 ──────────────────────────────
-yida-cli/dist/
-yida-cli/node_modules/
-yida-cli/tests/coverage/
-
 # ── openyida 用户工作区 ────────────────────────────
 # 登录态 & Schema 缓存（敏感信息，不入库）
 openyida/.cache/*
