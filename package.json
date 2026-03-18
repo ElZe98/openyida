@@ -20,7 +20,7 @@
     "test:coverage": "jest --coverage",
     "postinstall": "node scripts/postinstall.js"
   },
-  "keywords": ["yida", "aliwork", "dingtalk", "cli", "openyida", "low-code", "ai"],
+  "keywords": ["yida", "aliwork", "dingtalk", "cli", "openyida", "low-code", "ai", "qoder", "wukong"],
   "author": "OpenYida Contributors",
   "license": "MIT",
   "dependencies": {

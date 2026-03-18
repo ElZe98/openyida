@@ -19,6 +19,8 @@ npm install -g openyida
 - [Aone Copilot](https://copilot.code.alibaba-inc.com)
 - [Cursor](https://cursor.com/)
 - [Visual Studio Code](https://code.visualstudio.com/)
+- [Qoder](https://qoder.com)
+- [悟空](https://dingtalk.com/wukong)
 
 ---
 
