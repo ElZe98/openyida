@@ -28,6 +28,7 @@
   "dependencies": {
     "@babel/standalone": "^7.15.1",
     "playwright": "^1.40.0",
+    "qrcode": "^1.5.4",
     "uglify-js": "^3.19.3"
   },
   "devDependencies": {
