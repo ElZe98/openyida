@@ -186,6 +186,10 @@ this.utils.yida.saveFormData({
 
 **描述**：更新表单中指定组件值
 
+**后端 API 路径**：`POST /dingtalk/web/{appType}/v1/form/updateFormData.json`
+
+> ⚠️ **注意**：请勿使用错误路径 `/query/form/updateFormData.json`，该路径会返回错误。
+
 **参数**：
 
 | 参数名 | 类型 | 是否必填 | 描述 | 示例 |
