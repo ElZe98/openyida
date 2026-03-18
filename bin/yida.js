@@ -10,6 +10,12 @@
  *   openyida copy [--force]                             复制 project 工作目录到当前 AI 工具环境
  *   openyida login [--qr]                               登录态管理（--qr 使用终端二维码扫码）
  *   openyida logout                                     退出登录
+ *   openyida auth status                                查看当前登录状态
+ *   openyida auth login                                 执行登录
+ *   openyida auth refresh                               刷新登录态
+ *   openyida auth logout                                退出登录
+ *   openyida org list                                   列出可访问的组织
+ *   openyida org switch --corp-id <corpId>              切换组织（无需重新登录）
  *   openyida create-app "<名称>" [desc] [icon] [color]  创建应用
  *   openyida create-page <appType> "<页面名>"            创建自定义页面
  *   openyida create-form create <appType> "<表单名>" <字段JSON>  创建表单页面
@@ -156,6 +162,62 @@ async function main() {
     case 'logout': {
       const { logout } = require('../lib/login');
       logout();
+      break;
+    }
+
+    case 'auth': {
+      const subCommand = args[0];
+      const { authStatus, authLogin, authRefresh, authLogout } = require('../lib/auth');
+
+      if (subCommand === 'status') {
+        authStatus();
+      } else if (subCommand === 'login') {
+        authLogin({ type: 'qrcode' });
+      } else if (subCommand === 'refresh') {
+        authRefresh();
+      } else if (subCommand === 'logout') {
+        authLogout();
+      } else {
+        console.error(t('cli.auth_usage'));
+        console.error(t('cli.auth_example'));
+        process.exit(1);
+      }
+      break;
+    }
+
+    case 'org': {
+      const subCommand = args[0];
+      const { listOrganizations, switchOrganization, interactiveSwitch } = require('../lib/org');
+      const { loadCookieData } = require('../lib/utils');
+
+      if (subCommand === 'list') {
+        const cookieData = loadCookieData();
+        if (!cookieData || !cookieData.cookies) {
+          console.error(t('org.no_login'));
+          process.exit(1);
+        }
+        await listOrganizations(cookieData);
+      } else if (subCommand === 'switch') {
+        const cookieData = loadCookieData();
+        if (!cookieData || !cookieData.cookies) {
+          console.error(t('org.no_login'));
+          process.exit(1);
+        }
+
+        // 解析 --corp-id 参数
+        const corpIdIndex = args.indexOf('--corp-id');
+        if (corpIdIndex !== -1 && args[corpIdIndex + 1]) {
+          const targetCorpId = args[corpIdIndex + 1];
+          await switchOrganization(targetCorpId, cookieData);
+        } else {
+          // 交互式选择
+          await interactiveSwitch(cookieData);
+        }
+      } else {
+        console.error(t('cli.org_usage'));
+        console.error(t('cli.org_example'));
+        process.exit(1);
+      }
       break;
     }
 
