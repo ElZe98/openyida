@@ -259,15 +259,20 @@ describe("detectActiveTool", () => {
     delete process.env.IFLOW_IDE;
     delete process.env.AGENT_WORK_ROOT;
     process.env.TERM_PROGRAM = "vscode";
-    const hasAoneCopilot = fs.existsSync(path.join(os.homedir(), ".aone_copilot"));
+    
+    // 模拟 .aone_copilot 目录存在（CI 环境可能没有）
+    const originalExistsSync = fs.existsSync;
+    fs.existsSync = (p) => {
+      if (p.includes(".aone_copilot")) return true;
+      return originalExistsSync(p);
+    };
+    
     const result = detectActiveTool();
-    if (hasAoneCopilot) {
-      expect(result).not.toBeNull();
-      expect(result.tool).toBe("aone-copilot");
-    } else {
-      // 本机没有 .aone_copilot 目录，无法检测到 Aone Copilot
-      expect(result).toBeNull();
-    }
+    expect(result).not.toBeNull();
+    expect(result.tool).toBe("aone-copilot");
+    
+    // 恢复 fs.existsSync
+    fs.existsSync = originalExistsSync;
   });
 
   test("无任何 AI 工具环境变量时返回 null", () => {
@@ -280,7 +285,18 @@ describe("detectActiveTool", () => {
     delete process.env.IFLOW_IDE;
     delete process.env.AGENT_WORK_ROOT;
     delete process.env.TERM_PROGRAM;
+    
+    // 确保 .aone_copilot 目录不存在（避免干扰）
+    const originalExistsSync = fs.existsSync;
+    fs.existsSync = (p) => {
+      if (p.includes(".aone_copilot")) return false;
+      return originalExistsSync(p);
+    };
+    
     const result = detectActiveTool();
     expect(result).toBeNull();
+    
+    // 恢复 fs.existsSync
+    fs.existsSync = originalExistsSync;
   });
 });
