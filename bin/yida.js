@@ -266,6 +266,24 @@ async function main() {
       break;
     }
 
+    case 'cdn-config': {
+      const { run: runCdnConfig } = require('../lib/cdn-config-cmd');
+      await runCdnConfig(args);
+      break;
+    }
+
+    case 'cdn-upload': {
+      const { run: runCdnUpload } = require('../lib/cdn-upload');
+      await runCdnUpload(args);
+      break;
+    }
+
+    case 'cdn-refresh': {
+      const { run: runCdnRefresh } = require('../lib/cdn-refresh');
+      await runCdnRefresh(args);
+      break;
+    }
+
     default: {
       console.error(t('cli.unknown_command', command));
       console.error(t('cli.run_help'));

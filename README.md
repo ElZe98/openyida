@@ -83,6 +83,9 @@ openyida verify-short-url     # 验证短链接 URL 是否可用
 openyida save-share-config    # 保存公开访问 / 分享配置
 openyida get-page-config      # 查询页面公开访问 / 分享配置
 openyida update-form-config   # 更新表单配置
+openyida cdn-config           # 配置 CDN 图片上传（阿里云 OSS + CDN）
+openyida cdn-upload           # 上传图片到 CDN
+openyida cdn-refresh          # 刷新 CDN 缓存
 ```
 
 ---
