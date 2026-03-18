@@ -80,8 +80,81 @@ openyida - 宜搭命令行工具
 `);
 }
 
+/**
+ * 检测是否首次运行（安装后第一次执行 openyida 命令）。
+ * 通过 ~/.openyida/first-run-done 标记文件判断。
+ * 若是首次运行，打印新手引导并写入标记文件。
+ */
+function handleFirstRunGuide() {
+  const os = require('os');
+  const path = require('path');
+  const fs = require('fs');
+
+  const OPENYIDA_DIR = path.join(os.homedir(), '.openyida');
+  const FIRST_RUN_FLAG = path.join(OPENYIDA_DIR, 'first-run-done');
+
+  // 已运行过，跳过引导
+  if (fs.existsSync(FIRST_RUN_FLAG)) return;
+
+  // 写入标记，避免重复展示
+  try {
+    fs.mkdirSync(OPENYIDA_DIR, { recursive: true });
+    fs.writeFileSync(FIRST_RUN_FLAG, new Date().toISOString(), 'utf8');
+  } catch {
+    // 写入失败不影响主流程
+  }
+
+  const RESET   = '\x1b[0m';
+  const BOLD    = '\x1b[1m';
+  const DIM     = '\x1b[2m';
+  const CYAN    = '\x1b[36m';
+  const GREEN   = '\x1b[32m';
+  const YELLOW  = '\x1b[33m';
+  const BLUE    = '\x1b[34m';
+  const MAGENTA = '\x1b[35m';
+  const BG_CYAN = '\x1b[46m';
+  const WHITE   = '\x1b[37m';
+
+  const SEP = `${DIM}${'─'.repeat(60)}${RESET}`;
+
+  console.log('');
+  console.log(`${BG_CYAN}${WHITE}${BOLD}  🤖 OpenYida - AI 问答模式已开启！                         ${RESET}`);
+  console.log(SEP);
+  console.log(`  ${GREEN}${BOLD}欢迎首次使用 OpenYida！${RESET} 以下是快速上手指南：`);
+  console.log('');
+  console.log(`${BOLD}${CYAN}  📝 方式一：直接描述需求${RESET}`);
+  console.log(`  在 AI 工具对话框中，直接告诉 AI 你想要什么：`);
+  console.log('');
+  console.log(`  ${YELLOW}「帮我用宜搭创建一个考勤管理系统」${RESET}`);
+  console.log(`  ${YELLOW}「创建一个 CRM 客户管理系统」${RESET}`);
+  console.log(`  ${YELLOW}「帮我搭建个人薪资计算器应用」${RESET}`);
+  console.log('');
+  console.log(`${BOLD}${CYAN}  💡 方式二：指定详细需求${RESET}`);
+  console.log('');
+  console.log(`  ${YELLOW}「创建一个员工入职流程，包含基本信息填写、部门审批、HR 备案」${RESET}`);
+  console.log('');
+  console.log(`${BOLD}${CYAN}  📋 示例应用${RESET}`);
+  console.log('');
+  console.log(`  ${MAGENTA}•${RESET} 薪资计算器    ${MAGENTA}•${RESET} 生日祝福小程序    ${MAGENTA}•${RESET} 企业宣传页`);
+  console.log('');
+  console.log(SEP);
+  console.log(`${BOLD}${BLUE}  🔧 首次使用建议${RESET}`);
+  console.log('');
+  console.log(`  1. 运行 ${CYAN}openyida env${RESET}   检测环境和登录态`);
+  console.log(`  2. 运行 ${CYAN}openyida login${RESET} 登录宜搭账号`);
+  console.log(`  3. 在 AI 工具中直接对话，描述你想要的应用 🚀`);
+  console.log('');
+  console.log(SEP);
+  console.log(`  ${DIM}支持的 AI 工具：Claude Code / Aone Copilot / Cursor / OpenCode${RESET}`);
+  console.log(`  ${DIM}📚 文档：https://github.com/openyida/openyida${RESET}`);
+  console.log('');
+  console.log(`  ${DIM}（此引导仅首次运行时显示，运行 openyida --help 查看所有命令）${RESET}`);
+  console.log('');
+}
+
 async function main() {
   if (!command || command === '--help' || command === '-h') {
+    handleFirstRunGuide();
     printHelp();
     process.exit(0);
   }
