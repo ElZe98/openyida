@@ -28,6 +28,7 @@
 
 const { checkUpdate } = require('../lib/check-update');
 const { version: currentVersion } = require('../package.json');
+const { t } = require('../lib/i18n');
 
 // 异步检查更新，fire-and-forget，不阻塞主流程
 const updateCheckPromise = checkUpdate(currentVersion);
@@ -36,48 +37,7 @@ const command = process.argv[2];
 const args = process.argv.slice(3);
 
 function printHelp() {
-  console.log(`
-openyida - 宜搭命令行工具
-
-用法：
-  openyida <命令> [参数...]（别名：yida）
-
-命令：
-  env                                                          检测当前 AI 工具环境和登录态
-  copy [--force]                                               复制 project 工作目录到当前 AI 工具环境
-  login                                                        登录态管理（优先缓存，否则扫码）
-  logout                                                       退出登录 / 切换账号
-  create-app "<名称>" [描述] [图标] [颜色]                      创建应用，输出 appType
-  create-page <appType> "<页面名>"                             创建自定义页面，输出 pageId
-  create-form create <appType> "<表单名>" <字段JSON>            创建表单页面
-  create-form update <appType> <formUuid> <修改JSON>           更新表单页面
-  get-schema <appType> <formUuid>                              获取表单 Schema
-  publish <源文件路径> <appType> <formUuid>                    编译并发布自定义页面
-  verify-short-url <appType> <formUuid> <url>                  验证短链接 URL 是否可用
-  save-share-config <appType> <formUuid> <url> <isOpen> [auth] 保存公开访问/分享配置
-  get-page-config <appType> <formUuid>                         查询页面公开访问/分享配置
-  update-form-config <appType> <formUuid> <isRenderNav> <title> 更新表单配置
-  export <appType> [output]                                    导出应用所有表单 Schema（生成迁移包）
-  import <file> [name]                                         导入迁移包，在目标环境重建应用
-
-示例：
-  openyida login
-  openyida logout
-  openyida create-app "考勤管理"
-  openyida create-page APP_XXX "游戏主页"
-  openyida create-form create APP_XXX "员工信息" fields.json
-  openyida create-form update APP_XXX FORM-XXX '[{"action":"add","field":{"type":"TextField","label":"备注"}}]'
-  openyida get-schema APP_XXX FORM-XXX
-  openyida publish pages/src/home.jsx APP_XXX FORM-XXX
-  openyida verify-short-url APP_XXX FORM-XXX /o/myapp
-  openyida save-share-config APP_XXX FORM-XXX /o/myapp y n
-  openyida get-page-config APP_XXX FORM-XXX
-  openyida update-form-config APP_XXX FORM-XXX false "页面标题"
-  openyida export APP_XXX
-  openyida export APP_XXX ./my-app-backup.json
-  openyida import ./yida-export.json
-  openyida import ./yida-export.json "质量追溯系统（生产环境）"
-`);
+  console.log(t('cli.help'));
 }
 
 /**
@@ -118,37 +78,37 @@ function handleFirstRunGuide() {
   const SEP = `${DIM}${'─'.repeat(60)}${RESET}`;
 
   console.log('');
-  console.log(`${BG_CYAN}${WHITE}${BOLD}  🤖 OpenYida - AI 问答模式已开启！                         ${RESET}`);
+  console.log(`${BG_CYAN}${WHITE}${BOLD}${t('cli.first_run_title')}${RESET}`);
   console.log(SEP);
-  console.log(`  ${GREEN}${BOLD}欢迎首次使用 OpenYida！${RESET} 以下是快速上手指南：`);
+  console.log(t('cli.first_run_welcome', `${GREEN}${BOLD}`, RESET));
   console.log('');
-  console.log(`${BOLD}${CYAN}  📝 方式一：直接描述需求${RESET}`);
-  console.log(`  在 AI 工具对话框中，直接告诉 AI 你想要什么：`);
+  console.log(`${BOLD}${CYAN}${t('cli.first_run_way1_title')}${RESET}`);
+  console.log(t('cli.first_run_way1_desc'));
   console.log('');
-  console.log(`  ${YELLOW}「帮我用宜搭创建一个考勤管理系统」${RESET}`);
-  console.log(`  ${YELLOW}「创建一个 CRM 客户管理系统」${RESET}`);
-  console.log(`  ${YELLOW}「帮我搭建个人薪资计算器应用」${RESET}`);
+  console.log(`  ${YELLOW}${t('cli.first_run_prompt1')}${RESET}`);
+  console.log(`  ${YELLOW}${t('cli.first_run_prompt2')}${RESET}`);
+  console.log(`  ${YELLOW}${t('cli.first_run_prompt3')}${RESET}`);
   console.log('');
-  console.log(`${BOLD}${CYAN}  💡 方式二：指定详细需求${RESET}`);
+  console.log(`${BOLD}${CYAN}${t('cli.first_run_way2_title')}${RESET}`);
   console.log('');
-  console.log(`  ${YELLOW}「创建一个员工入职流程，包含基本信息填写、部门审批、HR 备案」${RESET}`);
+  console.log(`  ${YELLOW}${t('cli.first_run_prompt4')}${RESET}`);
   console.log('');
-  console.log(`${BOLD}${CYAN}  📋 示例应用${RESET}`);
+  console.log(`${BOLD}${CYAN}${t('cli.first_run_examples_title')}${RESET}`);
   console.log('');
-  console.log(`  ${MAGENTA}•${RESET} 薪资计算器    ${MAGENTA}•${RESET} 生日祝福小程序    ${MAGENTA}•${RESET} 企业宣传页`);
-  console.log('');
-  console.log(SEP);
-  console.log(`${BOLD}${BLUE}  🔧 首次使用建议${RESET}`);
-  console.log('');
-  console.log(`  1. 运行 ${CYAN}openyida env${RESET}   检测环境和登录态`);
-  console.log(`  2. 运行 ${CYAN}openyida login${RESET} 登录宜搭账号`);
-  console.log(`  3. 在 AI 工具中直接对话，描述你想要的应用 🚀`);
+  console.log(`  ${MAGENTA}•${RESET} ${t('cli.first_run_examples')}`);
   console.log('');
   console.log(SEP);
-  console.log(`  ${DIM}支持的 AI 工具：Claude Code / Aone Copilot / Cursor / OpenCode${RESET}`);
-  console.log(`  ${DIM}📚 文档：https://github.com/openyida/openyida${RESET}`);
+  console.log(`${BOLD}${BLUE}${t('cli.first_run_tips_title')}${RESET}`);
   console.log('');
-  console.log(`  ${DIM}（此引导仅首次运行时显示，运行 openyida --help 查看所有命令）${RESET}`);
+  console.log(t('cli.first_run_tip1', CYAN, RESET));
+  console.log(t('cli.first_run_tip2', CYAN, RESET));
+  console.log(t('cli.first_run_tip3'));
+  console.log('');
+  console.log(SEP);
+  console.log(`  ${DIM}${t('cli.first_run_footer1')}${RESET}`);
+  console.log(`  ${DIM}${t('cli.first_run_footer2')}${RESET}`);
+  console.log('');
+  console.log(`  ${DIM}${t('cli.first_run_footer3')}${RESET}`);
   console.log('');
 }
 
@@ -224,8 +184,8 @@ async function main() {
       // 参数顺序：<源文件路径> <appType> <formUuid>
       // publish.js 内部读取顺序：argv[2]=appType, argv[3]=formUuid, argv[4]=sourceFile
       if (args.length < 3) {
-        console.error('用法: openyida publish <源文件路径> <appType> <formUuid>');
-        console.error('示例: openyida publish pages/src/home.jsx APP_XXX FORM-XXX');
+        console.error(t('cli.publish_usage'));
+        console.error(t('cli.publish_example'));
         process.exit(1);
       }
       const [sourceFile, appType, formUuid] = args;
@@ -236,8 +196,8 @@ async function main() {
 
     case 'verify-short-url': {
       if (args.length < 3) {
-        console.error('用法: openyida verify-short-url <appType> <formUuid> <url>');
-        console.error('示例: openyida verify-short-url APP_XXX FORM-XXX /o/myapp');
+        console.error(t('cli.verify_usage'));
+        console.error(t('cli.verify_example'));
         process.exit(1);
       }
       process.argv = [process.argv[0], process.argv[1], ...args];
@@ -247,8 +207,8 @@ async function main() {
 
     case 'save-share-config': {
       if (args.length < 4) {
-        console.error('用法: openyida save-share-config <appType> <formUuid> <url> <isOpen> [openAuth]');
-        console.error('示例: openyida save-share-config APP_XXX FORM-XXX /o/myapp y n');
+        console.error(t('cli.share_usage'));
+        console.error(t('cli.share_example'));
         process.exit(1);
       }
       process.argv = [process.argv[0], process.argv[1], ...args];
@@ -258,8 +218,8 @@ async function main() {
 
     case 'get-page-config': {
       if (args.length < 2) {
-        console.error('用法: openyida get-page-config <appType> <formUuid>');
-        console.error('示例: openyida get-page-config APP_XXX FORM-XXX');
+        console.error(t('cli.page_config_usage'));
+        console.error(t('cli.page_config_example'));
         process.exit(1);
       }
       process.argv = [process.argv[0], process.argv[1], ...args];
@@ -269,8 +229,8 @@ async function main() {
 
     case 'update-form-config': {
       if (args.length < 4) {
-        console.error('用法: openyida update-form-config <appType> <formUuid> <isRenderNav> <title>');
-        console.error('示例: openyida update-form-config APP_XXX FORM-XXX false "页面标题"');
+        console.error(t('cli.form_config_usage'));
+        console.error(t('cli.form_config_example'));
         process.exit(1);
       }
       process.argv = [process.argv[0], process.argv[1], ...args];
@@ -280,9 +240,9 @@ async function main() {
 
     case 'export': {
       if (args.length < 1) {
-        console.error('用法: openyida export <appType> [output]');
-        console.error('示例: openyida export APP_XXX');
-        console.error('      openyida export APP_XXX ./my-app-backup.json');
+        console.error(t('cli.export_usage'));
+        console.error(t('cli.export_example1'));
+        console.error(t('cli.export_example2'));
         process.exit(1);
       }
       const { run: runExport } = require('../lib/export-app');
@@ -292,9 +252,9 @@ async function main() {
 
     case 'import': {
       if (args.length < 1) {
-        console.error('用法: openyida import <file> [name]');
-        console.error('示例: openyida import ./yida-export.json');
-        console.error('      openyida import ./yida-export.json "质量追溯系统（生产环境）"');
+        console.error(t('cli.import_usage'));
+        console.error(t('cli.import_example1'));
+        console.error(t('cli.import_example2'));
         process.exit(1);
       }
       const { run: runImport } = require('../lib/import-app');
@@ -303,8 +263,8 @@ async function main() {
     }
 
     default: {
-      console.error(`未知命令: ${command}`);
-      console.error('运行 openyida --help 查看帮助');
+      console.error(t('cli.unknown_command', command));
+      console.error(t('cli.run_help'));
       process.exit(1);
     }
   }
@@ -313,7 +273,7 @@ async function main() {
 main()
   .then(() => updateCheckPromise)
   .catch((err) => {
-    console.error(`\n❌ 执行失败: ${err.message}`);
+    console.error(t('cli.exec_failed', err.message));
     process.exit(1);
   });
 
