@@ -55,7 +55,7 @@ jobs:
           npm install -g openyida
           ```
 
-          安装后即可在 Claude Code / OpenCode / Aone Copilot / Cursor 中直接使用，零配置。
+          安装后即可在 Claude Code / OpenCode / Aone Copilot / Cursor / Qoder / 悟空 中直接使用，零配置。
 
           ## yida-skills 技能包
 
