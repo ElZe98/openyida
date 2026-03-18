@@ -98,8 +98,9 @@ function detectActiveTool() {
   
   // 优先级2：兜底检测
   
-  // Aone Copilot - 通过 TERM_PROGRAM 检测（VSCode 环境）
-  if (env.TERM_PROGRAM === "vscode") {
+  // Aone Copilot - 通过专属配置目录检测（VSCode 环境）
+  // Aone Copilot 没有独立的环境变量，但会在 home 目录创建 ~/.aone_copilot/
+  if (env.TERM_PROGRAM === "vscode" && fs.existsSync(path.join(home, ".aone_copilot"))) {
     return {
       tool: "aone-copilot",
       displayName: "Aone Copilot",

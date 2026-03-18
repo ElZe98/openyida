@@ -142,7 +142,10 @@ function run() {
 
   // ── 登录态检测 ─────────────────────────────────────
   console.log("\n🔐 登录态检测");
-  const projectRoot = activeProjectRoot || process.cwd();
+  // 修复：检查 activeProjectRoot 是否存在，与 login.js 的 findProjectRoot() 行为保持一致
+  const projectRoot = (activeProjectRoot && fs.existsSync(activeProjectRoot))
+    ? activeProjectRoot
+    : process.cwd();
   const loginStatus = detectLoginStatus(projectRoot);
 
   if (loginStatus.loggedIn) {
