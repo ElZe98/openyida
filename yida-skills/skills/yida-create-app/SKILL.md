@@ -42,10 +42,10 @@ openyida create-app "考勤管理"
 ```
 
 ### 示例 2：完整参数
-**场景**：创建带描述和图标的应用
+**场景**：创建带描述、图标和主题色的应用
 **命令**：
 ```bash
-openyida create-app "考勤管理" "员工考勤打卡系统" "xian-daka" "#00B853"
+openyida create-app "考勤管理" "员工考勤打卡系统" "xian-daka" "#00B853" "red"
 ```
 
 ## 使用方式
