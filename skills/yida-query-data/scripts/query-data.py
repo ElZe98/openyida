@@ -29,28 +29,82 @@ from urllib import parse, request, error
 from subprocess import run
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-# 技能路径: openyida/.claude/skills/skills/yida-query-data/scripts/
-# openyida 目录: SCRIPT_DIR/../../../
-OPENYIDA_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, "..", "..", "..", ".."))
-PROJECT_ROOT = os.path.dirname(OPENYIDA_DIR)
 
-if os.path.exists(os.path.join(OPENYIDA_DIR, ".cache", "cookies.json")):
-    COOKIE_FILE = os.path.join(OPENYIDA_DIR, ".cache", "cookies.json")
-else:
-    COOKIE_FILE = os.path.join(PROJECT_ROOT, ".cache", "cookies.json")
+# 动态查找项目根目录（包含 .cache 或 config.json 的目录）
+def find_project_root():
+    """从当前目录向上查找项目根目录"""
+    cwd = os.getcwd()
+    current = cwd
+    while current != "/":
+        if os.path.exists(os.path.join(current, ".cache")) or os.path.exists(os.path.join(current, "config.json")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    return cwd
 
-CONFIG_FILE = os.path.join(PROJECT_ROOT, "config.json")
+PROJECT_ROOT = find_project_root()
+
+# 动态查找 Cookie 文件
+def find_cookie_file():
+    """查找 Cookie 文件（优先级：项目根目录 > 当前工作目录 > 用户目录）"""
+    # 1. 项目根目录 .cache/
+    project_cookie = os.path.join(PROJECT_ROOT, ".cache", "cookies.json")
+    if os.path.exists(project_cookie):
+        return project_cookie
+    
+    # 2. 当前工作目录 .cache/
+    cwd_cookie = os.path.join(os.getcwd(), ".cache", "cookies.json")
+    if os.path.exists(cwd_cookie):
+        return cwd_cookie
+    
+    # 3. 用户目录 ~/.config/openyida/
+    home_cookie = os.path.expanduser("~/.config/openyida/cookies.json")
+    if os.path.exists(home_cookie):
+        return home_cookie
+    
+    # 默认返回项目根目录路径
+    return project_cookie
+
+COOKIE_FILE = find_cookie_file()
+
+# 动态查找 config.json
+def find_config_file():
+    """查找配置文件"""
+    project_config = os.path.join(PROJECT_ROOT, "config.json")
+    if os.path.exists(project_config):
+        return project_config
+    return os.path.join(os.getcwd(), "config.json")
+
+CONFIG_FILE = find_config_file()
 
 
-def find_login_script():
-    # 登录脚本在 openyida/.claude/skills/skills/yida-login/scripts/login.py
-    path = os.path.join(OPENYIDA_DIR, ".claude", "skills", "skills", "yida-login", "scripts", "login.py")
-    if os.path.exists(path):
-        return path
+def find_openyida_cli():
+    """查找 openyida CLI 工具"""
+    # 1. 检查全局安装的 openyida
+    try:
+        import shutil
+        global_path = shutil.which("openyida")
+        if global_path:
+            return global_path
+    except:
+        pass
+    
+    # 2. 检查项目内的 node_modules/.bin/openyida
+    npm_path = os.path.join(PROJECT_ROOT, "node_modules", ".bin", "openyida")
+    if os.path.exists(npm_path):
+        return npm_path
+    
+    # 3. 检查 bin/yida.js
+    bin_path = os.path.join(PROJECT_ROOT, "bin", "yida.js")
+    if os.path.exists(bin_path):
+        return bin_path
+    
     return None
 
 
-LOGIN_SCRIPT = find_login_script()
+OPENYIDA_CLI = find_openyida_cli()
 
 
 def load_config():
@@ -90,13 +144,22 @@ def extract_csrf_token(cookies):
 
 
 def trigger_login():
-    print("\n🔐 登录态失效，正在调用 login.py 重新登录...\n", file=sys.stderr)
-    if not LOGIN_SCRIPT or not os.path.exists(LOGIN_SCRIPT):
-        print(f"  ❌ 登录脚本不存在", file=sys.stderr)
+    """调用 openyida login 进行登录"""
+    print("\n🔐 登录态失效，正在调用 openyida login 重新登录...\n", file=sys.stderr)
+    
+    if not OPENYIDA_CLI:
+        print(f"  ❌ 未找到 openyida CLI 工具", file=sys.stderr)
+        print(f"  请确保已安装 openyida: npm install -g openyida", file=sys.stderr)
         sys.exit(1)
 
+    # 使用 openyida login 命令
+    if OPENYIDA_CLI.endswith('.js'):
+        cmd = ["node", OPENYIDA_CLI, "login"]
+    else:
+        cmd = [OPENYIDA_CLI, "login"]
+    
     result = run(
-        ["python3", LOGIN_SCRIPT],
+        cmd,
         capture_output=True,
         text=True,
         timeout=180,
@@ -106,16 +169,17 @@ def trigger_login():
         print(f"  ❌ 登录失败：{result.stderr}", file=sys.stderr)
         sys.exit(1)
 
-    lines = result.stdout.strip().split("\n")
-    json_line = lines[-1]
-    try:
-        login_result = json.loads(json_line)
-        if not login_result.get("cookies"):
-            raise ValueError("登录结果缺少 cookies")
-        return login_result
-    except Exception as e:
-        print(f"  ❌ 解析登录结果失败：{e}", file=sys.stderr)
+    print("  ✅ 登录成功，重新加载 Cookie...", file=sys.stderr)
+    
+    # 重新加载 Cookie
+    global COOKIE_FILE
+    COOKIE_FILE = find_cookie_file()
+    cookie_data = load_cookie_data()
+    if not cookie_data or not cookie_data.get("cookies"):
+        print(f"  ❌ 登录后无法加载 Cookie", file=sys.stderr)
         sys.exit(1)
+    
+    return cookie_data
 
 
 def ensure_login():

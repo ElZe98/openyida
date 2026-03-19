@@ -48,7 +48,7 @@ python3 yida-query-data/scripts/query-data.py <appType> <formUuid> [options]
 | `formUuid` | 是 | 表单 UUID | `FORM-E7E63583C4C143AE95F8C218D443B6CAC157` |
 | `--page` | 否 | 当前页码，默认 1 | `1` |
 | `--size` | 否 | 每页记录数，默认 20，最大 100 | `20` |
-| `--search-json` | 否 | 搜索条件 JSON 字符串 | `'{"textField_xxx": "值"}'` |
+| `--search-json` | 否 | 搜索条件 JSON 数组字符串 | `'[{"key":"fieldId","value":"值","type":"TEXT","operator":"eq","componentName":"TextField"}]'` |
 | `--inst-id` | 否 | 实例 ID（查询详情时使用） | `FINST-XXX` |
 
 ### 使用示例
@@ -71,10 +71,17 @@ python3 yida-query-data/scripts/query-data.py \
 
 #### 示例 3：条件搜索
 ```bash
+# 单行文本精确匹配
 python3 yida-query-data/scripts/query-data.py \
   "APP_CQ2P5NRFI5L1D6PB8Q7J" \
   "FORM-E7E63583C4C143AE95F8C218D443B6CAC157" \
-  --search-json '{"textField_w2805e7u": "测试2"}'
+  --search-json '[{"key":"textField_w2805e7u","value":"测试2","type":"TEXT","operator":"eq","componentName":"TextField"}]'
+
+# 数值范围查询
+python3 yida-query-data/scripts/query-data.py \
+  "APP_CQ2P5NRFI5L1D6PB8Q7J" \
+  "FORM-E7E63583C4C143AE95F8C218D443B6CAC157" \
+  --search-json '[{"key":"numberField_xxx","value":[10,100],"type":"DOUBLE","operator":"between","componentName":"NumberField"}]'
 ```
 
 #### 示例 4：查询指定实例详情
@@ -159,13 +166,13 @@ yida-query-data/
 
 ## 与其他技能配合
 
-- **登录管理**：自动调用 `yida-login` 技能获取/刷新登录态
-- **表单设计**：使用 `yida-get-schema` 技能获取表单字段 ID
-- **数据更新**：使用 `yida-save-data` 技能（需另行实现）
+- **登录管理**：自动调用 `openyida login` 命令获取/刷新登录态
+- **表单设计**：使用 `openyida get-schema` 命令获取表单字段 ID
+- **数据更新**：使用 `openyida create-form` 命令
 
 ## 注意事项
 
-1. **Cookie 位置**：脚本优先从 `openyida/.cache/cookies.json` 读取 Cookie
+1. **Cookie 位置**：脚本自动查找 Cookie 文件（优先级：项目根目录 `.cache/` > 当前工作目录 `.cache/` > 用户目录 `~/.config/openyida/`）
 2. **CSRF Token**：自动从 Cookie 的 `tianshu_csrf_token` 字段提取
 3. **时间戳**：每次请求自动生成当前时间的毫秒时间戳
 4. **分页说明**：

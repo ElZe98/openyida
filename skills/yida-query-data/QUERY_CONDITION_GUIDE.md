@@ -237,7 +237,7 @@ int(time.mktime(time.strptime("2024-01-01", "%Y-%m-%d"))) * 1000
 
 ### 示例 1：简单查询
 ```bash
-python3 query-data.py \
+python3 scripts/query-data.py \
   "APP_CQ2P5NRFI5L1D6PB8Q7J" \
   "FORM-035536EBA11447158458DFF86E7867E7WIW0" \
   --search-json '[{"key":"textField_wduvybsi","value":"A","type":"TEXT","operator":"eq","componentName":"TextField"}]'
@@ -245,7 +245,7 @@ python3 query-data.py \
 
 ### 示例 2：数值范围查询
 ```bash
-python3 query-data.py \
+python3 scripts/query-data.py \
   "APP_XXX" \
   "FORM_XXX" \
   --search-json '[{"key":"numberField_xxx","value":[10,100],"type":"DOUBLE","operator":"between","componentName":"NumberField"}]'
@@ -253,7 +253,7 @@ python3 query-data.py \
 
 ### 示例 3：日期范围查询
 ```bash
-python3 query-data.py \
+python3 scripts/query-data.py \
   "APP_XXX" \
   "FORM_XXX" \
   --search-json '[{"key":"dateField_xxx","value":[1704067200000,1706745600000],"type":"DOUBLE","operator":"between","componentName":"DateField"}]'
@@ -261,7 +261,7 @@ python3 query-data.py \
 
 ### 示例 4：多条件组合查询
 ```bash
-python3 query-data.py \
+python3 scripts/query-data.py \
   "APP_XXX" \
   "FORM_XXX" \
   --search-json '[{"key":"textField_xxx","value":"A","type":"TEXT","operator":"eq","componentName":"TextField"},{"key":"numberField_xxx","value":10,"type":"DOUBLE","operator":"gt","componentName":"NumberField"},{"key":"dateField_xxx","value":1704067200000,"type":"DOUBLE","operator":"gt","componentName":"DateField"}]'
@@ -283,14 +283,12 @@ python3 query-data.py \
 ## 如何获取字段 ID
 
 1. 在宜搭表单设计器中查看字段属性
-2. 使用 `yida-get-schema` 技能获取表单结构
+2. 使用 `openyida get-schema` 命令获取表单结构
 3. 查看已有数据的 formData 字段名
 
 ```bash
 # 获取表单 Schema
-node .claude/skills/skills/yida-get-schema/scripts/get-schema.js \
-  "APP_XXX" \
-  "FORM_XXX"
+openyida get-schema "APP_XXX" "FORM_XXX"
 ```
 
 ---
