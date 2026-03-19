@@ -87,6 +87,9 @@ openyida - 宜搭命令行工具
   openyida save-share-config APP_XXX FORM-XXX /o/myapp y n
   openyida get-page-config APP_XXX FORM-XXX
   openyida update-form-config APP_XXX FORM-XXX false "页面标题"
+  openyida configure-process APP_XXX FORM-YYY process-def.json
+  openyida create-process APP_XXX "订单处理表" fields.json process-def.json
+  openyida create-process APP_XXX --formUuid FORM-YYY process-def.json
   openyida doctor                                 完整诊断
   openyida doctor --fix                           诊断并自动修复
   openyida doctor --production --app APP_XXX      线上应用诊断

@@ -145,6 +145,8 @@ openyida copy
               ↓
 [Step 4]（按需）创建/更新表单 → openyida create-form → 获得 formUuid（表单）
               ↓
+[Step 4.5]（按需）配置流程 → openyida configure-process / create-process
+              ↓
 [Step 5] 编写自定义页面代码 → yida-custom-page 规范 → pages/src/<项目名>.js
               ↓
 [Step 6] 发布页面 → openyida publish
