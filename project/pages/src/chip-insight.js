@@ -41,7 +41,7 @@ export function forceUpdate() {
 export function didMount() {
   var self = this;
   // 加载 ECharts 5.5.1
-  this.utils.loadScript('https://g.alicdn.com/code/lib/echarts/5.5.1/echarts.min.js').then(function() {
+  this.utils.loadScript('https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js').then(function() {
     _customState.echartsLoaded = true;
     self.initCharts();
   }).catch(function(err) {
