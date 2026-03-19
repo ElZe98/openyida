@@ -18,7 +18,7 @@
  *   openyida org switch --corp-id <corpId>              切换组织（无需重新登录）
  *   openyida create-app "<名称>" [desc] [icon] [color]  创建应用
  *   openyida create-page <appType> "<页面名>"            创建自定义页面
- *   openyida create-form create <appType> "<表单名>" <字段JSON>  创建表单页面
+ *   openyida create-form create <appType> "<表单名>" <字段JSON> [--layout <布局>] [--theme <主题>] [--label-align <对齐>]  创建表单页面
  *   openyida create-form update <appType> <formUuid> <修改JSON>  更新表单页面
  *   openyida get-schema <appType> <formUuid>            获取表单 Schema
  *   openyida publish <源文件路径> <appType> <formUuid>   编译并发布自定义页面
@@ -57,7 +57,7 @@ openyida - 宜搭命令行工具
   logout                                                       退出登录 / 切换账号
   create-app "<名称>" [描述] [图标] [颜色]                      创建应用，输出 appType
   create-page <appType> "<页面名>"                             创建自定义页面，输出 pageId
-  create-form create <appType> "<表单名>" <字段JSON>            创建表单页面
+  create-form create <appType> "<表单名>" <字段JSON> [--layout <布局>] [--theme <主题>] [--label-align <对齐>]  创建表单页面
   create-form update <appType> <formUuid> <修改JSON>           更新表单页面
   get-schema <appType> <formUuid>                              获取表单 Schema
   publish <源文件路径> <appType> <formUuid>                    编译并发布自定义页面

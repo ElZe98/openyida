@@ -48,17 +48,30 @@ openyida create-form create <appType> <formTitle> <fieldsJsonOrFile>
 | `appType` | 是 | 应用 ID，如 `APP_XXX` |
 | `formTitle` | 是 | 表单名称 |
 | `fieldsJsonOrFile` | 是 | 字段定义，支持两种格式：JSON 字符串（以 `[` 开头）或 JSON 文件路径 |
-
-**示例（JSON 字符串，推荐）**：
+#### 示例 1：创建简单表单
 
 ```bash
-openyida create-form create "APP_XXX" "用户信息表" '[{"type":"TextField","label":"姓名","required":true},{"type":"SelectField","label":"部门","dataSource":[{"text":{"zh_CN":"技术部","en_US":"技术部","type":"i18n"},"value":"技术部","sid":"serial_xxx","disable":false,"defaultChecked":false},{"text":{"zh_CN":"产品部","en_US":"产品部","type":"i18n"},"value":"产品部","sid":"serial_xxx","disable":false,"defaultChecked":false}]}]'
-```
-**示例（JSON 文件）**：
-```bash
-openyida create-form create "APP_xxx" "用户信息表" .cache/user-info-fields.json
+openyida create-form create "APP_CQ2P5NRFI5L1D6PB8Q7J" "员工信息登记" fields.json
 ```
 
+#### 示例 2：创建双列表单
+
+```bash
+openyida create-form create "APP_CQ2P5NRFI5L1D6PB8Q7J" "员工信息登记" fields.json --layout double
+```
+
+#### 示例 3：创建卡片式分组表单
+
+```bash
+# fields.json 中包含 group 字段分组
+openyida create-form create "APP_CQ2P5NRFI5L1D6PB8Q7J" "员工信息登记" fields.json --layout card --theme comfortable
+```
+
+#### 示例 4：创建紧凑主题、左对齐标签的表单
+
+```bash
+openyida create-form create "APP_CQ2P5NRFI5L1D6PB8Q7J" "员工信息登记" fields.json --layout double --theme compact --label-align left
+```
 **输出**：日志输出到 stderr，JSON 结果输出到 stdout：
 
 ```json
