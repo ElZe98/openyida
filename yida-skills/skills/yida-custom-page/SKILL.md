@@ -79,7 +79,7 @@ openyida publish pages/src/my-page.js APP_XXX FORM-XXX
 
 在 `renderJsx` 顶部定义语义色彩对象，全页复用：
 
-**其中 primary primaryHover  hover active disabled primaryLight，宜搭环境中已经有对应的变量了，默认使用我给的变量即可**
+> **主色说明**：宜搭平台已内置品牌色 CSS 变量，主色相关 token 直接使用平台变量，无需硬编码色值，可随平台主题自动适配。
 
 ```javascript
 export function renderJsx() {
