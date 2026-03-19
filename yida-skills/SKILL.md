@@ -1,5 +1,5 @@
 ---
-name: Yida
+name: yida
 description: >
   宜搭 AI 应用开发总入口技能。通过有 AI Coding 能力的智能体（悟空/Claude/Open Code 等）+ 宜搭低代码平台，实现一句话生成完整应用。
   包含应用创建、表单设计、自定义页面开发、页面发布、登录态管理等完整开发流程。
