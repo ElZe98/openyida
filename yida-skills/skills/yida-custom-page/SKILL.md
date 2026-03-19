@@ -567,17 +567,6 @@ openyida publish <源文件路径> <appType> <formUuid>
 | **YouTube Audio Library** | https://studio.youtube.com/channel/music | 音乐/音效丰富 | 部分曲目需署名，自动化前先过滤许可条件 |
 | **Freesound** | https://freesound.org | 音效资源极丰富 | CC 协议多样，务必自动识别 License 并在 UI 中展示 |
 
-### AI 自动取素材的落地建议
-
-1. **优先使用有官方 API 的站点**（Unsplash / Pexels / Pixabay），避免爬虫方式导致不稳定
-2. **把许可信息当成一等数据**：至少保存以下字段，AI 生成页面时自动生成署名区块：
-   - `source`（来源站点）
-   - `author`（作者）
-   - `license`（许可证类型）
-   - `requiredAttribution`（是否需要署名）
-   - `sourceUrl`（原始链接）
-3. **做多源兜底**：同一关键词并行查 2-3 个库，失败自动切换；对外链下载做缓存
-
 ### Icon 素材库
 
 > 优先使用 npm 包本地化方案，比在线拉取更稳定、更快。
@@ -593,8 +582,23 @@ openyida publish <源文件路径> <appType> <formUuid>
 | **Tabler Icons** | https://tabler.io/icons | 开源、数量大、线性风格统一，适合产品级"图标一致性"诉求 | ✅ npm 包 |
 | **Feather Icons** | https://feathericons.com | 开源、极简线性，适合轻量产品与工具页 | ✅ npm 包 |
 
-**AI 自动取 Icon 的实践建议：**
+---
 
-1. **优先 npm 包本地化**：Font Awesome / Material / Remix / Bootstrap / Tabler / Heroicons 均支持，比在线拉取更稳更快
-2. **准备语义→图标名映射表**：例如 `search → magnifying-glass`、`settings → gear`，避免模型随机挑选导致风格混乱
-3. **统一输出 SVG 格式**：便于调色、缩放、暗黑模式适配，并在构建时打包进产物
+### AI 自动获取素材的通用建议
+
+> 适用于图片、音频、Icon 等所有类型素材的自动化获取。
+
+**稳定性**
+- **图片/音频**：优先使用有官方 API 的站点（Unsplash / Pexels / Pixabay / Freesound），避免爬虫方式
+- **Icon**：优先 npm 包本地化（Font Awesome / Material / Remix / Bootstrap / Tabler / Heroicons），比在线拉取更稳更快
+- **多源兜底**：同一关键词并行查 2-3 个库，失败自动切换；对外链下载做本地缓存
+
+**合规性**
+- **把许可信息当成一等数据**：至少保存以下字段，AI 生成页面时自动生成署名区块：
+  - `source`（来源站点）、`author`（作者）、`license`（许可证类型）
+  - `requiredAttribution`（是否需要署名）、`sourceUrl`（原始链接）
+- Wikimedia Commons / Freesound / FMA 等站点授权类型多样，务必自动识别 License 并在 UI 中展示
+
+**一致性**
+- **Icon**：准备"语义→图标名"映射表（如 `search → magnifying-glass`、`settings → gear`），避免模型随机挑选导致风格混乱
+- **Icon**：统一输出 SVG 格式，便于调色、缩放、暗黑模式适配，并在构建时打包进产物
