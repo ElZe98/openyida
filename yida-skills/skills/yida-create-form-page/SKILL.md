@@ -552,6 +552,52 @@ yida-create-form-page/
 - 建议在重要修改前先通过 `get-schema` 技能查看当前 Schema 结构
 - 脚本兼容旧的 create 模式调用方式（不带 `create` 前缀），但推荐使用新的显式模式参数
 
+## 已知问题与修复记录（lib/create-form.js）
+
+以下是 `lib/create-form.js` 中已发现并修复的关键 bug，修改代码时需注意避免回退：
+
+### Bug 1：utils.js 引入不完整
+
+**问题**：`require("./utils")` 缺少 `isLoginExpired` 和 `isCsrfTokenExpired` 的引入，但 `sendPostRequest`、`sendGetRequest`、`sendUpdateConfigRequest` 中使用了这两个函数，导致运行时报 `ReferenceError`。
+
+**修复**：确保 `require("./utils")` 的解构中包含所有使用到的函数：
+
+```javascript
+const {
+  findProjectRoot, loadCookieData, triggerLogin,
+  refreshCsrfToken, resolveBaseUrl,
+  isLoginExpired, isCsrfTokenExpired  // ← 这两个不能遗漏
+} = require("./utils");
+```
+
+**教训**：修改 `lib/create-form.js` 时，如果新增了对 `utils.js` 中函数的调用，必须同步更新顶部的 `require` 解构。
+
+### Bug 2：generateFieldId 在快速循环中可能生成重复 ID
+
+**问题**：`generateFieldId` 仅使用 `Date.now()` + 随机数生成 fieldId，在快速循环（如批量创建字段）中，`Date.now()` 返回相同的时间戳，随机数碰撞概率高，导致宜搭报「组件 ID 不允许重复」错误。
+
+**修复**：引入模块级递增计数器，确保即使时间戳相同，ID 也不会重复：
+
+```javascript
+let _fieldIdCounter = 0;
+function generateFieldId(prefix) {
+  _fieldIdCounter++;
+  return prefix + Date.now().toString(36).slice(-4)
+    + _fieldIdCounter.toString(36)
+    + Math.random().toString(36).slice(-4);
+}
+```
+
+**教训**：任何生成唯一 ID 的函数，都不能仅依赖时间戳 + 随机数，必须加入递增计数器。
+
+### Bug 3：buildFormSchema 中 FormContainer 重复嵌套
+
+**问题**：`buildFormSchema` 函数中，字段组件先被包裹在一个 `FormContainer` 中，然后整个结构又被外层再次包裹了一个 `FormContainer`，导致两层 `FormContainer` 使用了相同的组件 ID，宜搭报「组件 ID 不允许重复」错误。
+
+**修复**：确保 `buildFormSchema` 中只有一层 `FormContainer` 包裹字段组件，不要重复嵌套。
+
+**教训**：修改 Schema 构建逻辑时，注意检查组件树的层级结构，避免同一类型容器组件的重复嵌套。可通过单元测试验证 Schema 中不存在重复的组件 ID。
+
 
 ## 其他 yida-api 参考路径
 
