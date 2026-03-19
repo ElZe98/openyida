@@ -79,19 +79,17 @@ openyida publish pages/src/my-page.js APP_XXX FORM-XXX
 
 在 `renderJsx` 顶部定义语义色彩对象，全页复用：
 
-其中 primary primaryHover  hover active disabled primaryLight，宜搭环境中已经有对应的变量了，默认使用我给的变量即可。
+**其中 primary primaryHover  hover active disabled primaryLight，宜搭环境中已经有对应的变量了，默认使用我给的变量即可**
 
 ```javascript
 export function renderJsx() {
   var colors = {
-    // 主色
-    primary:        '--color-brand1-6',  // 
-    primaryHover:   '--color-brand1-1', 
-    hover:  '--color-brand1-9',  //
-    active:   '--color-brand1-9',  //
-    disabled:       '--color-brand1-8',
-    primaryLight:   '--color-brand1-2',  // 主色浅背景
-    
+    primary:      'var(--color-brand1-6)',  // 主色（品牌蓝），用于主操作按钮、链接、选中态高亮
+    primaryHover: 'var(--color-brand1-1)',  // 主色悬停态，鼠标 hover 时的按钮/链接颜色
+    hover:        'var(--color-brand1-9)',  // 通用悬停背景色，用于列表行 hover、菜单项 hover
+    active:       'var(--color-brand1-9)',  // 通用激活/按下态，点击时的视觉反馈
+    disabled:     'var(--color-brand1-8)',  // 禁用态颜色，用于不可操作的按钮、控件
+    primaryLight: 'var(--color-brand1-2)',  // 主色浅背景，用于选中行底色、标签高亮背景    
 
     // 语义色
     success:        '#52C41A',
