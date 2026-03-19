@@ -282,7 +282,7 @@ describe("EnvironmentChecker", () => {
     expect(results.every((r) => r.id && r.label)).toBe(true);
 
     cleanupTempDir(tmpDir);
-  });
+  }, 15000); // 增加超时时间，因为包含网络检查
 });
 
 // ── ApplicationChecker ────────────────────────────────
@@ -551,7 +551,7 @@ describe("PreChecker", () => {
     expect(envResults.length).toBe(result.results.length);
 
     cleanupTempDir(tmpDir);
-  });
+  }, 15000); // 增加超时时间，因为包含网络检查
 });
 
 // ── HealthMonitor ─────────────────────────────────────
