@@ -1,0 +1,29 @@
+# Development & CI
+.github/
+.editorconfig
+.eslintrc.json
+.gitattributes
+tests/
+scripts/validate-*.js
+scripts/validate-*.sh
+
+# Documentation (included via package.json "files")
+AGENTS.md
+CLAUDE.md
+CONTRIBUTING.md
+SECURITY.md
+CHANGELOG.md
+
+# Project artifacts (user-generated, not needed in npm package)
+project/.cache/
+project/pages/dist/
+project/pages/src/*.js
+!project/pages/src/demo-*
+project/prd/*.md
+!project/prd/demo-*
+
+# Misc
+.DS_Store
+*.swp
+*.dia~
+npm-debug.log*
