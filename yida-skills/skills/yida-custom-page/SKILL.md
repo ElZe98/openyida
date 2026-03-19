@@ -558,6 +558,27 @@ this.forceUpdate();
 | `didMount()` | 页面 DOM 加载渲染完毕 | 初始化数据加载、启动定时器、绑定事件 |
 | `didUnmount()` | 页面节点从 DOM 移除 | 清理 `setInterval` / `setTimeout`、解绑事件 |
 
+### 清除平台默认样式
+
+宜搭平台会为 `.vc-deep-container-entry` 注入 `margin: 20px 0 !important` 等默认样式，导致自定义页面出现不必要的 padding/margin。`openyida publish` 发布时已自动注入覆盖 CSS，但由于平台 CSS 加载顺序可能在注入 CSS 之后，部分情况下仍有残留。
+
+**推荐方案**：在 `didMount` 中通过动态 `<style>` 标签注入覆盖样式，确保在所有平台 CSS 之后生效：
+
+```javascript
+export function didMount() {
+  // 注入覆盖样式（确保在平台 CSS 之后生效）
+  var styleTag = document.createElement('style');
+  styleTag.textContent = '.vc-deep-container-entry.vc-rootcontent{padding:0!important;margin-top:0!important;margin-right:0!important;margin-bottom:0!important;margin-left:0!important}';
+  document.head.appendChild(styleTag);
+
+  // ... 其他初始化逻辑
+}
+```
+
+> **为什么用展开属性？** 平台的 `margin: 20px 0 !important` 会被浏览器展开为 `margin-top`、`margin-bottom` 等独立属性各自带 `!important`。CSS 规范中展开属性的 `!important` 优先级高于简写属性的 `!important`，因此必须用展开属性逐个覆盖。
+>
+> **为什么用动态 `<style>` 标签？** 比直接操作 DOM 元素的 `style` 属性更优雅，利用 CSS 级联机制通过选择器特异性（`.vc-deep-container-entry.vc-rootcontent` > `.vc-deep-container-entry`）自然胜出，样式归样式、逻辑归逻辑。
+
 ### 全局变量
 
 | 变量 | 类型 | 说明 |

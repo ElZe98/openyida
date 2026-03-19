@@ -74,6 +74,35 @@ node publish.js APP_XXX FORM-XXXXXX pages/src/xxx.js
 4. **发布 Schema**：通过 HTTP POST 调用 `saveFormSchema` 接口保存 Schema；根据响应体 `errorCode` 自动处理异常（详见 `yida-login` 技能文档「错误处理机制」章节）
 5. **更新表单配置**：调用 `updateFormConfig` 接口，设置 `MINI_RESOURCE` 配置为 `8`；同样根据响应体 `errorCode` 自动处理异常
 
+## 自动注入的覆盖样式
+
+发布时，Schema 中会自动注入以下 CSS，用于覆盖宜搭平台的默认样式：
+
+```css
+/* 页面背景色 */
+body { background-color: #f2f3f5; }
+
+/* 重置宜搭平台 CSS 变量（控制内容区 padding/margin） */
+.vc-page-yida-page {
+  --yida-form-content-padding: 0;
+  --yida-form-content-margin: 0;
+  --yida-layout-padding: 0;
+}
+
+/* 覆盖 RootContent 的默认 padding 和 margin */
+.vc-deep-container-entry.vc-rootcontent {
+  padding: 0 !important;
+  margin-top: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+}
+```
+
+> **为什么使用展开属性而非简写？** 宜搭平台有一条 `.vc-deep-container-entry { margin: 20px 0 !important }` 的 CSS 规则，浏览器会将其展开为 `margin-top`、`margin-bottom` 等独立属性并各自带 `!important`。CSS 规范中，当简写属性和展开属性都带 `!important` 时，展开属性优先级更高，因此必须用展开属性逐个覆盖。
+>
+> **CSS 加载顺序问题**：Schema 中注入的 CSS 可能被宜搭平台后加载的 CSS 覆盖。如果仍有残留的 padding/margin，可在页面 `didMount` 中通过动态 `<style>` 标签注入覆盖样式（详见 `yida-custom-page` 技能文档的「清除平台默认样式」章节）。
+
 > **注意**：发布目标地址由 `.cache/cookies.json` 中保存的 `base_url` 决定（即登录后浏览器实际跳转到的域名），而非 `config.json` 中的 `loginUrl`。详见 `yida-login` 技能文档。
 > **注意**：当发布页面碰到组织 corpId 不匹配 或  "您当前未在「xxx」组织内" 时，可以询问是否创建新的应用发布。
 
