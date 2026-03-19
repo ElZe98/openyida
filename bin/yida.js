@@ -26,6 +26,7 @@
  *   openyida save-share-config <appType> <formUuid> <url> <isOpen> [openAuth]  保存公开访问/分享配置
  *   openyida get-page-config <appType> <formUuid>       查询页面公开访问/分享配置
  *   openyida update-form-config <appType> <formUuid> <isRenderNav> <title>  更新表单配置
+ *   openyida doctor [选项]                              检查环境依赖，诊断应用问题
  *   openyida export <appType> [output]                  导出应用所有表单 Schema（生成迁移包）
  *   openyida import <file> [name]                       导入迁移包，在目标环境重建应用
  */
@@ -43,6 +44,58 @@ const command = process.argv[2];
 const args = process.argv.slice(3);
 
 function printHelp() {
+  console.log(`
+openyida - 宜搭命令行工具
+
+用法：
+  openyida <命令> [参数...]（别名：yida）
+
+命令：
+  env                                                          检测当前 AI 工具环境和登录态
+  copy [--force]                                               复制 project 工作目录到当前 AI 工具环境
+  login                                                        登录态管理（优先缓存，否则扫码）
+  logout                                                       退出登录 / 切换账号
+  create-app "<名称>" [描述] [图标] [颜色]                      创建应用，输出 appType
+  create-page <appType> "<页面名>"                             创建自定义页面，输出 pageId
+  create-form create <appType> "<表单名>" <字段JSON>            创建表单页面
+  create-form update <appType> <formUuid> <修改JSON>           更新表单页面
+  get-schema <appType> <formUuid>                              获取表单 Schema
+  publish <源文件路径> <appType> <formUuid>                    编译并发布自定义页面
+  verify-short-url <appType> <formUuid> <url>                  验证短链接 URL 是否可用
+  save-share-config <appType> <formUuid> <url> <isOpen> [auth] 保存公开访问/分享配置
+  get-page-config <appType> <formUuid>                         查询页面公开访问/分享配置
+  update-form-config <appType> <formUuid> <isRenderNav> <title> 更新表单配置
+  doctor [选项]                                                检查环境依赖，诊断应用问题
+    --fix / --repair                                           诊断并自动修复
+    --production --app <appId>                                 线上应用诊断
+    --monitor                                                  启动实时健康度监控
+    --report <format>                                          生成诊断报告（json | markdown | html）
+    --create-ticket                                            根据诊断结果创建工单
+    --create-voc                                               创建 VOC（需求反馈）
+    --auto-submit                                              自动判断并提交工单或 VOC
+
+示例：
+  openyida login
+  openyida logout
+  openyida create-app "考勤管理"
+  openyida create-page APP_XXX "游戏主页"
+  openyida create-form create APP_XXX "员工信息" fields.json
+  openyida create-form update APP_XXX FORM-XXX '[{"action":"add","field":{"type":"TextField","label":"备注"}}]'
+  openyida get-schema APP_XXX FORM-XXX
+  openyida publish pages/src/home.jsx APP_XXX FORM-XXX
+  openyida verify-short-url APP_XXX FORM-XXX /o/myapp
+  openyida save-share-config APP_XXX FORM-XXX /o/myapp y n
+  openyida get-page-config APP_XXX FORM-XXX
+  openyida update-form-config APP_XXX FORM-XXX false "页面标题"
+  openyida doctor                                 完整诊断
+  openyida doctor --fix                           诊断并自动修复
+  openyida doctor --production --app APP_XXX      线上应用诊断
+  openyida doctor --monitor                       实时监控
+  openyida doctor --report markdown               生成 Markdown 报告
+  openyida doctor --create-ticket                 创建工单
+  openyida doctor --create-voc                    创建 VOC
+  openyida doctor --auto-submit                   自动判断并提交
+`);
   console.log(t('cli.help'));
 }
 
@@ -301,6 +354,12 @@ async function main() {
       }
       process.argv = [process.argv[0], process.argv[1], ...args];
       require('../lib/update-form-config');
+      break;
+    }
+
+    case 'doctor': {
+      const { run } = require('../lib/doctor');
+      await run(args);
       break;
     }
 
