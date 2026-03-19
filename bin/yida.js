@@ -20,6 +20,7 @@
  *   openyida save-share-config <appType> <formUuid> <url> <isOpen> [openAuth]  保存公开访问/分享配置
  *   openyida get-page-config <appType> <formUuid>       查询页面公开访问/分享配置
  *   openyida update-form-config <appType> <formUuid> <isRenderNav> <title>  更新表单配置
+ *   openyida doctor [选项]                              检查环境依赖，诊断应用问题
  */
 
 "use strict";
@@ -55,6 +56,14 @@ openyida - 宜搭命令行工具
   save-share-config <appType> <formUuid> <url> <isOpen> [auth] 保存公开访问/分享配置
   get-page-config <appType> <formUuid>                         查询页面公开访问/分享配置
   update-form-config <appType> <formUuid> <isRenderNav> <title> 更新表单配置
+  doctor [选项]                                                检查环境依赖，诊断应用问题
+    --fix / --repair                                           诊断并自动修复
+    --production --app <appId>                                 线上应用诊断
+    --monitor                                                  启动实时健康度监控
+    --report <format>                                          生成诊断报告（json | markdown | html）
+    --create-ticket                                            根据诊断结果创建工单
+    --create-voc                                               创建 VOC（需求反馈）
+    --auto-submit                                              自动判断并提交工单或 VOC
 
 示例：
   openyida login
@@ -69,6 +78,14 @@ openyida - 宜搭命令行工具
   openyida save-share-config APP_XXX FORM-XXX /o/myapp y n
   openyida get-page-config APP_XXX FORM-XXX
   openyida update-form-config APP_XXX FORM-XXX false "页面标题"
+  openyida doctor                                 完整诊断
+  openyida doctor --fix                           诊断并自动修复
+  openyida doctor --production --app APP_XXX      线上应用诊断
+  openyida doctor --monitor                       实时监控
+  openyida doctor --report markdown               生成 Markdown 报告
+  openyida doctor --create-ticket                 创建工单
+  openyida doctor --create-voc                    创建 VOC
+  openyida doctor --auto-submit                   自动判断并提交
 `);
 }
 
@@ -194,6 +211,12 @@ async function main() {
       }
       process.argv = [process.argv[0], process.argv[1], ...args];
       require('../lib/update-form-config');
+      break;
+    }
+
+    case 'doctor': {
+      const { run } = require('../lib/doctor');
+      await run(args);
       break;
     }
 
