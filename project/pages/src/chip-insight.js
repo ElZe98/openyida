@@ -40,7 +40,13 @@ export function forceUpdate() {
 
 export function didMount() {
   var self = this;
-  // 加载 ECharts 5.5.1
+  // 强制清除宜搭平台 RootContent 的默认 padding/margin
+  var rootContent = document.querySelector('.vc-deep-container-entry.vc-rootcontent');
+  if (rootContent) {
+    rootContent.style.setProperty('padding', '0', 'important');
+    rootContent.style.setProperty('margin', '0', 'important');
+  }
+  // 加载 ECharts 5.5.0
   this.utils.loadScript('https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js').then(function() {
     _customState.echartsLoaded = true;
     self.initCharts();
