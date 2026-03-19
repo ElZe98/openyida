@@ -29,6 +29,8 @@
  *   openyida doctor [选项]                              检查环境依赖，诊断应用问题
  *   openyida export <appType> [output]                  导出应用所有表单 Schema（生成迁移包）
  *   openyida import <file> [name]                       导入迁移包，在目标环境重建应用
+ *   openyida get-permission <appType> <formUuid>        查询表单权限配置
+ *   openyida save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]  保存表单权限配置
  */
 
 "use strict";
@@ -73,6 +75,8 @@ openyida - 宜搭命令行工具
     --create-ticket                                            根据诊断结果创建工单
     --create-voc                                               创建 VOC（需求反馈）
     --auto-submit                                              自动判断并提交工单或 VOC
+  get-permission <appType> <formUuid>                          查询表单权限配置
+  save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]  保存表单权限配置
 
 示例：
   openyida login
@@ -384,6 +388,28 @@ async function main() {
       }
       const { run: runImport } = require('../lib/import-app');
       await runImport(args);
+      break;
+    }
+
+    case 'get-permission': {
+      if (args.length < 2) {
+        console.error('用法: openyida get-permission <appType> <formUuid>');
+        console.error('示例: openyida get-permission APP_XXX FORM-XXX');
+        process.exit(1);
+      }
+      const { run: runGetPermission } = require('../lib/get-permission');
+      await runGetPermission(args);
+      break;
+    }
+
+    case 'save-permission': {
+      if (args.length < 2) {
+        console.error('用法: openyida save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]');
+        console.error("示例: openyida save-permission APP_XXX FORM-XXX --data-permission '{\"role\":\"DEFAULT\",\"dataRange\":\"SELF\"}'");
+        process.exit(1);
+      }
+      const { run: runSavePermission } = require('../lib/save-permission');
+      await runSavePermission(args);
       break;
     }
 
