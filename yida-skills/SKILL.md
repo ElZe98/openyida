@@ -174,6 +174,7 @@ openyida copy
 | `yida-publish-page` | `skills/yida-publish-page/SKILL.md` | 编译并发布自定义页面 | `openyida publish <源文件路径> <appType> <formUuid>` |
 | `yida-page-config` | `skills/yida-page-config/SKILL.md` | 页面公开访问/组织内分享配置 | `openyida verify-short-url <appType> <formUuid> <url>` |
 | `yida-form-permission` | `skills/yida-form-permission/SKILL.md` | 表单权限配置（字段/数据/操作权限） | `openyida get-permission <appType> <formUuid>` |
+| `yida-query-data` | `skills/yida-query-data/SKILL.md` | 查询表单实例数据（分页/条件搜索） | `python3 scripts/query-data.py <appType> <formUuid>` |
 
 ---
 
