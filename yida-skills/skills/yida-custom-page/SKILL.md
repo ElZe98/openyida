@@ -79,13 +79,19 @@ openyida publish pages/src/my-page.js APP_XXX FORM-XXX
 
 在 `renderJsx` 顶部定义语义色彩对象，全页复用：
 
+其中 primary primaryHover  hover active disabled primaryLight，宜搭环境中已经有对应的变量了，默认使用我给的变量即可。
+
 ```javascript
 export function renderJsx() {
   var colors = {
     // 主色
-    primary:        '#1677FF',  // 蓝色，操作按钮、链接、高亮
-    primaryHover:   '#0958D9',
-    primaryLight:   '#E6F4FF',  // 主色浅背景
+    primary:        '--color-brand1-6',  // 
+    primaryHover:   '--color-brand1-1', 
+    hover:  '--color-brand1-9',  //
+    active:   '--color-brand1-9',  //
+    disabled:       '--color-brand1-8',
+    primaryLight:   '--color-brand1-2',  // 主色浅背景
+    
 
     // 语义色
     success:        '#52C41A',
@@ -112,6 +118,18 @@ export function renderJsx() {
 ```
 
 > 色彩选取参考阿里 Arco Design 色板，与宜搭平台视觉风格保持一致。
+
+---
+
+### 圆角系统
+
+| 值 | 使用场景 |
+|----|---------|
+| `6px`  | 小型 Badge、标签 |
+| `8px`  | 输入框、开关控件、小头像（< 32px） |
+| `12px` | 下拉菜单背景、小型卡片、菜单项、中头像（32px–48px） |
+| `16px` | 下拉菜单容器、Tooltip、大头像（> 48px） |
+| `24px` | 主要卡片、对话框、按钮、容器区域（强制统一） |
 
 ---
 
