@@ -247,10 +247,13 @@ yida-page-config/
 | --- | --- | --- | --- |
 | `_api` | String | 是 | `Share.saveShareConfig` |
 | `formUuid` | String | 是 | 表单 UUID |
-| `openUrl` | String | 是 | 短链接路径 |
-| `isOpen` | String | 是 | `y` 开启，`n` 关闭 |
-| `openPageAuthConfig` | String | 否 | 权限配置 JSON |
+| `openUrl` | String | 条件必填 | 公开访问路径 `/o/xxx`（与 `shareUrl` 二选一） |
+| `shareUrl` | String | 条件必填 | 组织内分享路径 `/s/xxx`（与 `openUrl` 二选一） |
+| `isOpen` | String | 否 | `y` 开启，`n` 关闭（仅 `openUrl` 模式需要） |
+| `openPageAuthConfig` | String | 否 | 权限配置 JSON（仅 `openUrl` 模式需要） |
 | `_csrf_token` | String | 是 | CSRF Token |
+
+> **注意**：`openUrl` 和 `shareUrl` 不能同时传递。传 `/s/xxx` 时只需传 `shareUrl` 和 `formUuid`，不传 `isOpen` 和 `openPageAuthConfig`，否则 API 会报 `参数校验失败openUrl` 错误。
 
 - **返回值**：`success: true` 表示成功
 

@@ -435,6 +435,48 @@ openyida publish <源文件路径> <appType> <formUuid>
 | **JavaScript 版本** | 使用 ES2015 (ES6) 语法，不能高于 ES2015 版本 |
 | **必须定义 renderJsx 函数** | renderJsx 是宜搭自定义页面核心渲染函数，也是入口函数，必须严格定义，不要改为其他名称 |
 
+### CDN 版本验证（loadScript 使用注意事项）
+
+使用 `this.utils.loadScript(url)` 加载第三方库时，需注意以下要点：
+
+**1. `loadScript` 只接受 URL 字符串参数**
+
+```javascript
+// ✅ 正确：直接传 URL 字符串
+this.utils.loadScript('https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js')
+
+// ❌ 错误：不支持对象形式
+this.utils.loadScript({ src: '...', type: 'css' })
+```
+
+**2. `g.alicdn.com` CDN 版本必须验证**
+
+`g.alicdn.com` 是阿里 CDN 镜像，不是所有 npm 版本都有镜像。使用前**必须通过 `curl` 验证版本是否存在**：
+
+```bash
+# 验证 CDN 上是否存在该版本（200 = 存在，404 = 不存在）
+curl -sI 'https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js' | head -1
+```
+
+**已验证可用的常用库版本**：
+
+| 库 | 可用版本 | CDN URL |
+| --- | --- | --- |
+| ECharts | 5.5.0 | `https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js` |
+| QRCode.js | 1.0.0 | `https://g.alicdn.com/code/lib/qrcodejs/1.0.0/qrcode.min.js` |
+| QRCode | 1.5.1 | `https://g.alicdn.com/code/lib/qrcode/1.5.1/qrcode.min.js` |
+
+> ⚠️ **典型踩坑**：ECharts 5.5.1 在 `g.alicdn.com` 上不存在（404），必须使用 5.5.0。AI 生成代码时容易使用最新版本号，但 CDN 镜像可能未同步，务必先验证。
+
+**3. 备选 CDN**
+
+如果 `g.alicdn.com` 上没有所需版本，可使用以下备选 CDN：
+
+| CDN | URL 格式 | 说明 |
+| --- | --- | --- |
+| jsDelivr | `https://cdn.jsdelivr.net/npm/<包名>@<版本>/<文件>` | 国内可访问，版本齐全 |
+| unpkg | `https://unpkg.com/<包名>@<版本>/<文件>` | 版本齐全，国内较慢 |
+
 ### 文件结构
 
 **一个完整的宜搭自定义页面源文件必须包含：**
