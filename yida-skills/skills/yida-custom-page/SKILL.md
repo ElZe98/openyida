@@ -513,6 +513,120 @@ this.utils.yida.searchFormDatas({
 
 完整参数说明和示例请参考 [yida-api.md](../../reference/yida-api.md) 的「工具类 API」章节。
 
+## 素材资源指南
+
+在自定义页面开发中，经常需要使用图片、音乐/音效、Icon 等素材资源。以下是推荐的素材获取方案，确保素材来源稳定、合规、风格一致。
+
+### 图片素材
+
+| 素材库 | API 可用性 | 授权方式 | 推荐场景 |
+| --- | --- | --- | --- |
+| [Unsplash](https://unsplash.com) | ✅ 提供 REST API | 免费商用，无需署名 | 高质量背景图、Banner、配图 |
+| [Pexels](https://pexels.com) | ✅ 提供 REST API | 免费商用，无需署名 | 人物、场景、商务类配图 |
+| [Pixabay](https://pixabay.com) | ✅ 提供 REST API | 免费商用，无需署名 | 插画、矢量图、通用配图 |
+| [Lorem Picsum](https://picsum.photos) | ✅ URL 直接引用 | 免费 | 开发阶段占位图 |
+
+**使用建议**：
+- 优先使用 Unsplash/Pexels 的 API 按关键词搜索获取高质量配图
+- 开发阶段可使用 Lorem Picsum 占位：`https://picsum.photos/800/400`
+- 生产环境建议将图片上传到 CDN（`openyida cdn-upload`），避免外链不稳定
+
+**代码示例**：
+```javascript
+// 使用 Unsplash 随机图片（按关键词）
+var imageUrl = 'https://source.unsplash.com/800x400/?business,office';
+
+// 使用 Lorem Picsum 占位图
+var placeholderUrl = 'https://picsum.photos/800/400';
+
+// 推荐：上传到 CDN 后使用稳定链接
+var cdnImageUrl = 'https://your-cdn.com/images/banner.jpg';
+```
+
+### 音乐/音效素材
+
+| 素材库 | 授权方式 | 署名要求 | 推荐场景 |
+| --- | --- | --- | --- |
+| [Pixabay Music](https://pixabay.com/music/) | 免费商用 | 无需署名 | 背景音乐、氛围音效 |
+| [Incompetech](https://incompetech.com/music/) | CC BY 4.0 | ⚠️ 需署名作者 Kevin MacLeod | 游戏、活动页背景音乐 |
+| [Freesound](https://freesound.org) | CC0 / CC BY | ⚠️ 部分需署名 | 按钮音效、提示音、环境音 |
+| [Mixkit](https://mixkit.co/free-sound-effects/) | 免费商用 | 无需署名 | 短音效、UI 交互音 |
+
+**使用建议**：
+- 优先使用 Pixabay Music 和 Mixkit（无署名要求）
+- 使用 Incompetech 或 Freesound 的 CC BY 素材时，需在页面底部或关于页面添加署名
+- 音频文件建议上传到 CDN，避免外链失效
+- 注意音频文件大小，移动端建议使用压缩后的 MP3 格式
+
+**署名示例**：
+```javascript
+// 页面底部添加音乐署名（使用 Incompetech 素材时必须）
+<div style={{ fontSize: '12px', color: '#999', textAlign: 'center', padding: '8px' }}>
+  Music: "Wallpaper" by Kevin MacLeod (incompetech.com) — Licensed under CC BY 4.0
+</div>
+```
+
+### Icon 素材
+
+| 图标库 | 使用方式 | 授权方式 | 推荐场景 |
+| --- | --- | --- | --- |
+| [Font Awesome](https://fontawesome.com) | CDN / npm | 免费版 MIT，Pro 版付费 | 通用 UI 图标 |
+| [Material Icons](https://fonts.google.com/icons) | CDN / npm | Apache 2.0 | Material Design 风格 |
+| [Remix Icon](https://remixicon.com) | CDN / npm | Apache 2.0 | 简洁现代风格 |
+| [Lucide](https://lucide.dev) | CDN / npm | ISC | 轻量、可定制 |
+| [Heroicons](https://heroicons.com) | SVG 内联 | MIT | Tailwind 风格 |
+
+**推荐方案 — CDN 引入**：
+
+在宜搭自定义页面中，通过 `this.utils.loadScript` 动态加载图标库 CSS：
+
+```javascript
+export function didMount() {
+  // 加载 Remix Icon（推荐，轻量且免费）
+  this.utils.loadScript({
+    src: 'https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css',
+    type: 'css',
+  });
+}
+
+export function renderJsx() {
+  return (
+    <div>
+      {/* 使用 Remix Icon */}
+      <i className="ri-home-line" style={{ fontSize: '24px', color: '#1890ff' }}></i>
+      <i className="ri-settings-3-line" style={{ fontSize: '24px', color: '#666' }}></i>
+    </div>
+  );
+}
+```
+
+**备选方案 — SVG 内联**：
+
+对于少量图标，可直接使用 SVG 内联，无需加载外部资源：
+
+```javascript
+// SVG 内联图标（无外部依赖，最稳定）
+function renderIcon(iconPath, size, color) {
+  return (
+    <svg width={size || 24} height={size || 24} viewBox="0 0 24 24" fill="none" stroke={color || 'currentColor'} strokeWidth="2">
+      <path d={iconPath} />
+    </svg>
+  );
+}
+```
+
+### 素材使用通用建议
+
+| 维度 | 建议 |
+| --- | --- |
+| **稳定性** | 生产环境的图片/音频应上传到自有 CDN（`openyida cdn-upload`），避免第三方外链失效 |
+| **合规性** | 优先使用无署名要求的素材库（Unsplash、Pexels、Pixabay、Mixkit）；使用 CC BY 素材时必须添加署名 |
+| **一致性** | 同一项目中统一使用一个图标库，避免混用多个图标库导致风格不一致 |
+| **性能** | 图片使用合适尺寸（避免加载 4K 大图）；音频使用压缩格式；图标优先使用 CDN 字体方案 |
+| **离线可用** | 关键素材建议下载到本地并上传 CDN，不依赖第三方服务的可用性 |
+
+---
+
 ## 工具链
 
 | Skill | 说明 | 用法 |
