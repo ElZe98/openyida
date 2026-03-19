@@ -10,7 +10,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/openyida?color=blue)](https://www.npmjs.com/package/openyida)
 [![CI](https://github.com/openyida/openyida/actions/workflows/ci.yml/badge.svg)](https://github.com/openyida/openyida/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Node.js ≥16](https://img.shields.io/badge/node-%3E%3D16-brightgreen)](https://nodejs.org)
+[![Node.js ≥18](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org)
 
 </div>
 
@@ -63,7 +63,7 @@ npm install -g openyida
 
 | 依赖 | 版本要求 | 用途 |
 |------|----------|------|
-| Node.js | ≥ 16 | CLI 运行、页面发布 |
+| Node.js | ≥ 18 | CLI 运行、页面发布 |
 
 ---
 

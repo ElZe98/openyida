@@ -2,21 +2,44 @@ const fs = require('fs');
 const path = require('path');
 
 const requiredDirs = ['bin', 'lib', 'project', 'yida-skills', 'scripts'];
-const requiredFiles = ['bin/yida.js', 'package.json', 'project/config.json'];
+const requiredFiles = [
+  'bin/yida.js',
+  'package.json',
+  'project/config.json',
+  'README.md',
+  'LICENSE',
+  'CONTRIBUTING.md',
+  '.eslintrc.json',
+];
+
+let hasError = false;
 
 for (const dir of requiredDirs) {
   if (!fs.existsSync(dir)) {
     console.error('Missing directory: ' + dir);
-    process.exit(1);
+    hasError = true;
   }
 }
 
 for (const file of requiredFiles) {
   if (!fs.existsSync(file)) {
     console.error('Missing file: ' + file);
-    process.exit(1);
+    hasError = true;
   }
 }
+
+if (hasError) {
+  process.exit(1);
+}
+
+// Validate package.json engines field
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+const nodeEngine = packageJson.engines && packageJson.engines.node;
+if (!nodeEngine) {
+  console.error('package.json missing engines.node field');
+  process.exit(1);
+}
+console.log('engines.node: ' + nodeEngine);
 
 const skillsDir = 'yida-skills/skills';
 if (fs.existsSync(skillsDir)) {

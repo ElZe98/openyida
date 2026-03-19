@@ -7,9 +7,35 @@ on:
     branches: [main]
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install --ignore-scripts
+
+    - name: Validate project structure
+      run: node scripts/validate-structure.js
+
+    - name: Check JavaScript syntax
+      run: |
+        node --check bin/yida.js
+        for f in lib/*.js; do node --check "$f"; done
+        echo "All JS files passed syntax check"
+
   test:
     name: Test (Node ${{ matrix.node-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    needs: lint
     strategy:
       fail-fast: false
       matrix:
@@ -34,23 +60,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'npm'
 
     - name: Install dependencies
       run: npm install --ignore-scripts
 
-    - name: Validate project structure
-      run: node scripts/validate-structure.js
-
-    - name: Check JavaScript syntax
-      run: |
-        node --check bin/yida.js
-        for f in lib/*.js; do node --check "$f"; done
-        echo "All JS files passed syntax check"
-      shell: bash
-
     - name: Run tests
       run: npm test
-
-    - name: Upload coverage report
-      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20'
-      run: npm run test:coverage
