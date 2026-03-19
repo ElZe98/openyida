@@ -17,7 +17,11 @@ done
 echo "All JS files passed syntax check"
 
 echo ""
-echo "=== Step 4: Run tests ==="
+echo "=== Step 4: ESLint ==="
+npm run lint
+
+echo ""
+echo "=== Step 5: Run tests ==="
 npm test
 
 echo ""

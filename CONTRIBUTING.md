@@ -36,7 +36,7 @@ cd openyida
 npm install
 
 # 3. 安装 Playwright（登录功能需要）
-pip install playwright && playwright install chromium
+npx playwright install chromium
 
 # 4. 全局链接，方便本地调试
 npm link
