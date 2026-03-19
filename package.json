@@ -25,6 +25,14 @@
   "keywords": ["yida", "aliwork", "dingtalk", "cli", "openyida", "low-code", "ai", "qoder", "wukong"],
   "author": "OpenYida Contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openyida/openyida.git"
+  },
+  "bugs": {
+    "url": "https://github.com/openyida/openyida/issues"
+  },
+  "homepage": "https://github.com/openyida/openyida#readme",
   "dependencies": {
     "@babel/standalone": "^7.15.1",
     "playwright": "^1.40.0",
