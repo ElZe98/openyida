@@ -542,3 +542,38 @@ openyida publish <源文件路径> <appType> <formUuid>
 输入 JSX 源文件，输出编译压缩后的 `<name>.compile.js`（与源文件同目录）。
 
 ---
+
+## 素材
+
+### 图片素材库
+
+> 以下站点国内均可访问，优先选有官方 API 的站点，避免爬虫方式。
+
+| 站点 | 地址 | 特点 | API |
+|------|------|------|-----|
+| **Unsplash** | https://unsplash.com | 质量高、覆盖广，适合通用配图；支持关键词检索和随机取图 | ✅ 有 |
+| **Pexels** | https://www.pexels.com | 图片+视频均强，检索友好，适合按主题批量拉取 | ✅ 有 |
+| **Pixabay** | https://pixabay.com | 图片/插画/少量视频，品类多，适合"兜底"素材来源 | ✅ 有 |
+| **Wikimedia Commons** | https://commons.wikimedia.org | 海量公共媒体，适合知识类/历史类；授权类型多样，需按条目核对 License | ⚠️ 需核对 |
+| **Openverse** | https://openverse.org | 聚合多站点可商用资源，适合做统一搜索入口；需按结果携带的许可信息落库 | ✅ 有 |
+
+### 音乐/音效素材库
+
+| 站点 | 地址 | 特点 | 注意事项 |
+|------|------|------|---------|
+| **Free Music Archive** | https://freemusicarchive.org | 曲库大，分类清晰 | 授权类型多，需解析并展示许可/署名要求 |
+| **Incompetech** | https://incompetech.com | 经典免版权音乐，授权规则清晰，适合做默认 BGM 库 | 需署名 Kevin MacLeod |
+| **Pixabay Music** | https://pixabay.com/music | 免版权音乐/音效，取用门槛低，适合短视频/产品演示配乐 | 基本免署名 |
+| **YouTube Audio Library** | https://studio.youtube.com/channel/music | 音乐/音效丰富 | 部分曲目需署名，自动化前先过滤许可条件 |
+| **Freesound** | https://freesound.org | 音效资源极丰富 | CC 协议多样，务必自动识别 License 并在 UI 中展示 |
+
+### AI 自动取素材的落地建议
+
+1. **优先使用有官方 API 的站点**（Unsplash / Pexels / Pixabay），避免爬虫方式导致不稳定
+2. **把许可信息当成一等数据**：至少保存以下字段，AI 生成页面时自动生成署名区块：
+   - `source`（来源站点）
+   - `author`（作者）
+   - `license`（许可证类型）
+   - `requiredAttribution`（是否需要署名）
+   - `sourceUrl`（原始链接）
+3. **做多源兜底**：同一关键词并行查 2-3 个库，失败自动切换；对外链下载做缓存
