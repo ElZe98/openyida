@@ -435,6 +435,48 @@ openyida publish <源文件路径> <appType> <formUuid>
 | **JavaScript 版本** | 使用 ES2015 (ES6) 语法，不能高于 ES2015 版本 |
 | **必须定义 renderJsx 函数** | renderJsx 是宜搭自定义页面核心渲染函数，也是入口函数，必须严格定义，不要改为其他名称 |
 
+### CDN 版本验证（loadScript 使用注意事项）
+
+使用 `this.utils.loadScript(url)` 加载第三方库时，需注意以下要点：
+
+**1. `loadScript` 只接受 URL 字符串参数**
+
+```javascript
+// ✅ 正确：直接传 URL 字符串
+this.utils.loadScript('https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js')
+
+// ❌ 错误：不支持对象形式
+this.utils.loadScript({ src: '...', type: 'css' })
+```
+
+**2. `g.alicdn.com` CDN 版本必须验证**
+
+`g.alicdn.com` 是阿里 CDN 镜像，不是所有 npm 版本都有镜像。使用前**必须通过 `curl` 验证版本是否存在**：
+
+```bash
+# 验证 CDN 上是否存在该版本（200 = 存在，404 = 不存在）
+curl -sI 'https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js' | head -1
+```
+
+**已验证可用的常用库版本**：
+
+| 库 | 可用版本 | CDN URL |
+| --- | --- | --- |
+| ECharts | 5.5.0 | `https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js` |
+| QRCode.js | 1.0.0 | `https://g.alicdn.com/code/lib/qrcodejs/1.0.0/qrcode.min.js` |
+| QRCode | 1.5.1 | `https://g.alicdn.com/code/lib/qrcode/1.5.1/qrcode.min.js` |
+
+> ⚠️ **典型踩坑**：ECharts 5.5.1 在 `g.alicdn.com` 上不存在（404），必须使用 5.5.0。AI 生成代码时容易使用最新版本号，但 CDN 镜像可能未同步，务必先验证。
+
+**3. 备选 CDN**
+
+如果 `g.alicdn.com` 上没有所需版本，可使用以下备选 CDN：
+
+| CDN | URL 格式 | 说明 |
+| --- | --- | --- |
+| jsDelivr | `https://cdn.jsdelivr.net/npm/<包名>@<版本>/<文件>` | 国内可访问，版本齐全 |
+| unpkg | `https://unpkg.com/<包名>@<版本>/<文件>` | 版本齐全，国内较慢 |
+
 ### 文件结构
 
 **一个完整的宜搭自定义页面源文件必须包含：**
@@ -557,27 +599,6 @@ this.forceUpdate();
 | --- | --- | --- |
 | `didMount()` | 页面 DOM 加载渲染完毕 | 初始化数据加载、启动定时器、绑定事件 |
 | `didUnmount()` | 页面节点从 DOM 移除 | 清理 `setInterval` / `setTimeout`、解绑事件 |
-
-### 清除平台默认样式
-
-宜搭平台会为 `.vc-deep-container-entry` 注入 `margin: 20px 0 !important` 等默认样式，导致自定义页面出现不必要的 padding/margin。`openyida publish` 发布时已自动注入覆盖 CSS，但由于平台 CSS 加载顺序可能在注入 CSS 之后，部分情况下仍有残留。
-
-**推荐方案**：在 `didMount` 中通过动态 `<style>` 标签注入覆盖样式，确保在所有平台 CSS 之后生效：
-
-```javascript
-export function didMount() {
-  // 注入覆盖样式（确保在平台 CSS 之后生效）
-  var styleTag = document.createElement('style');
-  styleTag.textContent = '.vc-deep-container-entry.vc-rootcontent{padding:0!important;margin-top:0!important;margin-right:0!important;margin-bottom:0!important;margin-left:0!important}';
-  document.head.appendChild(styleTag);
-
-  // ... 其他初始化逻辑
-}
-```
-
-> **为什么用展开属性？** 平台的 `margin: 20px 0 !important` 会被浏览器展开为 `margin-top`、`margin-bottom` 等独立属性各自带 `!important`。CSS 规范中展开属性的 `!important` 优先级高于简写属性的 `!important`，因此必须用展开属性逐个覆盖。
->
-> **为什么用动态 `<style>` 标签？** 比直接操作 DOM 元素的 `style` 属性更优雅，利用 CSS 级联机制通过选择器特异性（`.vc-deep-container-entry.vc-rootcontent` > `.vc-deep-container-entry`）自然胜出，样式归样式、逻辑归逻辑。
 
 ### 全局变量
 
