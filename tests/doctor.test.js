@@ -188,6 +188,23 @@ describe("DiagnosticEngine", () => {
 // ── EnvironmentChecker ────────────────────────────────
 
 describe("EnvironmentChecker", () => {
+  let networkSpy;
+
+  beforeEach(() => {
+    // mock 网络检查，避免在 CI 环境中因网络不通或超时导致测试失败
+    networkSpy = jest.spyOn(EnvironmentChecker.prototype, "checkNetwork").mockResolvedValue({
+      id: "env-network",
+      label: "网络连通性（aliwork.com）",
+      passed: true,
+      severity: "info",
+      fixType: null,
+    });
+  });
+
+  afterEach(() => {
+    networkSpy.mockRestore();
+  });
+
   test("checkNodeVersion 当前环境应通过", () => {
     const tmpDir = createTempProject();
     const checker = new EnvironmentChecker({ projectRoot: tmpDir });
@@ -282,7 +299,7 @@ describe("EnvironmentChecker", () => {
     expect(results.every((r) => r.id && r.label)).toBe(true);
 
     cleanupTempDir(tmpDir);
-  }, 15000); // 增加超时时间，因为包含网络检查
+  });
 });
 
 // ── ApplicationChecker ────────────────────────────────
@@ -525,6 +542,23 @@ describe("ReportGenerator", () => {
 // ── PreChecker ────────────────────────────────────────
 
 describe("PreChecker", () => {
+  let networkSpy;
+
+  beforeEach(() => {
+    // mock 网络检查，避免在 CI 环境中因网络不通或超时导致测试失败
+    networkSpy = jest.spyOn(EnvironmentChecker.prototype, "checkNetwork").mockResolvedValue({
+      id: "env-network",
+      label: "网络连通性（aliwork.com）",
+      passed: true,
+      severity: "info",
+      fixType: null,
+    });
+  });
+
+  afterEach(() => {
+    networkSpy.mockRestore();
+  });
+
   test("prePublishCheck 返回检查结果和通过状态", async () => {
     const tmpDir = createTempProject({
       config: { loginUrl: "https://www.aliwork.com" },
@@ -551,7 +585,7 @@ describe("PreChecker", () => {
     expect(envResults.length).toBe(result.results.length);
 
     cleanupTempDir(tmpDir);
-  }, 15000); // 增加超时时间，因为包含网络检查
+  });
 });
 
 // ── HealthMonitor ─────────────────────────────────────
