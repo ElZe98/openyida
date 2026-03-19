@@ -35,23 +35,42 @@ jobs:
           repo = os.environ["REPO"]
           print("📋 获取仓库所有贡献者...")
 
-          # 从 GitHub API 获取所有贡献者（gh cli 支持自动分页）
+          # 从 GitHub API 获取所有贡献者
+          # 使用 --jq 让 gh 自动合并分页结果为单个数组
           result = subprocess.run(
-              ["gh", "api", f"repos/{repo}/contributors?per_page=100&anon=false", "--paginate"],
+              ["gh", "api", f"repos/{repo}/contributors?per_page=100&anon=false",
+               "--paginate", "--jq", ".[]"],
               capture_output=True, text=True
           )
           if result.returncode != 0:
               print(f"⚠️  获取贡献者失败: {result.stderr}")
               sys.exit(0)
 
-          # gh --paginate 返回多个 JSON 数组拼接，需要合并
+          # --jq '.[]' 输出每个对象一行 JSON，逐行解析
           raw = result.stdout.strip()
           all_contributors = []
-          for chunk in re.findall(r'\[.*?\]', raw, re.DOTALL):
-              try:
-                  all_contributors.extend(json.loads(chunk))
-              except json.JSONDecodeError:
-                  pass
+          if raw:
+              for line in raw.split("\n"):
+                  line = line.strip()
+                  if not line:
+                      continue
+                  try:
+                      all_contributors.append(json.loads(line))
+                  except json.JSONDecodeError as e:
+                      print(f"⚠️  JSON 解析失败: {e}, line: {line[:100]}")
+
+          if not all_contributors:
+              # 回退方案：不使用 --jq，直接解析完整 JSON
+              print("⚠️  --jq 方式未获取到数据，尝试直接解析...")
+              result2 = subprocess.run(
+                  ["gh", "api", f"repos/{repo}/contributors?per_page=100&anon=false"],
+                  capture_output=True, text=True
+              )
+              if result2.returncode == 0 and result2.stdout.strip():
+                  try:
+                      all_contributors = json.loads(result2.stdout)
+                  except json.JSONDecodeError as e:
+                      print(f"⚠️  回退 JSON 解析失败: {e}")
 
           if not all_contributors:
               print("⚠️  未获取到贡献者数据，跳过更新")
@@ -111,13 +130,13 @@ jobs:
 
           # 在 contributors 区域的 </p> 前插入新贡献者头像
           # README 中 contributors 区域格式：
-          #   ### 贡献者
+          #   ## 贡献者
           #   <p align="left">
           #     <a href="..."><img .../></a> ...
           #   </p>
           new_html_str = " " + " ".join(new_html_parts)
 
-          pattern = r'(### 贡献者.*?<p align="left">)(.*?)(</p>)'
+          pattern = r'(##\s+贡献者.*?<p align="left">)(.*?)(</p>)'
 
           def replacer(m):
               existing_block = m.group(2).rstrip()
@@ -126,7 +145,7 @@ jobs:
           updated_content = re.sub(pattern, replacer, readme_content, flags=re.DOTALL)
 
           if updated_content == readme_content:
-              print("⚠️  未找到 contributors 区域（### 贡献者 + <p align=\"left\">），跳过更新")
+              print("⚠️  未找到 contributors 区域（## 贡献者 + <p align=\"left\">），跳过更新")
               sys.exit(0)
 
           with open("README.md", "w", encoding="utf-8") as f:
