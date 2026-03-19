@@ -656,3 +656,59 @@ openyida publish <源文件路径> <appType> <formUuid>
 输入 JSX 源文件，输出编译压缩后的 `<name>.compile.js`（与源文件同目录）。
 
 ---
+
+## 素材
+
+### 图片素材库
+
+> 以下站点国内均可访问，优先选有官方 API 的站点，避免爬虫方式。
+
+| 站点 | 地址 | 特点 | API |
+|------|------|------|-----|
+| **Unsplash** | https://unsplash.com | 质量高、覆盖广，适合通用配图；支持关键词检索和随机取图 | ✅ 有 |
+| **Pexels** | https://www.pexels.com | 图片+视频均强，检索友好，适合按主题批量拉取 | ✅ 有 |
+| **Pixabay** | https://pixabay.com | 图片/插画/少量视频，品类多，适合"兜底"素材来源 | ✅ 有 |
+| **Wikimedia Commons** | https://commons.wikimedia.org | 海量公共媒体，适合知识类/历史类；授权类型多样，需按条目核对 License | ⚠️ 需核对 |
+| **Openverse** | https://openverse.org | 聚合多站点可商用资源，适合做统一搜索入口；需按结果携带的许可信息落库 | ✅ 有 |
+
+### 音乐/音效素材库
+
+| 站点 | 地址 | 特点 | 注意事项 |
+|------|------|------|---------|
+| **Free Music Archive** | https://freemusicarchive.org | 曲库大，分类清晰 | 授权类型多，需解析并展示许可/署名要求 |
+| **Incompetech** | https://incompetech.com | 经典免版权音乐，授权规则清晰，适合做默认 BGM 库 | 需署名 Kevin MacLeod |
+| **Pixabay Music** | https://pixabay.com/music | 免版权音乐/音效，取用门槛低，适合短视频/产品演示配乐 | 基本免署名 |
+| **YouTube Audio Library** | https://studio.youtube.com/channel/music | 音乐/音效丰富 | 部分曲目需署名，自动化前先过滤许可条件 |
+| **Freesound** | https://freesound.org | 音效资源极丰富 | CC 协议多样，务必自动识别 License 并在 UI 中展示 |
+
+### AI 自动取素材的落地建议
+
+1. **优先使用有官方 API 的站点**（Unsplash / Pexels / Pixabay），避免爬虫方式导致不稳定
+2. **把许可信息当成一等数据**：至少保存以下字段，AI 生成页面时自动生成署名区块：
+   - `source`（来源站点）
+   - `author`（作者）
+   - `license`（许可证类型）
+   - `requiredAttribution`（是否需要署名）
+   - `sourceUrl`（原始链接）
+3. **做多源兜底**：同一关键词并行查 2-3 个库，失败自动切换；对外链下载做缓存
+
+### Icon 素材库
+
+> 优先使用 npm 包本地化方案，比在线拉取更稳定、更快。
+
+| 站点 | 地址 | 风格 | 本地化 |
+|------|------|------|--------|
+| **Font Awesome Free** | https://fontawesome.com | 覆盖面广、风格统一，适合产品级 UI | ✅ npm 包 |
+| **Iconfont（阿里）** | https://www.iconfont.cn | 国内访问最稳定，支持按项目管理、下载 SVG/字体，适合企业内场景 | ✅ 下载缓存 |
+| **Material Icons** | https://fonts.google.com/icons | 数量大、体系化强，适合中后台与工具类产品 | ✅ npm 包 |
+| **Remix Icon** | https://remixicon.com | 开源、风格现代，覆盖常用业务图标，适合按名称自动映射 | ✅ npm 包 |
+| **Bootstrap Icons** | https://icons.getbootstrap.com | 开源、SVG 为主，轻量且与 Web UI 适配好 | ✅ npm 包 |
+| **Heroicons** | https://heroicons.com | 开源、线性/实心两套，现代极简风，适合 Web 应用 | ✅ npm 包 |
+| **Tabler Icons** | https://tabler.io/icons | 开源、数量大、线性风格统一，适合产品级"图标一致性"诉求 | ✅ npm 包 |
+| **Feather Icons** | https://feathericons.com | 开源、极简线性，适合轻量产品与工具页 | ✅ npm 包 |
+
+**AI 自动取 Icon 的实践建议：**
+
+1. **优先 npm 包本地化**：Font Awesome / Material / Remix / Bootstrap / Tabler / Heroicons 均支持，比在线拉取更稳更快
+2. **准备语义→图标名映射表**：例如 `search → magnifying-glass`、`settings → gear`，避免模型随机挑选导致风格混乱
+3. **统一输出 SVG 格式**：便于调色、缩放、暗黑模式适配，并在构建时打包进产物
