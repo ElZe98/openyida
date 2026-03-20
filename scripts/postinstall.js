@@ -6,7 +6,7 @@
  * directory, pointing to the yida-skills/ folder inside this package.
  * Each tool discovers the skill pack by scanning its own config directory.
  *
- * Supported tools: Claude Code / OpenCode / Aone Copilot / Cursor / Qoder / iFlow / Wukong
+ * Supported tools: Claude Code / OpenCode / Aone Copilot / Cursor / Qoder / Wukong
  *
  * Symlink layout (no extra "skills/" subdirectory needed):
  *   ~/.claude/yida-skills          → <package>/yida-skills
@@ -14,7 +14,6 @@
  *   ~/.aone_copilot/yida-skills    → <package>/yida-skills
  *   ~/.cursor/yida-skills          → <package>/yida-skills
  *   ~/.qoder/yida-skills           → <package>/yida-skills
- *   ~/.iflow/yida-skills           → <package>/yida-skills
  *   ~/.real/yida-skills            → <package>/yida-skills  (Wukong)
  */
 
@@ -105,13 +104,6 @@ safeExec(() => {
 safeExec(() => {
   if (fs.existsSync(path.join(HOME_DIR, ".qoder"))) {
     installSymlink(path.join(HOME_DIR, ".qoder"));
-  }
-});
-
-// iFlow
-safeExec(() => {
-  if (fs.existsSync(path.join(HOME_DIR, ".iflow"))) {
-    installSymlink(path.join(HOME_DIR, ".iflow"));
   }
 });
 

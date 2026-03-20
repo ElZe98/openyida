@@ -242,7 +242,6 @@ describe("detectActiveTool", () => {
     delete process.env.OPENCODE;
     delete process.env.QODER_IDE;
     delete process.env.CURSOR_TRACE_ID;
-    delete process.env.IFLOW_ACTIVE;
     process.env.AGENT_WORK_ROOT = "/home/user/.real/workspace";
     const result = detectActiveTool();
     expect(result.tool).toBe("wukong");
@@ -255,8 +254,6 @@ describe("detectActiveTool", () => {
     delete process.env.QODER_IDE;
     delete process.env.QODER_AGENT;
     delete process.env.CURSOR_TRACE_ID;
-    delete process.env.IFLOW_ACTIVE;
-    delete process.env.IFLOW_IDE;
     delete process.env.AGENT_WORK_ROOT;
     process.env.TERM_PROGRAM = "vscode";
     
@@ -281,8 +278,6 @@ describe("detectActiveTool", () => {
     delete process.env.QODER_IDE;
     delete process.env.QODER_AGENT;
     delete process.env.CURSOR_TRACE_ID;
-    delete process.env.IFLOW_ACTIVE;
-    delete process.env.IFLOW_IDE;
     delete process.env.AGENT_WORK_ROOT;
     delete process.env.TERM_PROGRAM;
     

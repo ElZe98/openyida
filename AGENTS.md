@@ -61,7 +61,7 @@ openyida/
 
 ### 环境检测
 - `lib/env.js` 负责检测当前运行的 AI 工具环境
-- 支持环境：Claude Code、Aone Copilot、Cursor、OpenCode、Qoder、悟空、iFlow
+- 支持环境：Claude Code、Aone Copilot、Cursor、OpenCode、Qoder、悟空
 - 不同环境的 Cookie 提取方式不同（CDP 协议 / 文件读取 / 扫码）
 
 ### 自定义页面
