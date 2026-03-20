@@ -57,40 +57,40 @@ metadata:
 
 ## 使用方式
 
-建议统一脚本入口：
+建议统一命令入口：
 
 ```bash
-python3 scripts/yida-data.py <action> <resource> [args] [options]
+openyida data <action> <resource> [args] [options]
 ```
 
 ### 表单实例
 
 ```bash
-python3 scripts/yida-data.py query form <appType> <formUuid> [options]
-python3 scripts/yida-data.py get form <appType> --inst-id <formInstId>
-python3 scripts/yida-data.py create form <appType> <formUuid> --data-json '<json>'
-python3 scripts/yida-data.py update form <appType> --inst-id <formInstId> --data-json '<json>'
-python3 scripts/yida-data.py query subform <appType> <formUuid> --inst-id <formInstId> --table-field-id <fieldId>
+openyida data query form <appType> <formUuid> [options]
+openyida data get form <appType> --inst-id <formInstId>
+openyida data create form <appType> <formUuid> --data-json '<json>'
+openyida data update form <appType> --inst-id <formInstId> --data-json '<json>'
+openyida data query subform <appType> <formUuid> --inst-id <formInstId> --table-field-id <fieldId>
 ```
 
 ### 流程实例
 
 ```bash
-python3 scripts/yida-data.py query process <appType> <formUuid> [options]
-python3 scripts/yida-data.py get process <appType> --process-inst-id <processInstanceId>
-python3 scripts/yida-data.py create process <appType> <formUuid> --process-code <processCode> --data-json '<json>'
-python3 scripts/yida-data.py update process <appType> --process-inst-id <processInstanceId> --data-json '<json>'
-python3 scripts/yida-data.py query operation-records <appType> --process-inst-id <processInstanceId>
-python3 scripts/yida-data.py execute task <appType> --task-id <taskId> --process-inst-id <processInstanceId> --out-result AGREE --remark '同意'
+openyida data query process <appType> <formUuid> [options]
+openyida data get process <appType> --process-inst-id <processInstanceId>
+openyida data create process <appType> <formUuid> --process-code <processCode> --data-json '<json>'
+openyida data update process <appType> --process-inst-id <processInstanceId> --data-json '<json>'
+openyida data query operation-records <appType> --process-inst-id <processInstanceId>
+openyida data execute task <appType> --task-id <taskId> --process-inst-id <processInstanceId> --out-result AGREE --remark '同意'
 ```
 
 ### 任务中心
 
 ```bash
-python3 scripts/yida-data.py query tasks --type todo --page 1 --size 20
-python3 scripts/yida-data.py query tasks --type done --page 1 --size 20
-python3 scripts/yida-data.py query tasks --type submitted --page 1 --size 20
-python3 scripts/yida-data.py query tasks --type cc --page 1 --size 20
+openyida data query tasks <appType> --type todo --page 1 --size 20
+openyida data query tasks <appType> --type done --page 1 --size 20
+openyida data query tasks <appType> --type submitted --page 1 --size 20
+openyida data query tasks <appType> --type cc --page 1 --size 20
 ```
 
 ## 必填参数校验
@@ -110,7 +110,7 @@ python3 scripts/yida-data.py query tasks --type cc --page 1 --size 20
 | `update process` | `appType`, `processInstanceId`, `dataJson` |
 | `query operation-records` | `appType`, `processInstanceId` |
 | `execute task` | `appType`, `taskId`, `processInstanceId`, `outResult`, `remark` |
-| `query tasks` | `type` |
+| `query tasks` | `appType`, `type` |
 
 建议报错：
 
@@ -233,19 +233,19 @@ python3 scripts/yida-data.py query tasks --type cc --page 1 --size 20
 
 ```bash
 # 查询表单列表
-python3 scripts/yida-data.py query form "APP_XXX" "FORM_XXX" --page 1 --size 20
+openyida data query form "APP_XXX" "FORM_XXX" --page 1 --size 20
 
 # 查询流程列表
-python3 scripts/yida-data.py query process "APP_XXX" "FORM_XXX" --instance-status RUNNING
+openyida data query process "APP_XXX" "FORM_XXX" --instance-status RUNNING
 
 # 新增表单实例
-python3 scripts/yida-data.py create form "APP_XXX" "FORM_XXX" --data-json '{"textField_xxx":"测试"}'
+openyida data create form "APP_XXX" "FORM_XXX" --data-json '{"textField_xxx":"测试"}'
 
 # 发起流程
-python3 scripts/yida-data.py create process "APP_XXX" "FORM_XXX" --process-code "TPROC--XXX" --data-json '{"textField_xxx":"123"}'
+openyida data create process "APP_XXX" "FORM_XXX" --process-code "TPROC--XXX" --data-json '{"textField_xxx":"123"}'
 
 # 查询任务
-python3 scripts/yida-data.py query tasks --type todo --page 1 --size 10
+openyida data query tasks "APP_XXX" --type todo --page 1 --size 10
 ```
 
 ## 与其他技能配合
@@ -270,6 +270,10 @@ yida-data-management/
     ├── api-matrix.md
     ├── data-format-guide.md
     └── verified-endpoints.md
+
+CLI:
+├── bin/yida.js
+└── lib/data-management.js
 ```
 
 ## 注意事项

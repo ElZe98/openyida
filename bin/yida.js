@@ -26,6 +26,7 @@
  *   openyida save-share-config <appType> <formUuid> <url> <isOpen> [openAuth]  保存公开访问/分享配置
  *   openyida get-page-config <appType> <formUuid>       查询页面公开访问/分享配置
  *   openyida update-form-config <appType> <formUuid> <isRenderNav> <title>  更新表单配置
+ *   openyida data <action> <resource> [args]            统一数据管理（表单/流程/任务/子表单）
  *   openyida doctor [选项]                              检查环境依赖，诊断应用问题
  *   openyida export <appType> [output]                  导出应用所有表单 Schema（生成迁移包）
  *   openyida import <file> [name]                       导入迁移包，在目标环境重建应用
@@ -82,6 +83,7 @@ openyida - 宜搭命令行工具
   save-share-config <appType> <formUuid> <url> <isOpen> [auth] 保存公开访问/分享配置
   get-page-config <appType> <formUuid>                         查询页面公开访问/分享配置
   update-form-config <appType> <formUuid> <isRenderNav> <title> 更新表单配置
+  data <action> <resource> [args]                              统一数据管理（表单/流程/任务/子表单）
   doctor [选项]                                                检查环境依赖，诊断应用问题
     --fix / --repair                                           诊断并自动修复
     --production --app <appId>                                 线上应用诊断
@@ -131,6 +133,7 @@ openyida - 宜搭命令行工具
   openyida save-share-config APP_XXX FORM-XXX /o/myapp y n
   openyida get-page-config APP_XXX FORM-XXX
   openyida update-form-config APP_XXX FORM-XXX false "页面标题"
+  openyida data query form APP_XXX FORM-XXX --page 1 --size 20
   openyida create-report APP_XXX "销售报表" charts.json
   openyida append-chart APP_XXX REPORT-XXX charts.json
   openyida configure-process APP_XXX FORM-YYY process-def.json
@@ -406,6 +409,17 @@ async function main() {
       break;
     }
 
+    case 'data': {
+      if (args.length < 2) {
+        console.error('用法: openyida data <action> <resource> [args] [options]');
+        console.error('示例: openyida data query form APP_XXX FORM_XXX --page 1 --size 20');
+        process.exit(1);
+      }
+      const { run: runDataManagement } = require('../lib/data-management');
+      await runDataManagement(args);
+      break;
+    }
+
     case 'doctor': {
       const { run } = require('../lib/doctor');
       await run(args);
@@ -590,4 +604,3 @@ main()
     console.error(t('cli.exec_failed', err.message));
     process.exit(1);
   });
-
