@@ -96,6 +96,9 @@ openyida - 宜搭命令行工具
   org switch --corp-id <corpId>                                切换组织（无需重新登录）
   get-permission <appType> <formUuid>                          查询表单权限配置
   save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]  保存表单权限配置
+  configure-process <appType> <formUuid> <processDefinitionFile> [processCode]  配置并发布流程
+  create-process <appType> <formTitle> <fieldsJsonFile> <processDefinitionFile>  创建流程表单（一体化）
+  create-process <appType> --formUuid <formUuid> <processDefinitionFile>         复用已有表单创建流程
   connector list [选项]                                          列出 HTTP 连接器
   connector create "名称" "域名" --operations <file> [选项]      创建连接器
   connector detail <connector-id>                               查看连接器详情
@@ -109,9 +112,6 @@ openyida - 宜搭命令行工具
   connector smart-create --curl "curl命令" [选项]               智能创建连接器
   connector parse-api [选项]                                    解析接口信息
   connector gen-template [输出路径]                              生成接口文档模板
-  configure-process <appType> <formUuid> <processDefinitionFile> [processCode]  配置并发布流程
-  create-process <appType> <formTitle> <fieldsJsonFile> <processDefinitionFile>  创建流程表单（一体化）
-  create-process <appType> --formUuid <formUuid> <processDefinitionFile>         复用已有表单创建流程
 
 示例：
   openyida login
