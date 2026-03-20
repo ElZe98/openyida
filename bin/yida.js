@@ -75,8 +75,17 @@ openyida - 宜搭命令行工具
     --create-ticket                                            根据诊断结果创建工单
     --create-voc                                               创建 VOC（需求反馈）
     --auto-submit                                              自动判断并提交工单或 VOC
+  auth status                                                  查看当前登录状态
+  auth login                                                   执行登录
+  auth refresh                                                 刷新登录态
+  auth logout                                                  退出登录
+  org list                                                     列出可访问的组织
+  org switch --corp-id <corpId>                                切换组织（无需重新登录）
   get-permission <appType> <formUuid>                          查询表单权限配置
   save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]  保存表单权限配置
+  configure-process <appType> <formUuid> <processDefinitionFile> [processCode]  配置并发布流程
+  create-process <appType> <formTitle> <fieldsJsonFile> <processDefinitionFile>  创建流程表单（一体化）
+  create-process <appType> --formUuid <formUuid> <processDefinitionFile>         复用已有表单创建流程
 
 示例：
   openyida login
@@ -397,8 +406,8 @@ async function main() {
 
     case 'get-permission': {
       if (args.length < 2) {
-        console.error('用法: openyida get-permission <appType> <formUuid>');
-        console.error('示例: openyida get-permission APP_XXX FORM-XXX');
+        console.error(t('cli.get_permission_usage'));
+        console.error(t('cli.get_permission_example'));
         process.exit(1);
       }
       const { run: runGetPermission } = require('../lib/get-permission');
@@ -408,8 +417,8 @@ async function main() {
 
     case 'save-permission': {
       if (args.length < 2) {
-        console.error('用法: openyida save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]');
-        console.error("示例: openyida save-permission APP_XXX FORM-XXX --data-permission '{\"role\":\"DEFAULT\",\"dataRange\":\"SELF\"}'");
+        console.error(t('cli.save_permission_usage'));
+        console.error(t('cli.save_permission_example'));
         process.exit(1);
       }
       const { run: runSavePermission } = require('../lib/save-permission');
@@ -417,6 +426,27 @@ async function main() {
       break;
     }
 
+    case 'configure-process': {
+      if (args.length < 3) {
+        console.error(t('cli.configure_process_usage'));
+        console.error(t('cli.configure_process_example'));
+        process.exit(1);
+      }
+      const { run: runConfigureProcess } = require('../lib/configure-process');
+      await runConfigureProcess(args);
+      break;
+    }
+
+    case 'create-process': {
+      if (args.length < 2) {
+        console.error(t('cli.create_process_usage'));
+        console.error(t('cli.create_process_example'));
+        process.exit(1);
+      }
+      const { run: runCreateProcess } = require('../lib/create-process');
+      await runCreateProcess(args);
+      break;
+    }
     case 'cdn-config': {
       const { run: runCdnConfig } = require('../lib/cdn-config-cmd');
       await runCdnConfig(args);
