@@ -5,20 +5,15 @@
  * Copies the yida-skills/ folder into each AI tool's config directory.
  * Each tool discovers the skill pack by scanning its own config directory.
  *
- * Uses file copy instead of symlink to avoid first-run skill loading failures
- * caused by some AI tools (e.g. Claude Code) not resolving symlinks on initial scan.
- * See: https://github.com/openyida/openyida/issues/186
+ * Supported tools: Claude Code / OpenCode / Aone Copilot / Cursor / Qoder / Wukong
  *
- * Supported tools: Claude Code / OpenCode / Aone Copilot / Cursor / Qoder / iFlow / Wukong
- *
- * Layout (no extra "skills/" subdirectory needed):
- *   ~/.claude/yida-skills          ← <package>/yida-skills (copy)
- *   ~/.opencode/yida-skills        ← <package>/yida-skills (copy)
- *   ~/.aone_copilot/yida-skills    ← <package>/yida-skills (copy)
- *   ~/.cursor/yida-skills          ← <package>/yida-skills (copy)
- *   ~/.qoder/yida-skills           ← <package>/yida-skills (copy)
- *   ~/.iflow/yida-skills           ← <package>/yida-skills (copy)
- *   ~/.real/yida-skills            ← <package>/yida-skills (copy, Wukong)
+ * Symlink layout (no extra "skills/" subdirectory needed):
+ *   ~/.claude/yida-skills          → <package>/yida-skills
+ *   ~/.opencode/yida-skills        → <package>/yida-skills
+ *   ~/.aone_copilot/yida-skills    → <package>/yida-skills
+ *   ~/.cursor/yida-skills          → <package>/yida-skills
+ *   ~/.qoder/yida-skills           → <package>/yida-skills
+ *   ~/.real/yida-skills            → <package>/yida-skills  (Wukong)
  */
 
 "use strict";
@@ -126,13 +121,6 @@ safeExec(() => {
 safeExec(() => {
   if (fs.existsSync(path.join(HOME_DIR, ".qoder"))) {
     installSkills(path.join(HOME_DIR, ".qoder"));
-  }
-});
-
-// iFlow
-safeExec(() => {
-  if (fs.existsSync(path.join(HOME_DIR, ".iflow"))) {
-    installSkills(path.join(HOME_DIR, ".iflow"));
   }
 });
 
