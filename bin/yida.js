@@ -44,6 +44,8 @@
  *   openyida connector smart-create --curl "curl命令" [选项]  智能创建连接器
  *   openyida connector parse-api [选项]                  解析接口信息
  *   openyida connector gen-template [输出路径]            生成接口文档模板
+ *   openyida create-report <appType> "<报表名称>" <图表定义JSON或文件路径>  创建宜搭报表
+ *   openyida append-chart <appType> <reportId> <图表定义JSON或文件路径>    向已有报表追加图表
  */
 
 "use strict";
@@ -112,6 +114,8 @@ openyida - 宜搭命令行工具
   connector smart-create --curl "curl命令" [选项]               智能创建连接器
   connector parse-api [选项]                                    解析接口信息
   connector gen-template [输出路径]                              生成接口文档模板
+  create-report <appType> "<报表名称>" <图表定义JSON或文件路径>   创建宜搭报表
+  append-chart <appType> <reportId> <图表定义JSON或文件路径>      向已有报表追加图表
 
 示例：
   openyida login
@@ -127,6 +131,8 @@ openyida - 宜搭命令行工具
   openyida save-share-config APP_XXX FORM-XXX /o/myapp y n
   openyida get-page-config APP_XXX FORM-XXX
   openyida update-form-config APP_XXX FORM-XXX false "页面标题"
+  openyida create-report APP_XXX "销售报表" charts.json
+  openyida append-chart APP_XXX REPORT-XXX charts.json
   openyida configure-process APP_XXX FORM-YYY process-def.json
   openyida create-process APP_XXX "订单处理表" fields.json process-def.json
   openyida create-process APP_XXX --formUuid FORM-YYY process-def.json
