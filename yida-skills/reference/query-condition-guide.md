@@ -237,7 +237,7 @@ int(time.mktime(time.strptime("2024-01-01", "%Y-%m-%d"))) * 1000
 
 ### 示例 1：简单查询
 ```bash
-python3 scripts/query-data.py \
+python3 scripts/yida-data.py query form \
   "APP_CQ2P5NRFI5L1D6PB8Q7J" \
   "FORM-035536EBA11447158458DFF86E7867E7WIW0" \
   --search-json '[{"key":"textField_wduvybsi","value":"A","type":"TEXT","operator":"eq","componentName":"TextField"}]'
@@ -245,7 +245,7 @@ python3 scripts/query-data.py \
 
 ### 示例 2：数值范围查询
 ```bash
-python3 scripts/query-data.py \
+python3 scripts/yida-data.py query form \
   "APP_XXX" \
   "FORM_XXX" \
   --search-json '[{"key":"numberField_xxx","value":[10,100],"type":"DOUBLE","operator":"between","componentName":"NumberField"}]'
@@ -253,7 +253,7 @@ python3 scripts/query-data.py \
 
 ### 示例 3：日期范围查询
 ```bash
-python3 scripts/query-data.py \
+python3 scripts/yida-data.py query form \
   "APP_XXX" \
   "FORM_XXX" \
   --search-json '[{"key":"dateField_xxx","value":[1704067200000,1706745600000],"type":"DOUBLE","operator":"between","componentName":"DateField"}]'
@@ -261,7 +261,7 @@ python3 scripts/query-data.py \
 
 ### 示例 4：多条件组合查询
 ```bash
-python3 scripts/query-data.py \
+python3 scripts/yida-data.py query form \
   "APP_XXX" \
   "FORM_XXX" \
   --search-json '[{"key":"textField_xxx","value":"A","type":"TEXT","operator":"eq","componentName":"TextField"},{"key":"numberField_xxx","value":10,"type":"DOUBLE","operator":"gt","componentName":"NumberField"},{"key":"dateField_xxx","value":1704067200000,"type":"DOUBLE","operator":"gt","componentName":"DateField"}]'

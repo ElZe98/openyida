@@ -137,7 +137,7 @@ openyida copy
 | `yida-publish-page` | `skills/yida-publish-page/SKILL.md` | 编译并发布自定义页面 | `openyida publish <源文件路径> <appType> <formUuid>` |
 | `yida-page-config` | `skills/yida-page-config/SKILL.md` | 页面公开访问/组织内分享配置 | `openyida verify-short-url <appType> <formUuid> <url>` |
 | `yida-form-permission` | `skills/yida-form-permission/SKILL.md` | 表单权限配置（字段/数据/操作权限） | `openyida get-permission <appType> <formUuid>` |
-| `yida-query-data` | `skills/yida-query-data/SKILL.md` | 查询表单实例数据（分页/条件搜索） | `python3 scripts/query-data.py <appType> <formUuid>` |
+| `yida-data-management` | `skills/yida-data-management/SKILL.md` | 数据管理（表单实例/流程实例/任务中心的查询、新增、更新） | `python3 scripts/yida-data.py query form <appType> <formUuid>` |
 | `yida-connector` | `skills/yida-connector/SKILL.md` | 宜搭 HTTP 连接器管理（创建/编辑/测试/智能生成） | `openyida connector list` |
 | `yida-report` | `skills/yida-report/SKILL.md` | 创建宜搭报表、追加图表 | `openyida create-report APP_XXX "报表名" charts.json` |
 
@@ -214,4 +214,10 @@ openyida copy
 
 **Q：如何更新已有表单字段？** 使用 `yida-create-form-page` 的 update 模式，详见 `skills/yida-create-form-page/SKILL.md`。
 
-**Q：发布时提示 corpId 不匹配？** 询问用户是否重新登录到正确组织（`openyida logout` → `openyida login`），或在当前组织新建应用。
+**Q：发布时提示 corpId 不匹配？**
+
+询问用户是否在当前组织创建新应用发布，或重新登录到正确组织：
+```bash
+openyida logout
+openyida login
+```
