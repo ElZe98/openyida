@@ -35,3 +35,4 @@ node --check lib/xxx.js  # 语法检查
 - 不要在代码中硬编码任何 Cookie、Token 或凭证
 - 不要修改 `yida-skills/` 文档（除非明确要求更新技能）
 - 不要引入需要编译的依赖（项目是纯 JS，无构建步骤）
+- 不要直接推送 main 分支

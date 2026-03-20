@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const CREATE_FORM_PATH = path.join(__dirname, "..", "lib", "create-form.js");
+const CREATE_FORM_PATH = path.join(__dirname, "..", "lib", "app", "create-form.js");
 const sourceCode = fs.readFileSync(CREATE_FORM_PATH, "utf-8");
 
 // ── Bug #1: isLoginExpired / isCsrfTokenExpired 必须从 utils.js 引入 ──
@@ -12,7 +12,7 @@ describe("create-form.js imports", () => {
   test("imports isLoginExpired from utils.js", () => {
     const requireLine = sourceCode
       .split("\n")
-      .find((line) => line.includes('require("./utils")') || line.includes("require('./utils')"));
+      .find((line) => line.includes('require("../core/utils")') || line.includes("require('../core/utils')"));
     expect(requireLine).toBeDefined();
     expect(requireLine).toContain("isLoginExpired");
   });
@@ -20,7 +20,7 @@ describe("create-form.js imports", () => {
   test("imports isCsrfTokenExpired from utils.js", () => {
     const requireLine = sourceCode
       .split("\n")
-      .find((line) => line.includes('require("./utils")') || line.includes("require('./utils')"));
+      .find((line) => line.includes('require("../core/utils")') || line.includes("require('../core/utils')"));
     expect(requireLine).toBeDefined();
     expect(requireLine).toContain("isCsrfTokenExpired");
   });

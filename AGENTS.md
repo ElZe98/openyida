@@ -15,26 +15,66 @@ openyida/
 ├── bin/
 │   └── yida.js              # CLI 入口，解析命令并路由到 lib/
 ├── lib/
-│   ├── env.js               # 检测 AI 工具环境（Claude/Cursor/Copilot 等）
-│   ├── login.js             # 宜搭登录（扫码 + Cookie 缓存）
-│   ├── logout.js            # 退出登录
-│   ├── copy.js              # 初始化工作目录
-│   ├── create-app.js        # 创建宜搭应用
-│   ├── create-page.js       # 创建自定义展示页面
-│   ├── create-form.js       # 创建 / 更新表单页面
-│   ├── get-schema.js        # 获取表单 Schema
-│   ├── publish.js           # 编译并发布自定义页面（Babel 转译）
-│   ├── verify-short-url.js  # 验证短链接 URL
-│   ├── save-share-config.js # 保存公开访问 / 分享配置
-│   ├── get-page-config.js   # 查询页面公开访问 / 分享配置
-│   ├── update-form-config.js# 更新表单配置
-│   ├── export-app.js        # 导出应用
-│   ├── import-app.js        # 导入应用
-│   ├── check-update.js      # 版本检测（每天一次）
-│   ├── babel-transform/     # Babel 编译器（用于自定义页面）
-│   ├── i18n.js              # 国际化支持
-│   ├── locales/             # 语言包
-│   └── utils.js             # 公共工具函数
+│   ├── core/                # 核心基础模块
+│   │   ├── utils.js         # 公共工具函数（Cookie、HTTP、路径等）
+│   │   ├── i18n.js          # 国际化支持
+│   │   ├── locales/         # 语言包（zh-CN、en-US）
+│   │   ├── env.js           # 检测 AI 工具环境（Claude/Cursor/Copilot 等）
+│   │   ├── copy.js          # 初始化 project 工作目录
+│   │   ├── check-update.js  # 版本检测（每天一次）
+│   │   ├── doctor.js        # 环境诊断与自动修复
+│   │   ├── query-data.js    # 查询表单实例数据
+│   │   └── babel-transform/ # Babel 编译器（用于自定义页面）
+│   ├── auth/                # 登录认证模块
+│   │   ├── login.js         # 宜搭登录（Cookie 缓存 + 扫码）
+│   │   ├── auth.js          # 登录态管理（status/login/refresh/logout）
+│   │   ├── org.js           # 组织管理（列出/切换组织）
+│   │   └── qr-login.js      # 终端二维码扫码登录
+│   ├── app/                 # 应用 / 表单 / 页面管理
+│   │   ├── create-app.js    # 创建宜搭应用
+│   │   ├── create-page.js   # 创建自定义展示页面
+│   │   ├── create-form.js   # 创建 / 更新表单页面
+│   │   ├── get-schema.js    # 获取表单 Schema
+│   │   ├── publish.js       # 编译并发布自定义页面（Babel 转译）
+│   │   ├── export-app.js    # 导出应用（生成迁移包）
+│   │   ├── import-app.js    # 导入迁移包，重建应用
+│   │   └── update-form-config.js  # 更新表单配置
+│   ├── page-config/         # 页面公开访问 / 分享配置
+│   │   ├── verify-short-url.js    # 验证短链接 URL
+│   │   ├── save-share-config.js   # 保存公开访问 / 分享配置
+│   │   └── get-page-config.js     # 查询页面公开访问 / 分享配置
+│   ├── permission/          # 表单权限管理
+│   │   ├── get-permission.js      # 查询表单权限配置
+│   │   └── save-permission.js     # 保存表单权限配置
+│   ├── process/             # 流程管理
+│   │   ├── configure-process.js   # 配置并发布流程规则
+│   │   └── create-process.js      # 创建流程表单（一体化）
+│   ├── connector/           # HTTP 连接器管理
+│   │   ├── connector-list.js
+│   │   ├── connector-create.js
+│   │   ├── connector-detail.js
+│   │   ├── connector-delete.js
+│   │   ├── connector-add-action.js
+│   │   ├── connector-list-actions.js
+│   │   ├── connector-delete-action.js
+│   │   ├── connector-test.js
+│   │   ├── connector-list-connections.js
+│   │   ├── connector-create-connection.js
+│   │   ├── connector-smart-create.js
+│   │   ├── connector-parse-api.js
+│   │   └── connector-gen-template.js
+│   ├── cdn/                 # CDN / OSS 管理
+│   │   ├── cdn-config.js          # CDN 配置读写
+│   │   ├── cdn-config-cmd.js      # CDN 配置命令
+│   │   ├── cdn-upload.js          # 上传图片到 OSS/CDN
+│   │   └── cdn-refresh.js         # 刷新 CDN 缓存
+│   └── report/              # 宜搭报表管理
+│       ├── create-report.js       # 创建报表（入口）
+│       ├── index.js               # 创建报表主流程
+│       ├── append.js              # 向已有报表追加图表
+│       ├── chart-builder.js       # 图表 Schema 构建
+│       ├── http.js                # 报表 HTTP 请求封装
+│       └── constants.js           # 常量与 ID 生成工具
 ├── project/
 │   ├── config.json          # 应用配置（appType、pageId 等）
 │   └── pages/               # 自定义页面源码目录

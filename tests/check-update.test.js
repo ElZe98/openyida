@@ -1,7 +1,7 @@
 "use strict";
 
 const https = require("https");
-const { isNewer, fetchLatestVersion, checkUpdate } = require("../lib/check-update");
+const { isNewer, fetchLatestVersion, checkUpdate } = require("../lib/core/check-update");
 
 // ── isNewer ───────────────────────────────────────────────────────────
 

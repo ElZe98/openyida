@@ -93,11 +93,33 @@ yida-create-page/
 
 ## 与其他技能配合
 
-1. **创建应用** → 使用 `yida-create-app` 技能获取 `appType`
-2. **创建自定义页面** → 本技能，获取 `pageId`（formUuid）
-3. **编写 JSX 源码** → **必须先加载 `yida-custom-page` skill**，严格按照其开发规范编写代码
-4. **部署页面代码** → 使用 `yida-publish-page` 技能将代码部署到该页面
+### 完整开发流程
 
-> ⚠️ **重要警告**：宜搭自定义页面使用类组件模式，**禁止使用 React Hooks**（useState/useEffect）。编写代码前必须先加载 `yida-custom-page` skill 查看完整的开发规范。
+```
+[Step 1] 创建自定义页面 → 本技能
+         openyida create-page <appType> "<页面名>"
+         → 获得 formUuid，记录到 prd/<项目名>.md
+              ↓
+[Step 2] 编写页面代码 → 读取并严格遵循 yida-custom-page SKILL.md
+         → 在 project/pages/src/<项目名>.js 编写 JSX 代码
+         → 必须包含：_customState、getCustomState、setCustomState、
+           forceUpdate、didMount、didUnmount、renderJsx 七个函数
+         → 禁止使用 React Hooks（useState/useEffect）
+         → 所有事件绑定必须用箭头函数：(e) => { this.方法名(e) }
+              ↓
+[Step 3] 编译并发布 → 读取并遵循 yida-publish-page SKILL.md
+         openyida publish <源文件路径> <appType> <formUuid>
+         → JSX → Babel(ES5) + UglifyJS 压缩 → 保存到宜搭
+         → 输出页面访问链接
+```
+
+### 技能依赖关系
+
+| 步骤 | 技能 | 说明 |
+|------|------|------|
+| 创建应用 | `yida-create-app` | 获取 `appType` |
+| **创建自定义页面** | **本技能** | 获取 `formUuid` |
+| 编写 JSX 代码 | `yida-custom-page` | **执行前必须完整读取其 SKILL.md** |
+| 编译并发布 | `yida-publish-page` | **执行前必须完整读取其 SKILL.md** |
 
 > **提示**：如果需要创建的是表单页面（带字段的数据收集页），请使用 `yida-create-form-page` 技能。

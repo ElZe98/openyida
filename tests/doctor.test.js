@@ -17,7 +17,7 @@ const {
   TicketCreator,
   VOCCreator,
   SubmissionDecider,
-} = require("../lib/doctor");
+} = require("../lib/core/doctor");
 
 // ── 测试用临时目录 ────────────────────────────────────
 

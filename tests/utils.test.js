@@ -12,7 +12,7 @@ const {
   isCsrfTokenExpired,
   loadCookieData,
   detectActiveTool,
-} = require("../lib/utils");
+} = require("../lib/core/utils");
 
 // ── extractInfoFromCookies ────────────────────────────────────────────
 

@@ -169,7 +169,7 @@ describe("createSymlink Windows 降级逻辑", () => {
 // ── detectActiveTool Windows 路径兼容测试 ────────────────────────────
 
 describe("detectActiveTool Windows 路径兼容", () => {
-  const { detectActiveTool } = require("../lib/utils");
+  const { detectActiveTool } = require("../lib/core/utils");
   const originalEnv = { ...process.env };
 
   afterEach(() => {

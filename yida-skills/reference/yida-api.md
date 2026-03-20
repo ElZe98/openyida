@@ -39,6 +39,7 @@
   - [isSubmissionPage](#issubmissionpage) - 判断是否提交页面
   - [isViewPage](#isviewpage) - 判断是否查看页面
   - [loadScript](#loadscript) - 动态加载脚本
+  - [loadStyleSheet](#loadstylesheet) - 动态加载样式表
   - [openPage](#openpage) - 打开新页面
   - [router.push](#router.push) - 页面路由跳转工具
   - [previewImage](#previewimage) - 图片预览
@@ -1002,31 +1003,99 @@ export function didMount() {
 }
 ```
 
+**CDN 版本验证（loadScript 使用注意事项）**
+
+使用 `this.utils.loadScript(url)` 加载第三方库时，需注意以下要点：
+
+**1. `loadScript` 只接受 URL 字符串参数**
+
+```javascript
+// ✅ 正确：直接传 URL 字符串
+this.utils.loadScript('https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js')
+
+// ❌ 错误：不支持对象形式
+this.utils.loadScript({ src: '...', type: 'css' })
+```
+
+**2. `g.alicdn.com` CDN 版本必须验证**
+
+`g.alicdn.com` 是阿里 CDN 镜像，不是所有 npm 版本都有镜像。使用前**必须通过 `curl` 验证版本是否存在**：
+
+```bash
+# 验证 CDN 上是否存在该版本（200 = 存在，404 = 不存在）
+curl -sI 'https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js' | head -1
+```
+
+**已验证可用的常用库版本**：
+
+| 库 | 可用版本 | CDN URL |
+| --- | --- | --- |
+| ECharts | 5.5.0 | `https://g.alicdn.com/code/lib/echarts/5.5.0/echarts.min.js` |
+| QRCode.js | 1.0.0 | `https://g.alicdn.com/code/lib/qrcodejs/1.0.0/qrcode.min.js` |
+| QRCode | 1.5.1 | `https://g.alicdn.com/code/lib/qrcode/1.5.1/qrcode.min.js` |
+
+> ⚠️ **典型踩坑**：ECharts 5.5.1 在 `g.alicdn.com` 上不存在（404），必须使用 5.5.0。AI 生成代码时容易使用最新版本号，但 CDN 镜像可能未同步，务必先验证。
+
 ---
 
-### openPage
+### loadStyleSheet
 
-**描述**：打开新页面。在钉钉环境下会使用钉钉 API 打开，体验更友好。
+**描述**：动态加载远程 CSS 样式表，在 `<head>` 中插入 `<link rel="stylesheet" href="...">` 标签。适用于加载图标库、第三方组件样式等 CSS 文件。
+
+> ⚠️ **重要**：加载 CSS 文件必须使用 `loadStyleSheet`，**不能**使用 `loadScript`。
+> - `loadScript(url)` → 插入 `<script>` 标签，**仅用于 JS 脚本**
+> - `loadStyleSheet(url)` → 插入 `<link rel="stylesheet">` 标签，**仅用于 CSS 文件**
 
 **参数**：
 
 | 参数名 | 类型 | 是否必填 | 说明 |
 | :--- | :--- | :--- | :--- |
-| url | String | 是 | 页面地址，支持相对路径或绝对路径 |
+| url | String | 是 | CSS 文件的完整 URL 地址 |
 
-**请求示例**：
+**返回值**：`Promise` - 样式表加载完成后 resolve
+
+**场景一：加载 iconfont 图标库**
+
+在 [iconfont.cn](https://www.iconfont.cn) 创建项目并收藏图标后，生成在线 CSS 链接，然后在 `didMount` 中加载：
 
 ```javascript
-export function someFunctionName() {
-  // 打开应用内页面
-  this.utils.openPage('/workbench');
-  
-  // 打开外部链接
-  this.utils.openPage('https://www.dingtalk.com');
+export function didMount() {
+  // 从 iconfont.cn 项目「查看在线链接」中复制，格式如下
+  this.utils.loadStyleSheet('https://at.alicdn.com/t/c/font_XXXXX_YYYYY.css');
+}
+
+export function renderJsx() {
+  return (
+    <div>
+      {/* 类名格式：iconfont icon-<图标名> */}
+      <i className="iconfont icon-home" style={{ fontSize: '24px', color: '#1677FF' }}></i>
+      <i className="iconfont icon-setting" style={{ fontSize: '24px', color: '#86909C' }}></i>
+    </div>
+  );
+}
+```
+
+**场景二：加载第三方组件 CSS（如 react-cropper）**
+
+当使用 `loadScript` 加载第三方 JS 组件库时，若该库有对应的 CSS 文件，需同时用 `loadStyleSheet` 加载：
+
+```javascript
+export function didMount() {
+  // 先加载 CSS 样式
+  this.utils.loadStyleSheet('https://g.alicdn.com/yida-platform/react-cropper/1.0.0/css/react-cropper.css');
+  // 再加载 JS 脚本
+  this.utils.loadScript('https://g.alicdn.com/yida-platform/react-cropper/1.0.0/js/react-cropper.js')
+    .then(() => {
+      console.log('react-cropper 加载完成');
+    });
 }
 ```
 
 ---
+
+### openPage
+
+**描述**：打开新页面。在钉钉环境下会使用钉钉 API 打开，体验更友好。
 
 ### router.push
 
