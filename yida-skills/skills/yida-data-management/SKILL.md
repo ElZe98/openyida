@@ -38,7 +38,7 @@ metadata:
 
 ## 前置依赖
 
-- Python 3.8+
+- Node.js >= 18
 - 项目根目录存在 `.cache/cookies.json`
 - 项目根目录存在 `config.json`，或默认域名为 `https://www.aliwork.com`
 
