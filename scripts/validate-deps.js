@@ -32,7 +32,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
  */
 function collectJsFiles(dir) {
   const absoluteDir = path.resolve(PROJECT_ROOT, dir);
-  if (!fs.existsSync(absoluteDir)) return [];
+  if (!fs.existsSync(absoluteDir)) {return [];}
 
   const results = [];
   const entries = fs.readdirSync(absoluteDir, { withFileTypes: true });

@@ -13,19 +13,19 @@
  *
  * 退出码：0 = 通过，1 = 存在问题
  */
-"use strict";
+'use strict';
 
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const LOCALES_DIR = path.join(__dirname, "..", "lib", "core", "locales");
-const BIN_YIDA = path.join(__dirname, "..", "bin", "yida.js");
+const LOCALES_DIR = path.join(__dirname, '..', 'lib', 'core', 'locales');
+const BIN_YIDA = path.join(__dirname, '..', 'bin', 'yida.js');
 
 const EXPECTED_LOCALES = [
-  "zh", "en", "ja", "ko", "fr", "de", "es", "pt", "vi", "hi", "ar", "zh-TW",
+  'zh', 'en', 'ja', 'ko', 'fr', 'de', 'es', 'pt', 'vi', 'hi', 'ar', 'zh-TW',
 ];
 
-const isStrictMode = process.argv.includes("--strict");
+const isStrictMode = process.argv.includes('--strict');
 
 let errorCount = 0;
 let warningCount = 0;
@@ -51,7 +51,7 @@ function extractKeyPaths(obj, prefix) {
   const keys = [];
   for (const key of Object.keys(obj)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
-    if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
       keys.push(...extractKeyPaths(obj[key], fullKey));
     } else {
       keys.push(fullKey);
@@ -62,7 +62,7 @@ function extractKeyPaths(obj, prefix) {
 
 // ── 检查 1：语言包文件是否齐全 ──────────────────────────────────────
 
-console.log("\n📋 检查 1：语言包文件完整性");
+console.log('\n📋 检查 1：语言包文件完整性');
 
 const missingFiles = [];
 const localeModules = {};
@@ -83,14 +83,14 @@ for (const locale of EXPECTED_LOCALES) {
 }
 
 const existingLocaleFiles = fs.readdirSync(LOCALES_DIR)
-  .filter((fileName) => fileName.endsWith(".js"))
-  .map((fileName) => fileName.replace(".js", ""));
+  .filter((fileName) => fileName.endsWith('.js'))
+  .map((fileName) => fileName.replace('.js', ''));
 
 const unexpectedFiles = existingLocaleFiles.filter(
   (locale) => !EXPECTED_LOCALES.includes(locale)
 );
 if (unexpectedFiles.length > 0) {
-  logWarning(`发现未注册的语言包文件: ${unexpectedFiles.join(", ")}`);
+  logWarning(`发现未注册的语言包文件: ${unexpectedFiles.join(', ')}`);
 }
 
 if (missingFiles.length === 0) {
@@ -99,16 +99,16 @@ if (missingFiles.length === 0) {
 
 // ── 检查 2：语言包 key 一致性 ────────────────────────────────────────
 
-console.log("\n📋 检查 2：语言包 key 一致性（基准: zh.js）");
+console.log('\n📋 检查 2：语言包 key 一致性（基准: zh.js）');
 
-if (localeModules["zh"]) {
-  const baseKeys = extractKeyPaths(localeModules["zh"], "");
+if (localeModules['zh']) {
+  const baseKeys = extractKeyPaths(localeModules['zh'], '');
   const baseKeySet = new Set(baseKeys);
 
   for (const locale of EXPECTED_LOCALES) {
-    if (locale === "zh" || !localeModules[locale]) continue;
+    if (locale === 'zh' || !localeModules[locale]) {continue;}
 
-    const localeKeys = extractKeyPaths(localeModules[locale], "");
+    const localeKeys = extractKeyPaths(localeModules[locale], '');
     const localeKeySet = new Set(localeKeys);
 
     const missingKeys = baseKeys.filter((key) => !localeKeySet.has(key));
@@ -142,16 +142,16 @@ if (localeModules["zh"]) {
     }
   }
 } else {
-  logError("基准语言包 zh.js 不可用，跳过 key 一致性检查");
+  logError('基准语言包 zh.js 不可用，跳过 key 一致性检查');
 }
 
 // ── 检查 3：bin/yida.js 硬编码中文检测 ──────────────────────────────
 
-console.log("\n📋 检查 3：bin/yida.js 硬编码中文检测");
+console.log('\n📋 检查 3：bin/yida.js 硬编码中文检测');
 
 if (fs.existsSync(BIN_YIDA)) {
-  const yidaContent = fs.readFileSync(BIN_YIDA, "utf8");
-  const lines = yidaContent.split("\n");
+  const yidaContent = fs.readFileSync(BIN_YIDA, 'utf8');
+  const lines = yidaContent.split('\n');
 
   // 匹配包含中文字符的行（排除注释和合理的场景）
   const chinesePattern = /[\u4e00-\u9fff]/;
@@ -162,20 +162,20 @@ if (fs.existsSync(BIN_YIDA)) {
     const trimmed = line.trim();
 
     // 跳过注释行
-    if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) {
+    if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
       continue;
     }
 
     // 跳过 require 语句
-    if (trimmed.includes("require(")) continue;
+    if (trimmed.includes('require(')) {continue;}
 
     // 检测 console.log/console.error 中的硬编码中文
     if (chinesePattern.test(trimmed)) {
       // 检查是否在字符串字面量中（排除 t() 调用内的）
       // 简单策略：如果行中有中文且不是注释，就标记
       if (
-        (trimmed.includes("console.log") || trimmed.includes("console.error")) &&
-        !trimmed.includes("t(")
+        (trimmed.includes('console.log') || trimmed.includes('console.error')) &&
+        !trimmed.includes('t(')
       ) {
         hardcodedLines.push({ line: lineIndex + 1, content: trimmed });
       }
@@ -191,29 +191,29 @@ if (fs.existsSync(BIN_YIDA)) {
       console.warn(`         ... 还有 ${hardcodedLines.length - 10} 处`);
     }
   } else {
-    logSuccess("bin/yida.js 未发现硬编码中文（console 输出）");
+    logSuccess('bin/yida.js 未发现硬编码中文（console 输出）');
   }
 } else {
-  logError("bin/yida.js 文件不存在");
+  logError('bin/yida.js 文件不存在');
 }
 
 // ── 检查 4：翻译值非空检测 ───────────────────────────────────────────
 
-console.log("\n📋 检查 4：翻译值非空检测");
+console.log('\n📋 检查 4：翻译值非空检测');
 
 for (const locale of EXPECTED_LOCALES) {
-  if (!localeModules[locale]) continue;
+  if (!localeModules[locale]) {continue;}
 
-  const keys = extractKeyPaths(localeModules[locale], "");
+  const keys = extractKeyPaths(localeModules[locale], '');
   const emptyKeys = [];
 
   for (const keyPath of keys) {
-    const parts = keyPath.split(".");
+    const parts = keyPath.split('.');
     let value = localeModules[locale];
     for (const part of parts) {
       value = value[part];
     }
-    if (typeof value === "string" && value.trim() === "") {
+    if (typeof value === 'string' && value.trim() === '') {
       emptyKeys.push(keyPath);
     }
   }
@@ -226,21 +226,21 @@ for (const locale of EXPECTED_LOCALES) {
   }
 }
 
-logSuccess("翻译值非空检测完成");
+logSuccess('翻译值非空检测完成');
 
 // ── 汇总结果 ─────────────────────────────────────────────────────────
 
-console.log("\n" + "─".repeat(50));
+console.log('\n' + '─'.repeat(50));
 
 if (errorCount > 0) {
   console.error(`\n❌ 校验失败: ${errorCount} 个错误, ${warningCount} 个警告`);
-  console.error("请修复以上错误后重新提交。\n");
+  console.error('请修复以上错误后重新提交。\n');
   process.exit(1);
 } else if (warningCount > 0) {
   console.log(`\n⚠️  校验通过（有 ${warningCount} 个警告）`);
-  console.log("建议关注以上警告信息。\n");
+  console.log('建议关注以上警告信息。\n');
   process.exit(0);
 } else {
-  console.log("\n✅ i18n 校验全部通过！\n");
+  console.log('\n✅ i18n 校验全部通过！\n');
   process.exit(0);
 }

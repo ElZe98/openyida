@@ -9,15 +9,15 @@
  *
  * 用法：node scripts/sync-locales.js [--dry-run]
  */
-"use strict";
+'use strict';
 
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const LOCALES_DIR = path.join(__dirname, "..", "lib", "core", "locales");
-const isDryRun = process.argv.includes("--dry-run");
+const LOCALES_DIR = path.join(__dirname, '..', 'lib', 'core', 'locales');
+const isDryRun = process.argv.includes('--dry-run');
 
-const TARGET_LOCALES = ["en", "ja", "ko", "fr", "de", "es", "pt", "vi", "hi", "ar", "zh-TW"];
+const TARGET_LOCALES = ['en', 'ja', 'ko', 'fr', 'de', 'es', 'pt', 'vi', 'hi', 'ar', 'zh-TW'];
 
 // ── 工具函数 ─────────────────────────────────────────
 
@@ -28,7 +28,7 @@ function extractKeyPaths(obj, prefix) {
   const paths = [];
   for (const key of Object.keys(obj)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
-    if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
       paths.push(...extractKeyPaths(obj[key], fullKey));
     } else {
       paths.push(fullKey);
@@ -41,10 +41,10 @@ function extractKeyPaths(obj, prefix) {
  * 根据点号路径获取嵌套对象的值
  */
 function getNestedValue(obj, keyPath) {
-  const parts = keyPath.split(".");
+  const parts = keyPath.split('.');
   let current = obj;
   for (const part of parts) {
-    if (current === undefined || current === null || typeof current !== "object") {
+    if (current === undefined || current === null || typeof current !== 'object') {
       return undefined;
     }
     current = current[part];
@@ -56,11 +56,11 @@ function getNestedValue(obj, keyPath) {
  * 根据点号路径设置嵌套对象的值
  */
 function setNestedValue(obj, keyPath, value) {
-  const parts = keyPath.split(".");
+  const parts = keyPath.split('.');
   let current = obj;
   for (let i = 0; i < parts.length - 1; i++) {
     const part = parts[i];
-    if (current[part] === undefined || typeof current[part] !== "object") {
+    if (current[part] === undefined || typeof current[part] !== 'object') {
       current[part] = {};
     }
     current = current[part];
@@ -77,7 +77,7 @@ function serializeToModule(obj, fileHeader) {
   // 将 JSON 转为 JS 对象字面量格式
   let jsStr = jsonStr
     // 将 JSON key 的双引号去掉（如果 key 是合法标识符）
-    .replace(/"([a-zA-Z_$][a-zA-Z0-9_$]*)"\s*:/g, "$1:")
+    .replace(/"([a-zA-Z_$][a-zA-Z0-9_$]*)"\s*:/g, '$1:')
     // 保留含特殊字符的 key 的双引号（如 zh-TW）
     // 将值中的双引号字符串改为单引号（简单字符串）
     .replace(/: "((?:[^"\\]|\\.)*)"/g, function(match, content) {
@@ -86,11 +86,11 @@ function serializeToModule(obj, fileHeader) {
         return ': "' + content + '"';
       }
       // 如果内容包含 \n（实际换行转义），使用模板字符串
-      if (content.includes("\\n")) {
+      if (content.includes('\\n')) {
         const unescaped = content
-          .replace(/\\n/g, "\n")
+          .replace(/\\n/g, '\n')
           .replace(/\\"/g, '"');
-        return ": `" + unescaped + "`";
+        return ': `' + unescaped + '`';
       }
       return ": '" + content + "'";
     });
@@ -98,26 +98,26 @@ function serializeToModule(obj, fileHeader) {
   // 处理多行模板字符串值（已经是反引号包裹的）
   // JSON.stringify 会把模板字符串中的换行转为 \n，需要还原
   jsStr = jsStr.replace(/: `([^`]*)`/g, function(match, content) {
-    return ": `" + content + "`";
+    return ': `' + content + '`';
   });
 
-  return fileHeader + "module.exports = " + jsStr + ";\n";
+  return fileHeader + 'module.exports = ' + jsStr + ';\n';
 }
 
 // ── 主逻辑 ───────────────────────────────────────────
 
-console.log("📦 语言包同步工具");
-console.log("   基准: zh.js");
-console.log("   模式: " + (isDryRun ? "预览（不写入文件）" : "写入文件"));
-console.log("");
+console.log('📦 语言包同步工具');
+console.log('   基准: zh.js');
+console.log('   模式: ' + (isDryRun ? '预览（不写入文件）' : '写入文件'));
+console.log('');
 
 // 加载基准语言包
-const zhModule = require(path.join(LOCALES_DIR, "zh.js"));
-const enModule = require(path.join(LOCALES_DIR, "en.js"));
-const baseKeyPaths = extractKeyPaths(zhModule, "");
+const zhModule = require(path.join(LOCALES_DIR, 'zh.js'));
+const enModule = require(path.join(LOCALES_DIR, 'en.js'));
+const baseKeyPaths = extractKeyPaths(zhModule, '');
 
 console.log(`   基准 key 数量: ${baseKeyPaths.length}`);
-console.log("");
+console.log('');
 
 for (const locale of TARGET_LOCALES) {
   const filePath = path.join(LOCALES_DIR, `${locale}.js`);
@@ -128,8 +128,7 @@ for (const locale of TARGET_LOCALES) {
   }
 
   const existingModule = require(filePath);
-  const existingKeyPaths = extractKeyPaths(existingModule, "");
-  const existingKeySet = new Set(existingKeyPaths);
+  const existingKeyPaths = extractKeyPaths(existingModule, '');
 
   // 构建新的语言包对象
   const newModule = {};
@@ -145,7 +144,7 @@ for (const locale of TARGET_LOCALES) {
       // 目标语言包已有此 key，保留
       setNestedValue(newModule, keyPath, existingValue);
       preservedCount++;
-    } else if (locale !== "en") {
+    } else if (locale !== 'en') {
       // 缺失的 key，优先用 en.js 填充
       const enValue = getNestedValue(enModule, keyPath);
       if (enValue !== undefined) {
@@ -170,7 +169,7 @@ for (const locale of TARGET_LOCALES) {
     }
   }
 
-  const newKeyPaths = extractKeyPaths(newModule, "");
+  const newKeyPaths = extractKeyPaths(newModule, '');
 
   console.log(`📝 ${locale}.js:`);
   console.log(`   保留: ${preservedCount} | 从 en 填充: ${filledFromEnCount} | 从 zh 填充: ${filledFromZhCount} | 移除多余: ${removedCount}`);
@@ -178,38 +177,38 @@ for (const locale of TARGET_LOCALES) {
 
   if (!isDryRun) {
     // 读取原文件头部注释
-    const originalContent = fs.readFileSync(filePath, "utf8");
-    let fileHeader = "";
+    const originalContent = fs.readFileSync(filePath, 'utf8');
+    let fileHeader = '';
 
     // 提取文件头部（注释 + "use strict"）
     const headerMatch = originalContent.match(/^([\s\S]*?"use strict";\s*\n)/);
     if (headerMatch) {
-      fileHeader = headerMatch[1] + "\n";
+      fileHeader = headerMatch[1] + '\n';
     } else {
       // 如果没有匹配到，使用默认头部
       const langNames = {
-        en: "English", ja: "Japanese (日本語)", ko: "Korean (한국어)",
-        fr: "French (Français)", de: "German (Deutsch)", es: "Spanish (Español)",
-        pt: "Portuguese (Português)", vi: "Vietnamese (Tiếng Việt)",
-        hi: "Hindi (हिन्दी)", ar: "Arabic (العربية)", "zh-TW": "Traditional Chinese (繁體中文)",
+        en: 'English', ja: 'Japanese (日本語)', ko: 'Korean (한국어)',
+        fr: 'French (Français)', de: 'German (Deutsch)', es: 'Spanish (Español)',
+        pt: 'Portuguese (Português)', vi: 'Vietnamese (Tiếng Việt)',
+        hi: 'Hindi (हिन्दी)', ar: 'Arabic (العربية)', 'zh-TW': 'Traditional Chinese (繁體中文)',
       };
       fileHeader = `/**\n * ${locale}.js - ${langNames[locale] || locale} translations\n */\n"use strict";\n\n`;
     }
 
     // 写入文件 - 使用 JSON 序列化后手动转为 JS 格式
     const output = generateModuleSource(newModule, fileHeader, originalContent);
-    fs.writeFileSync(filePath, output, "utf8");
+    fs.writeFileSync(filePath, output, 'utf8');
     console.log(`   ✅ 已写入 ${locale}.js`);
   }
 
-  console.log("");
+  console.log('');
 }
 
 if (isDryRun) {
-  console.log("ℹ️  预览模式，未写入任何文件。去掉 --dry-run 参数以实际写入。");
+  console.log('ℹ️  预览模式，未写入任何文件。去掉 --dry-run 参数以实际写入。');
 }
 
-console.log("✅ 同步完成！");
+console.log('✅ 同步完成！');
 
 /**
  * 生成 module.exports 源码
@@ -224,7 +223,7 @@ function generateModuleSource(moduleObj, fileHeader, originalContent) {
     sectionComments[commentMatch[1]] = commentMatch[0];
   }
 
-  let output = fileHeader + "module.exports = {\n";
+  let output = fileHeader + 'module.exports = {\n';
 
   // 按 zh.js 的顶层 key 顺序输出
   const zhKeys = Object.keys(zhModule);
@@ -233,15 +232,15 @@ function generateModuleSource(moduleObj, fileHeader, originalContent) {
     const topKey = zhKeys[topIdx];
     const value = moduleObj[topKey];
 
-    if (value === undefined) continue;
+    if (value === undefined) {continue;}
 
     // 尝试添加分节注释
     const sectionComment = findSectionComment(topKey, originalContent);
     if (sectionComment) {
-      output += "\n  " + sectionComment + "\n";
+      output += '\n  ' + sectionComment + '\n';
     }
 
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       output += `  ${formatKey(topKey)}: {\n`;
       const subKeys = Object.keys(value);
       for (let subIdx = 0; subIdx < subKeys.length; subIdx++) {
@@ -249,21 +248,21 @@ function generateModuleSource(moduleObj, fileHeader, originalContent) {
         const subValue = value[subKey];
         output += `    ${formatKey(subKey)}: ${formatValue(subValue)}`;
         if (subIdx < subKeys.length - 1) {
-          output += ",";
+          output += ',';
         } else {
-          output += ",";
+          output += ',';
         }
-        output += "\n";
+        output += '\n';
       }
-      output += "  }";
+      output += '  }';
     } else {
       output += `  ${formatKey(topKey)}: ${formatValue(value)}`;
     }
 
-    output += ",\n";
+    output += ',\n';
   }
 
-  output += "};\n";
+  output += '};\n';
   return output;
 }
 
@@ -279,7 +278,7 @@ function findSectionComment(topKey, originalContent) {
   }
 
   // 使用 zh.js 原文件的注释映射
-  const zhContent = fs.readFileSync(path.join(LOCALES_DIR, "zh.js"), "utf8");
+  const zhContent = fs.readFileSync(path.join(LOCALES_DIR, 'zh.js'), 'utf8');
   const zhMatch = zhContent.match(keyPattern);
   if (zhMatch) {
     return zhMatch[1].trim();
@@ -302,23 +301,23 @@ function formatKey(key) {
  * 格式化值为 JS 字面量
  */
 function formatValue(value) {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     // 多行字符串使用模板字符串
-    if (value.includes("\n")) {
+    if (value.includes('\n')) {
       // 转义模板字符串中的反引号和 ${
-      const escaped = value.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
-      return "`" + escaped + "`";
+      const escaped = value.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+      return '`' + escaped + '`';
     }
     // 单行字符串
     if (value.includes("'") && !value.includes('"')) {
-      return '"' + value.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
+      return '"' + value.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
     }
     if (value.includes("'") && value.includes('"')) {
-      return "`" + value.replace(/\\/g, "\\\\").replace(/`/g, "\\`") + "`";
+      return '`' + value.replace(/\\/g, '\\\\').replace(/`/g, '\\`') + '`';
     }
-    return "'" + value.replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'";
+    return "'" + value.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
   }
-  if (typeof value === "number" || typeof value === "boolean") {
+  if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value);
   }
   return JSON.stringify(value);
