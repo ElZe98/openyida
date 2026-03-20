@@ -151,9 +151,7 @@ openyida copy
               ↓
 [Step 6] 发布页面 → openyida publish
               ↓
-[Step 7]（按需）配置公开访问 → openyida verify-short-url / save-share-config
-              ↓
-[Step 8] 输出访问链接，用系统浏览器打开
+[Step 7] 输出访问链接，用系统浏览器打开
 ```
 
 ---
