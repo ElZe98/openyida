@@ -151,10 +151,10 @@ openyida copy
               ↓
 [Step 6] 发布页面 → openyida publish
               ↓
-[Step 7]（按需）配置公开访问 → openyida verify-short-url / save-share-config
-              ↓
-[Step 8] 输出访问链接，用系统浏览器打开
+[Step 7] 输出访问链接，用系统浏览器打开
 ```
+
+> ⚠️ **公开访问配置不在主流程中**：若用户明确要求配置公开访问或组织内分享，再执行 `openyida verify-short-url` / `save-share-config`，详见 `skills/yida-page-config/SKILL.md`。
 
 ---
 
