@@ -547,6 +547,16 @@ async function main() {
       break;
     }
 
+    case 'query-data': {
+      if (args.length < 2) {
+        console.error('用法：openyida query-data <appType> <formUuid> [--page N] [--size N] [--search-json JSON] [--inst-id ID]');
+        process.exit(1);
+      }
+      const { run: runQueryData } = require('../lib/query-data');
+      await runQueryData(args);
+      break;
+    }
+
     default: {
       console.error(t('cli.unknown_command', command));
       console.error(t('cli.run_help'));
