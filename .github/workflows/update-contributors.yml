@@ -182,21 +182,15 @@ jobs:
           print(f"\n✅ 共获取到 {len(all_logins)} 位 GitHub 贡献者")
 
           # ============================================================
-          # 第三步：对比 README，找出新贡献者并更新所有 README 文件
+          # 第三步：对比 README，找出新贡献者并更新
           # ============================================================
-          import glob
+          with open("README.md", "r", encoding="utf-8") as f:
+              readme_content = f.read()
 
-          readme_files = glob.glob("README*.md")
-          print(f"📋 找到 {len(readme_files)} 个 README 文件")
-
-          # 从第一个文件获取已有贡献者
-          existing_users = set()
-          for readme_file in readme_files:
-              with open(readme_file, "r", encoding="utf-8") as f:
-                  content = f.read()
-              users = set(u.lower() for u in re.findall(r'href="https://github\.com/([^"]+)"', content))
-              existing_users.update(users)
-          print(f"=== 当前所有 README 中已有贡献者: {len(existing_users)} 位 ===")
+          existing_users = set(
+              u.lower() for u in re.findall(r'href="https://github\.com/([^"]+)"', readme_content)
+          )
+          print(f"=== 当前 README 中已有贡献者: {len(existing_users)} 位 ===")
 
           bot_patterns = re.compile(r'\[bot\]|dependabot|github-actions|renovate|actions-user', re.IGNORECASE)
 
@@ -230,9 +224,14 @@ jobs:
               print("\n✅ 没有新贡献者需要添加，README 无需更新")
               sys.exit(0)
 
-          print(f"\n📝 添加 {len(new_html_parts)} 位新贡献者到所有 README 文件...")
+          print(f"\n📝 添加 {len(new_html_parts)} 位新贡献者到 README...")
 
           new_html_str = " " + " ".join(new_html_parts)
+          import glob
+
+          readme_files = glob.glob("README*.md")
+          print(f"📋 找到 {len(readme_files)} 个 README 文件")
+
           pattern = r'(<p align="left" id="contributors">)(.*?)(</p>)'
 
           def replacer(m):
