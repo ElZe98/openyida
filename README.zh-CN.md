@@ -162,7 +162,7 @@ npx clawhub@latest install nicky1108/yida-app
 
 感谢所有为 OpenYida 做出贡献的开发者！欢迎阅读 [贡献指南](./CONTRIBUTING.md) 参与共建。
 
-<p align="left">
+<p align="left" id="contributors">
   <a href="https://github.com/yize"><img src="https://avatars.githubusercontent.com/u/1578814?v=4&s=48" width="48" height="48" alt="九神" title="九神"/></a>
   <a href="https://github.com/alex-mm"><img src="https://avatars.githubusercontent.com/u/3302053?v=4&s=48" width="48" height="48" alt="天晟" title="天晟"/></a>
   <a href="https://github.com/nicky1108"><img src="https://avatars.githubusercontent.com/u/4279283?v=4&s=48" width="48" height="48" alt="nicky1108" title="nicky1108"/></a>
