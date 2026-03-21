@@ -1,9 +1,9 @@
 /**
  * 手动更新 README contributors 的脚本
- * 
+ *
  * 使用方法：
  *   npm run contributors
- * 
+ *
  * 前置条件：
  *   已安装 gh 命令行工具并登录（gh auth login）
  */
