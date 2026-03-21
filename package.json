@@ -22,7 +22,8 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint bin/ lib/ scripts/ --ext .js",
     "lint:fix": "eslint bin/ lib/ scripts/ --ext .js --fix",
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node scripts/postinstall.js",
+    "contributors": "node scripts/update-contributors.js"
   },
   "keywords": ["yida", "aliwork", "dingtalk", "cli", "openyida", "low-code", "ai", "qoder", "wukong"],
   "author": "OpenYida Contributors",
