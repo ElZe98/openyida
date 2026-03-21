@@ -156,3 +156,8 @@ openyida/
 - 检查 `lib/login.js` 中的 Cookie 缓存逻辑
 - 使用 `openyida env` 确认当前环境检测是否正确
 - 悟空环境使用 CDP 协议，其他环境使用扫码登录
+
+### 更新贡献者
+- 运行 `npm run contributors` 自动更新所有 README 文件中的贡献者列表
+- 前置条件：已安装 gh 命令行工具并登录（`gh auth login`）
+- 脚本会自动跳过机器人账号，只添加新贡献者
