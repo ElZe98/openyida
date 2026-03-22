@@ -77,22 +77,61 @@ npm install -g openyida
 ## أوامر CLI
 
 ```bash
-openyida env                  # اكتشاف بيئة أداة الذكاء الاصطناعي الحالية وحالة تسجيل الدخول
-openyida login                # تسجيل الدخول إلى Yida (الذاكرة المؤقتة أولاً، وإلا رمز QR)
-openyida logout               # تسجيل الخروج / تبديل الحساب
-openyida copy                 # تهيئة دليل project لأداة الذكاء الاصطناعي الحالية
-openyida create-app           # إنشاء تطبيق Yida
-openyida create-page          # إنشاء صفحة عرض مخصصة
-openyida create-form          # إنشاء / تحديث صفحة نموذج
-openyida get-schema           # جلب مخطط النموذج
-openyida publish              # تجميع ونشر صفحة مخصصة
-openyida verify-short-url     # التحقق من إمكانية الوصول إلى رابط مختصر
-openyida save-share-config    # حفظ إعدادات الوصول العام / المشاركة
-openyida get-page-config      # الاستعلام عن إعدادات الوصول العام / المشاركة لصفحة
-openyida update-form-config   # تحديث إعدادات النموذج
-openyida cdn-config           # إعداد رفع الصور إلى CDN (Aliyun OSS + CDN)
-openyida cdn-upload           # رفع الصور إلى CDN
-openyida cdn-refresh          # تحديث ذاكرة CDN المؤقتة
+# البيئة والمصادقة
+openyida env                                   # اكتشاف بيئة أداة الذكاء الاصطناعي الحالية وحالة تسجيل الدخول
+openyida login                                 # تسجيل الدخول إلى Yida (الذاكرة المؤقتة أولاً، وإلا رمز QR)
+openyida logout                                # تسجيل الخروج / تبديل الحساب
+openyida copy                                  # تهيئة دليل project لأداة الذكاء الاصطناعي الحالية
+openyida auth status                           # عرض حالة تسجيل الدخول الحالية
+openyida auth login                            # تنفيذ تسجيل الدخول
+openyida auth refresh                          # تحديث حالة تسجيل الدخول
+openyida auth logout                           # تسجيل الخروج
+openyida org list                              # سرد المؤسسات المتاحة
+openyida org switch                            # تبديل المؤسسة (--corp-id <corpId>)
+openyida doctor                                # تشخيص البيئة والإصلاح التلقائي (--fix, --report, إلخ)
+
+# التطبيق والنموذج
+openyida create-app                            # إنشاء تطبيق
+openyida create-page                           # إنشاء صفحة عرض مخصصة
+openyida create-form                           # إنشاء أو تحديث صفحة نموذج
+openyida get-schema                            # جلب مخطط النموذج
+openyida publish                               # تجميع ونشر صفحة مخصصة
+openyida update-form-config                    # تحديث إعدادات النموذج
+openyida export                                # تصدير التطبيق
+openyida import                                # استيراد حزمة الترحيل
+
+# تكوين الصفحة والمشاركة
+openyida verify-short-url                      # التحقق من إمكانية الوصول إلى رابط مختصر
+openyida save-share-config                     # حفظ إعدادات الوصول العام / المشاركة
+openyida get-page-config                       # الاستعلام عن إعدادات مشاركة الصفحة
+
+# إدارة البيانات
+openyida data                                  # إدارة البيانات الموحدة
+openyida query-data                            # الاستعلام عن بيانات نموذج البيانات
+
+# الأذونات والعملية
+openyida get-permission                        # الاستعلام عن تكوين أذونات النموذج
+openyida save-permission                       # حفظ تكوين أذونات النموذج
+openyida configure-process                     # تكوين ونشر العملية
+openyida create-process                        # إنشاء نموذج العملية
+
+# الموصل (HTTP)
+openyida connector list                        # سرد الموصلات HTTP
+openyida connector create                      # إنشاء موصل
+openyida connector detail                      # عرض تفاصيل الموصل
+openyida connector delete                      # حذف الموصل
+openyida connector add-action                  # إضافة إجراء إلى الموصل
+openyida connector test                        # اختبار إجراء الموصل
+openyida connector smart-create                # إنشاء ذكي من أمر curl
+
+# التقرير
+openyida create-report                         # إنشاء تقرير Yida مع الرسوم البيانية
+openyida append-chart                          # إضافة رسوم بيانية إلى التقرير
+
+# CDN
+openyida cdn-config                            # إعداد رفع الصور إلى CDN
+openyida cdn-upload                            # رفع الصور إلى CDN
+openyida cdn-refresh                           # تحديث ذاكرة CDN المؤقتة
 ```
 
 ---

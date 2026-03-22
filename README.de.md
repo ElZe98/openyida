@@ -77,22 +77,61 @@ Erstelle eine persönliche Gehaltsrechner-App
 ## CLI-Befehle
 
 ```bash
-openyida env                  # Aktuelle KI-Tool-Umgebung und Login-Status erkennen
-openyida login                # Bei Yida anmelden (Cache bevorzugt, sonst QR-Code)
-openyida logout               # Abmelden / Konto wechseln
-openyida copy                 # Project-Verzeichnis für aktuelles KI-Tool initialisieren
-openyida create-app           # Yida-App erstellen
-openyida create-page          # Benutzerdefinierte Anzeigeseite erstellen
-openyida create-form          # Formularseite erstellen / aktualisieren
-openyida get-schema           # Formular-Schema abrufen
-openyida publish              # Benutzerdefinierte Seite kompilieren und veröffentlichen
-openyida verify-short-url     # Prüfen ob eine Kurz-URL erreichbar ist
-openyida save-share-config    # Öffentlichen Zugang / Freigabe-Konfiguration speichern
-openyida get-page-config      # Öffentlichen Zugang / Freigabe-Konfiguration einer Seite abfragen
-openyida update-form-config   # Formularkonfiguration aktualisieren
-openyida cdn-config           # CDN-Bild-Upload konfigurieren (Aliyun OSS + CDN)
-openyida cdn-upload           # Bilder zum CDN hochladen
-openyida cdn-refresh          # CDN-Cache aktualisieren
+# Umgebung und Authentifizierung
+openyida env                                   # Aktuelle KI-Tool-Umgebung und Login-Status erkennen
+openyida login                                 # Bei Yida anmelden (Cache bevorzugt, sonst QR-Code)
+openyida logout                                # Abmelden / Konto wechseln
+openyida copy                                  # Project-Verzeichnis für aktuelles KI-Tool initialisieren
+openyida auth status                           # Aktuellen Login-Status anzeigen
+openyida auth login                            # Anmeldung durchführen
+openyida auth refresh                          # Login-Status aktualisieren
+openyida auth logout                           # Abmelden
+openyida org list                              # Zugängliche Organisationen auflisten
+openyida org switch                            # Organisation wechseln (--corp-id <corpId>)
+openyida doctor                                # Umgebungsdiagnose & automatische Reparatur (--fix, --report usw.)
+
+# App und Formular
+openyida create-app                            # App erstellen
+openyida create-page                           # Benutzerdefinierte Anzeigeseite erstellen
+openyida create-form                           # Formularseite erstellen oder aktualisieren
+openyida get-schema                            # Formular-Schema abrufen
+openyida publish                               # Benutzerdefinierte Seite kompilieren und veröffentlichen
+openyida update-form-config                    # Formularkonfiguration aktualisieren
+openyida export                                # App exportieren
+openyida import                                # Migrationspaket importieren
+
+# Seitenkonfiguration und Freigabe
+openyida verify-short-url                      # Prüfen ob eine Kurz-URL erreichbar ist
+openyida save-share-config                     # Öffentlichen Zugang / Freigabe-Konfiguration speichern
+openyida get-page-config                       # Seitenfreigabe-Konfiguration abfragen
+
+# Datenverwaltung
+openyida data                                  # Einheitliche Datenverwaltung
+openyida query-data                            # Formularinstanzdaten abfragen
+
+# Berechtigungen und Prozess
+openyida get-permission                        # Formularberechtigungskonfiguration abfragen
+openyida save-permission                       # Formularberechtigungskonfiguration speichern
+openyida configure-process                     # Prozess konfigurieren und veröffentlichen
+openyida create-process                        # Prozessformular erstellen
+
+# Konnektor (HTTP)
+openyida connector list                        # HTTP-Konnektoren auflisten
+openyida connector create                      # Konnektor erstellen
+openyida connector detail                      # Konnektordetails anzeigen
+openyida connector delete                      # Konnektor löschen
+openyida connector add-action                  # Konnektoraktion hinzufügen
+openyida connector test                        # Konnektoraktion testen
+openyida connector smart-create                # Intelligent aus curl-Befehl erstellen
+
+# Bericht
+openyida create-report                         # Yida-Bericht mit Diagrammen erstellen
+openyida append-chart                          # Diagramme an Bericht anhängen
+
+# CDN
+openyida cdn-config                            # CDN-Bild-Upload konfigurieren
+openyida cdn-upload                            # Bilder zum CDN hochladen
+openyida cdn-refresh                           # CDN-Cache aktualisieren
 ```
 
 ---

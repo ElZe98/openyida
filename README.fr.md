@@ -77,22 +77,61 @@ Crée une application de calcul de salaire personnel
 ## Commandes CLI
 
 ```bash
-openyida env                  # Détecter l'environnement IA actuel et le statut de connexion
-openyida login                # Se connecter à Yida (cache en priorité, sinon QR code)
-openyida logout               # Se déconnecter / changer de compte
-openyida copy                 # Initialiser le répertoire project pour l'outil IA actuel
-openyida create-app           # Créer une application Yida
-openyida create-page          # Créer une page d'affichage personnalisée
-openyida create-form          # Créer / mettre à jour une page de formulaire
-openyida get-schema           # Récupérer le schéma de formulaire
-openyida publish              # Compiler et publier une page personnalisée
-openyida verify-short-url     # Vérifier si une URL courte est accessible
-openyida save-share-config    # Sauvegarder la config d'accès public / partage
-openyida get-page-config      # Consulter la config d'accès public / partage d'une page
-openyida update-form-config   # Mettre à jour la configuration du formulaire
-openyida cdn-config           # Configurer l'upload d'images CDN (Aliyun OSS + CDN)
-openyida cdn-upload           # Uploader des images vers le CDN
-openyida cdn-refresh          # Rafraîchir le cache CDN
+# Environnement et authentification
+openyida env                                   # Détecter l'environnement IA actuel et le statut de connexion
+openyida login                                 # Se connecter à Yida (cache en priorité, sinon QR code)
+openyida logout                                # Se déconnecter / changer de compte
+openyida copy                                  # Initialiser le répertoire project pour l'outil IA actuel
+openyida auth status                           # Afficher le statut de connexion actuel
+openyida auth login                            # Exécuter la connexion
+openyida auth refresh                          # Actualiser le statut de connexion
+openyida auth logout                           # Se déconnecter
+openyida org list                              # Lister les organisations accessibles
+openyida org switch                            # Changer d'organisation (--corp-id <corpId>)
+openyida doctor                                # Diagnostic d'environnement et réparation auto (--fix, --report etc.)
+
+# Application et formulaire
+openyida create-app                            # Créer une application
+openyida create-page                           # Créer une page d'affichage personnalisée
+openyida create-form                           # Créer ou mettre à jour une page de formulaire
+openyida get-schema                            # Récupérer le schéma de formulaire
+openyida publish                               # Compiler et publier une page personnalisée
+openyida update-form-config                    # Mettre à jour la configuration du formulaire
+openyida export                                # Exporter l'application
+openyida import                                # Importer le package de migration
+
+# Configuration et partage de page
+openyida verify-short-url                      # Vérifier si une URL courte est accessible
+openyida save-share-config                     # Sauvegarder la config d'accès public / partage
+openyida get-page-config                       # Consulter la config de partage de page
+
+# Gestion des données
+openyida data                                  # Gestion unifiée des données
+openyida query-data                            # Consulter les données d'instance de formulaire
+
+# Permissions et processus
+openyida get-permission                        # Consulter la config de permissions du formulaire
+openyida save-permission                       # Sauvegarder la config de permissions du formulaire
+openyida configure-process                     # Configurer et publier un processus
+openyida create-process                        # Créer un formulaire de processus
+
+# Connecteur (HTTP)
+openyida connector list                        # Lister les connecteurs HTTP
+openyida connector create                      # Créer un connecteur
+openyida connector detail                      # Afficher les détails du connecteur
+openyida connector delete                      # Supprimer un connecteur
+openyida connector add-action                  # Ajouter une action au connecteur
+openyida connector test                        # Tester une action de connecteur
+openyida connector smart-create                # Créer intelligemment depuis une commande curl
+
+# Rapport
+openyida create-report                         # Créer un rapport Yida avec graphiques
+openyida append-chart                          # Ajouter des graphiques au rapport
+
+# CDN
+openyida cdn-config                            # Configurer l'upload d'images CDN
+openyida cdn-upload                            # Uploader des images vers le CDN
+openyida cdn-refresh                           # Rafraîchir le cache CDN
 ```
 
 ---

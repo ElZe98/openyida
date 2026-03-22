@@ -77,22 +77,61 @@ CRMシステムを構築して
 ## CLIコマンド一覧
 
 ```bash
-openyida env                  # 現在のAIツール環境とログイン状態を確認
-openyida login                # Yidaにログイン（キャッシュ優先、なければQRコード）
-openyida logout               # ログアウト / アカウント切り替え
-openyida copy                 # 現在のAIツール環境にprojectディレクトリを初期化
-openyida create-app           # Yidaアプリを作成
-openyida create-page          # カスタム表示ページを作成
-openyida create-form          # フォームページを作成 / 更新
-openyida get-schema           # フォームスキーマを取得
-openyida publish              # カスタムページをコンパイルして公開
-openyida verify-short-url     # 短縮URLが利用可能か確認
-openyida save-share-config    # 公開アクセス / 共有設定を保存
-openyida get-page-config      # ページの公開アクセス / 共有設定を照会
-openyida update-form-config   # フォーム設定を更新
-openyida cdn-config           # CDN画像アップロードを設定（Aliyun OSS + CDN）
-openyida cdn-upload           # CDNに画像をアップロード
-openyida cdn-refresh          # CDNキャッシュを更新
+# 環境とログイン
+openyida env                                   # 現在のAIツール環境とログイン状態を確認
+openyida login                                 # Yidaにログイン（キャッシュ優先、なければQRコード）
+openyida logout                                # ログアウト / アカウント切り替え
+openyida copy                                  # 現在のAIツール環境にprojectディレクトリを初期化
+openyida auth status                           # 現在のログイン状態を表示
+openyida auth login                            # ログインを実行
+openyida auth refresh                          # ログイン状態を更新
+openyida auth logout                           # ログアウト
+openyida org list                              # アクセス可能な組織を一覧表示
+openyida org switch                            # 組織を切り替え（--corp-id <corpId>）
+openyida doctor                                # 環境診断と自動修復（--fix, --report など）
+
+# アプリとフォーム
+openyida create-app                            # アプリを作成
+openyida create-page                           # カスタム表示ページを作成
+openyida create-form                           # フォームページを作成または更新
+openyida get-schema                            # フォームスキーマを取得
+openyida publish                               # カスタムページをコンパイルして公開
+openyida update-form-config                    # フォーム設定を更新
+openyida export                                # アプリをエクスポート
+openyida import                                # 移行パッケージをインポート
+
+# ページ設定と共有
+openyida verify-short-url                      # 短縮URLが利用可能か確認
+openyida save-share-config                     # 公開アクセス / 共有設定を保存
+openyida get-page-config                       # ページ共有設定を照会
+
+# データ管理
+openyida data                                  # 統合データ管理
+openyida query-data                            # フォームインスタンスデータを照会
+
+# 権限とプロセス
+openyida get-permission                        # フォーム権限設定を照会
+openyida save-permission                       # フォーム権限設定を保存
+openyida configure-process                     # プロセスを設定して公開
+openyida create-process                        # プロセスフォームを作成
+
+# コネクタ（HTTP）
+openyida connector list                        # HTTPコネクタを一覧表示
+openyida connector create                      # コネクタを作成
+openyida connector detail                      # コネクタの詳細を表示
+openyida connector delete                      # コネクタを削除
+openyida connector add-action                  # コネクタアクションを追加
+openyida connector test                        # コネクタアクションをテスト
+openyida connector smart-create                # curlコマンドからスマート作成
+
+# レポート
+openyida create-report                         # チャート付きYidaレポートを作成
+openyida append-chart                          # レポートにチャートを追加
+
+# CDN
+openyida cdn-config                            # CDN画像アップロードを設定
+openyida cdn-upload                            # CDNに画像をアップロード
+openyida cdn-refresh                           # CDNキャッシュを更新
 ```
 
 ---

@@ -77,22 +77,61 @@ Tạo ứng dụng tính lương cá nhân
 ## Lệnh CLI
 
 ```bash
-openyida env                  # Phát hiện môi trường công cụ AI hiện tại và trạng thái đăng nhập
-openyida login                # Đăng nhập Yida (ưu tiên cache, nếu không có thì dùng QR code)
-openyida logout               # Đăng xuất / chuyển tài khoản
-openyida copy                 # Khởi tạo thư mục project cho công cụ AI hiện tại
-openyida create-app           # Tạo ứng dụng Yida
-openyida create-page          # Tạo trang hiển thị tùy chỉnh
-openyida create-form          # Tạo / cập nhật trang biểu mẫu
-openyida get-schema           # Lấy schema biểu mẫu
-openyida publish              # Biên dịch và xuất bản trang tùy chỉnh
-openyida verify-short-url     # Kiểm tra URL rút gọn có khả dụng không
-openyida save-share-config    # Lưu cấu hình truy cập công khai / chia sẻ
-openyida get-page-config      # Truy vấn cấu hình truy cập công khai / chia sẻ của trang
-openyida update-form-config   # Cập nhật cấu hình biểu mẫu
-openyida cdn-config           # Cấu hình tải ảnh CDN (Aliyun OSS + CDN)
-openyida cdn-upload           # Tải ảnh lên CDN
-openyida cdn-refresh          # Làm mới cache CDN
+# Môi trường và đăng nhập
+openyida env                                   # Phát hiện môi trường công cụ AI hiện tại và trạng thái đăng nhập
+openyida login                                 # Đăng nhập Yida (ưu tiên cache, nếu không có thì dùng QR code)
+openyida logout                                # Đăng xuất / chuyển tài khoản
+openyida copy                                  # Khởi tạo thư mục project cho công cụ AI hiện tại
+openyida auth status                           # Xem trạng thái đăng nhập hiện tại
+openyida auth login                            # Thực hiện đăng nhập
+openyida auth refresh                          # Làm mới trạng thái đăng nhập
+openyida auth logout                           # Đăng xuất
+openyida org list                              # Liệt kê các tổ chức có thể truy cập
+openyida org switch                            # Chuyển tổ chức (--corp-id <corpId>)
+openyida doctor                                # Chẩn đoán môi trường và sửa tự động (--fix, --report, v.v.)
+
+# Ứng dụng và biểu mẫu
+openyida create-app                            # Tạo ứng dụng
+openyida create-page                           # Tạo trang hiển thị tùy chỉnh
+openyida create-form                           # Tạo hoặc cập nhật trang biểu mẫu
+openyida get-schema                            # Lấy schema biểu mẫu
+openyida publish                               # Biên dịch và xuất bản trang tùy chỉnh
+openyida update-form-config                    # Cập nhật cấu hình biểu mẫu
+openyida export                                # Xuất ứng dụng
+openyida import                                # Nhập gói di chuyển
+
+# Cấu hình và chia sẻ trang
+openyida verify-short-url                      # Kiểm tra URL rút gọn có khả dụng không
+openyida save-share-config                     # Lưu cấu hình truy cập công khai / chia sẻ
+openyida get-page-config                       # Truy vấn cấu hình chia sẻ trang
+
+# Quản lý dữ liệu
+openyida data                                  # Quản lý dữ liệu thống nhất
+openyida query-data                            # Truy vấn dữ liệu phiên bản biểu mẫu
+
+# Quyền và quy trình
+openyida get-permission                        # Truy vấn cấu hình quyền biểu mẫu
+openyida save-permission                       # Lưu cấu hình quyền biểu mẫu
+openyida configure-process                     # Cấu hình và xuất bản quy trình
+openyida create-process                        # Tạo biểu mẫu quy trình
+
+# Kết nối (HTTP)
+openyida connector list                        # Liệt kê các kết nối HTTP
+openyida connector create                      # Tạo kết nối
+openyida connector detail                      # Xem chi tiết kết nối
+openyida connector delete                      # Xóa kết nối
+openyida connector add-action                  # Thêm hành động vào kết nối
+openyida connector test                        # Kiểm tra hành động kết nối
+openyida connector smart-create                # Tạo thông minh từ lệnh curl
+
+# Báo cáo
+openyida create-report                         # Tạo báo cáo Yida với biểu đồ
+openyida append-chart                          # Thêm biểu đồ vào báo cáo
+
+# CDN
+openyida cdn-config                            # Cấu hình tải ảnh CDN
+openyida cdn-upload                            # Tải ảnh lên CDN
+openyida cdn-refresh                           # Làm mới cache CDN
 ```
 
 ---

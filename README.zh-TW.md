@@ -77,22 +77,61 @@ npm install -g openyida
 ## CLI 指令一覽
 
 ```bash
-openyida env                  # 偵測目前 AI 工具環境和登入狀態
-openyida login                # 登入宜搭（優先快取，否則掃碼）
-openyida logout               # 登出 / 切換帳號
-openyida copy                 # 初始化 project 工作目錄到目前 AI 工具環境
-openyida create-app           # 建立宜搭應用
-openyida create-page          # 建立自訂展示頁面
-openyida create-form          # 建立 / 更新表單頁面
-openyida get-schema           # 取得表單 Schema
-openyida publish              # 編譯並發布自訂頁面
-openyida verify-short-url     # 驗證短網址是否可用
-openyida save-share-config    # 儲存公開存取 / 分享設定
-openyida get-page-config      # 查詢頁面公開存取 / 分享設定
-openyida update-form-config   # 更新表單設定
-openyida cdn-config           # 設定 CDN 圖片上傳（阿里雲 OSS + CDN）
-openyida cdn-upload           # 上傳圖片到 CDN
-openyida cdn-refresh          # 重新整理 CDN 快取
+# 環境與登入
+openyida env                                   # 偵測目前 AI 工具環境和登入狀態
+openyida login                                 # 登入宜搭（優先快取，否則掃碼）
+openyida logout                                # 登出 / 切換帳號
+openyida copy                                  # 初始化 project 工作目錄
+openyida auth status                           # 查看目前登入狀態
+openyida auth login                            # 執行登入
+openyida auth refresh                          # 重新整理登入態
+openyida auth logout                           # 登出
+openyida org list                              # 列出可存取的組織
+openyida org switch                            # 切換組織（--corp-id <corpId>）
+openyida doctor                                # 環境診斷與自動修復（--fix, --report 等）
+
+# 應用與表單
+openyida create-app                            # 建立應用
+openyida create-page                           # 建立自訂展示頁面
+openyida create-form                           # 建立或更新表單頁面
+openyida get-schema                            # 取得表單 Schema
+openyida publish                               # 編譯並發布自訂頁面
+openyida update-form-config                    # 更新表單設定
+openyida export                                # 匯出應用
+openyida import                                # 匯入遷移套件
+
+# 頁面設定與分享
+openyida verify-short-url                      # 驗證短網址是否可用
+openyida save-share-config                     # 儲存公開存取 / 分享設定
+openyida get-page-config                       # 查詢頁面分享設定
+
+# 資料管理
+openyida data                                  # 統一資料管理
+openyida query-data                            # 查詢表單執行個體資料
+
+# 權限與流程
+openyida get-permission                        # 查詢表單權限設定
+openyida save-permission                       # 儲存表單權限設定
+openyida configure-process                     # 設定並發布流程
+openyida create-process                        # 建立流程表單
+
+# 連接器（HTTP）
+openyida connector list                        # 列出 HTTP 連接器
+openyida connector create                      # 建立連接器
+openyida connector detail                      # 檢視連接器詳情
+openyida connector delete                      # 刪除連接器
+openyida connector add-action                  # 新增連接器操作
+openyida connector test                        # 測試連接器操作
+openyida connector smart-create                # 從 curl 命令智慧建立
+
+# 報表
+openyida create-report                         # 建立宜搭報表（帶圖表）
+openyida append-chart                          # 向報表新增圖表
+
+# CDN
+openyida cdn-config                            # 設定 CDN 圖片上傳
+openyida cdn-upload                            # 上傳圖片到 CDN
+openyida cdn-refresh                           # 重新整理 CDN 快取
 ```
 
 ---

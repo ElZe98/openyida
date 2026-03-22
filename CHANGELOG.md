@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2026.03.22-1] - 2026-03-22
+
+### Added
+- `yida-custom-page` 技能新增「JSX 编译错误自查清单」：禁止语法、易错点详解、快速验证脚本
+- 编译错误提示优化：publish 时自动输出常见错误原因和解决方案
+
+### Changed
+- 统一 `yida-publish-page` 文档使用 `openyida publish` 命令格式
+- 修正编译工具名称（`@ali/vu-babel-transform` → `@babel/standalone`）
+- 主 SKILL.md 添加 JSX 编译规范为第 0 条关键规则
+
 ## [2026.03.22] - 2026-03-22
 
 ### Added
@@ -118,8 +129,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 优化 Babel 编译错误提示信息
 - 修复 `SKILL.md` 编号问题
 
-[Unreleased]: https://github.com/openyida/openyida/compare/v2026.3.22...HEAD
-[2026.03.22]: https://github.com/openyida/openyida/compare/v2026.03.21-1...v2026.3.22
+[Unreleased]: https://github.com/openyida/openyida/compare/v2026.03.22-1...HEAD
+[2026.03.22-1]: https://github.com/openyida/openyida/compare/v2026.03.22...v2026.03.22-1
+[2026.03.22]: https://github.com/openyida/openyida/compare/v2026.03.21-1...v2026.03.22
 [2026.03.21]: https://github.com/openyida/openyida/compare/v2026.03.20-2...v2026.03.21
 [2026.03.20]: https://github.com/openyida/openyida/compare/v2026.03.19...v2026.03.20
 [2026.03.19]: https://github.com/openyida/openyida/compare/v1.0.0-beta.0...v2026.03.19

@@ -77,22 +77,61 @@ CRM 시스템 구축해줘
 ## CLI 명령어 목록
 
 ```bash
-openyida env                  # 현재 AI 도구 환경 및 로그인 상태 확인
-openyida login                # Yida 로그인 (캐시 우선, 없으면 QR 코드)
-openyida logout               # 로그아웃 / 계정 전환
-openyida copy                 # 현재 AI 도구 환경에 project 디렉토리 초기화
-openyida create-app           # Yida 앱 생성
-openyida create-page          # 커스텀 표시 페이지 생성
-openyida create-form          # 폼 페이지 생성 / 업데이트
-openyida get-schema           # 폼 스키마 가져오기
-openyida publish              # 커스텀 페이지 컴파일 및 배포
-openyida verify-short-url     # 단축 URL 사용 가능 여부 확인
-openyida save-share-config    # 공개 접근 / 공유 설정 저장
-openyida get-page-config      # 페이지 공개 접근 / 공유 설정 조회
-openyida update-form-config   # 폼 설정 업데이트
-openyida cdn-config           # CDN 이미지 업로드 설정 (Aliyun OSS + CDN)
-openyida cdn-upload           # CDN에 이미지 업로드
-openyida cdn-refresh          # CDN 캐시 갱신
+# 환경 및 로그인
+openyida env                                   # 현재 AI 도구 환경 및 로그인 상태 확인
+openyida login                                 # Yida 로그인 (캐시 우선, 없으면 QR 코드)
+openyida logout                                # 로그아웃 / 계정 전환
+openyida copy                                  # 현재 AI 도구 환경에 project 디렉토리 초기화
+openyida auth status                           # 현재 로그인 상태 보기
+openyida auth login                            # 로그인 실행
+openyida auth refresh                          # 로그인 상태 새로고침
+openyida auth logout                           # 로그아웃
+openyida org list                              # 액세스 가능한 조직 목록
+openyida org switch                            # 조직 전환 (--corp-id <corpId>)
+openyida doctor                                # 환경 진단 및 자동 수정 (--fix, --report 등)
+
+# 앱 및 폼
+openyida create-app                            # 앱 생성
+openyida create-page                           # 커스텀 표시 페이지 생성
+openyida create-form                           # 폼 페이지 생성 또는 업데이트
+openyida get-schema                            # 폼 스키마 가져오기
+openyida publish                               # 커스텀 페이지 컴파일 및 배포
+openyida update-form-config                    # 폼 설정 업데이트
+openyida export                                # 앱 내보내기
+openyida import                                # 마이그레이션 패키지 가져오기
+
+# 페이지 설정 및 공유
+openyida verify-short-url                      # 단축 URL 사용 가능 여부 확인
+openyida save-share-config                     # 공개 접근 / 공유 설정 저장
+openyida get-page-config                       # 페이지 공유 설정 조회
+
+# 데이터 관리
+openyida data                                  # 통합 데이터 관리
+openyida query-data                            # 폼 인스턴스 데이터 조회
+
+# 권한 및 프로세스
+openyida get-permission                        # 폼 권한 설정 조회
+openyida save-permission                       # 폼 권한 설정 저장
+openyida configure-process                     # 프로세스 설정 및 배포
+openyida create-process                        # 프로세스 폼 생성
+
+# 커넥터 (HTTP)
+openyida connector list                        # HTTP 커넥터 목록
+openyida connector create                      # 커넥터 생성
+openyida connector detail                      # 커넥터 상세 보기
+openyida connector delete                      # 커넥터 삭제
+openyida connector add-action                  # 커넥터 액션 추가
+openyida connector test                        # 커넥터 액션 테스트
+openyida connector smart-create                # curl 명령에서 스마트 생성
+
+# 보고서
+openyida create-report                         # 차트가 포함된 Yida 보고서 생성
+openyida append-chart                          # 보고서에 차트 추가
+
+# CDN
+openyida cdn-config                            # CDN 이미지 업로드 설정
+openyida cdn-upload                            # CDN에 이미지 업로드
+openyida cdn-refresh                           # CDN 캐시 새로고침
 ```
 
 ---

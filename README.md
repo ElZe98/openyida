@@ -72,66 +72,76 @@ Create a personal salary calculator app
 |------------|---------|---------|
 | Node.js | ≥ 18 | CLI runtime & page publishing |
 
+### ⚠️ JSX Compilation Notes
+
+When developing custom pages, the code must be compatible with **React 16 + Babel ES2015**. Avoid using:
+- ❌ Class fields syntax (`count = 0`)
+- ❌ `import` / `export default`
+- ❌ Optional chaining (`obj?.prop`) / Nullish coalescing (`a ?? b`)
+- ⚠️ Event handlers must use arrow functions: `onClick={(e) => { this.handle(e); }}`
+
+See `skills/yida-custom-page/SKILL.md` for detailed guidelines and troubleshooting.
+
 ---
 
 ## CLI Commands
 
 ```bash
 # Environment & Auth
-openyida env                  # Detect current AI tool environment and login status
-openyida login                # Log in to Yida (uses cache, falls back to QR code)
-openyida logout               # Log out / switch account
-openyida copy                 # Initialize project working directory for current AI tool
-openyida auth status          # View current login status
-openyida auth login           # Perform login
-openyida auth refresh         # Refresh login session
-openyida auth logout          # Log out
-openyida org list             # List accessible organizations
-openyida org switch           # Switch organization (--corp-id <corpId>)
-openyida doctor               # Environment diagnostics & auto-fix (--fix, --report, etc.)
+openyida env                                   # Detect current AI tool environment and login status
+openyida login                                 # Log in to Yida (uses cache, falls back to QR code)
+openyida logout                                # Log out / switch account
+openyida copy                                  # Initialize project working directory for current AI tool
+openyida auth status                           # View current login status
+openyida auth login                            # Perform login
+openyida auth refresh                          # Refresh login session
+openyida auth logout                           # Log out
+openyida org list                              # List accessible organizations
+openyida org switch                            # Switch organization (--corp-id <corpId>)
+openyida doctor                                # Environment diagnostics & auto-fix (--fix, --report, etc.)
 
 # App & Form Management
-openyida create-app           # Create a Yida application
-openyida create-page          # Create a custom display page
-openyida create-form          # Create / update a form page
-openyida get-schema           # Fetch form schema
-openyida publish              # Compile and publish a custom page
-openyida update-form-config   # Update form configuration
-openyida export               # Export app (generate migration package)
-openyida import               # Import migration package, rebuild app
+openyida create-app                            # Create application
+openyida create-page                           # Create custom display page
+openyida create-form                           # Create or update form page
+openyida get-schema                            # Fetch form schema
+openyida publish                               # Compile and publish custom page
+openyida update-form-config                    # Update form configuration
+openyida export                                # Export app
+openyida import                                # Import migration package
 
 # Page Config & Sharing
-openyida verify-short-url     # Verify if a short URL is accessible
-openyida save-share-config    # Save public access / sharing config
-openyida get-page-config      # Query page public access / sharing config
+openyida verify-short-url                      # Verify short URL accessibility
+openyida save-share-config                     # Save public access / sharing config
+openyida get-page-config                       # Query page sharing config
 
 # Data Management
-openyida data                 # Unified data management (form/process/task/subform)
-openyida query-data           # Query form instance data
+openyida data                                  # Unified data management
+openyida query-data                            # Query form instance data
 
 # Permissions & Process
-openyida get-permission       # Query form permission config
-openyida save-permission      # Save form permission config
-openyida configure-process    # Configure and publish a process
-openyida create-process       # Create a process form (integrated)
+openyida get-permission                        # Query form permission config
+openyida save-permission                       # Save form permission config
+openyida configure-process                     # Configure and publish process
+openyida create-process                        # Create process form
 
 # Connector (HTTP)
-openyida connector list       # List HTTP connectors
-openyida connector create     # Create a connector
-openyida connector detail     # View connector details
-openyida connector delete     # Delete a connector
-openyida connector add-action # Add an action to a connector
-openyida connector test       # Test a connector action
-openyida connector smart-create # Smart create connector from curl command
+openyida connector list                        # List HTTP connectors
+openyida connector create                      # Create a connector
+openyida connector detail                      # View connector details
+openyida connector delete                      # Delete a connector
+openyida connector add-action                  # Add an action to a connector
+openyida connector test                        # Test a connector action
+openyida connector smart-create                # Smart create from curl command
 
 # Report
-openyida create-report        # Create a Yida report with charts
-openyida append-chart         # Append chart(s) to an existing report
+openyida create-report                         # Create Yida report with charts
+openyida append-chart                          # Append charts to existing report
 
 # CDN
-openyida cdn-config           # Configure CDN image upload (Aliyun OSS + CDN)
-openyida cdn-upload           # Upload images to CDN
-openyida cdn-refresh          # Refresh CDN cache
+openyida cdn-config                            # Configure CDN image upload
+openyida cdn-upload                            # Upload images to CDN
+openyida cdn-refresh                           # Refresh CDN cache
 ```
 
 ---

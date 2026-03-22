@@ -77,22 +77,61 @@ CRM सिस्टम बनाओ
 ## CLI कमांड
 
 ```bash
-openyida env                  # वर्तमान AI टूल वातावरण और लॉगिन स्थिति का पता लगाएं
-openyida login                # Yida में लॉगिन करें (कैश प्राथमिकता, अन्यथा QR कोड)
-openyida logout               # लॉगआउट / खाता बदलें
-openyida copy                 # वर्तमान AI टूल के लिए project डायरेक्टरी इनिशियलाइज़ करें
-openyida create-app           # Yida ऐप बनाएं
-openyida create-page          # कस्टम डिस्प्ले पेज बनाएं
-openyida create-form          # फ़ॉर्म पेज बनाएं / अपडेट करें
-openyida get-schema           # फ़ॉर्म स्कीमा प्राप्त करें
-openyida publish              # कस्टम पेज कंपाइल और प्रकाशित करें
-openyida verify-short-url     # शॉर्ट URL उपलब्ध है या नहीं जांचें
-openyida save-share-config    # सार्वजनिक एक्सेस / शेयरिंग कॉन्फ़िग सहेजें
-openyida get-page-config      # पेज की सार्वजनिक एक्सेस / शेयरिंग कॉन्फ़िग देखें
-openyida update-form-config   # फ़ॉर्म कॉन्फ़िगरेशन अपडेट करें
-openyida cdn-config           # CDN इमेज अपलोड कॉन्फ़िगर करें (Aliyun OSS + CDN)
-openyida cdn-upload           # CDN पर इमेज अपलोड करें
-openyida cdn-refresh          # CDN कैश रिफ्रेश करें
+# वातावरण और प्रमाणीकरण
+openyida env                                   # वर्तमान AI टूल वातावरण और लॉगिन स्थिति का पता लगाएं
+openyida login                                 # Yida में लॉगिन करें (कैश प्राथमिकता, अन्यथा QR कोड)
+openyida logout                                # लॉगआउट / खाता बदलें
+openyida copy                                  # वर्तमान AI टूल के लिए project डायरेक्टरी इनिशियलाइज़ करें
+openyida auth status                           # वर्तमान लॉगिन स्थिति देखें
+openyida auth login                            # लॉगिन करें
+openyida auth refresh                          # लॉगिन स्थिति रिफ्रेश करें
+openyida auth logout                           # लॉगआउट करें
+openyida org list                              # सुलभ संगठनों की सूची बनाएं
+openyida org switch                            # संगठन बदलें (--corp-id <corpId>)
+openyida doctor                                # वातावरण निदान और ऑटो-फिक्स (--fix, --report, आदि)
+
+# ऐप और फॉर्म
+openyida create-app                            # ऐप बनाएं
+openyida create-page                           # कस्टम डिस्प्ले पेज बनाएं
+openyida create-form                           # फॉर्म पेज बनाएं या अपडेट करें
+openyida get-schema                            # फॉर्म स्कीमा प्राप्त करें
+openyida publish                               # कस्टम पेज कंपाइल और पब्लिश करें
+openyida update-form-config                    # फॉर्म कॉन्फ़िगरेशन अपडेट करें
+openyida export                                # ऐप एक्सपोर्ट करें
+openyida import                                # माइग्रेशन पैकेज इम्पोर्ट करें
+
+# पेज कॉन्फ़िगरेशन और शेयरिंग
+openyida verify-short-url                      # शॉर्ट URL उपलब्ध है या नहीं जांचें
+openyida save-share-config                     # सार्वजनिक एक्सेस / शेयरिंग कॉन्फ़िग सहेजें
+openyida get-page-config                       # पेज शेयरिंग कॉन्फ़िग देखें
+
+# डेटा प्रबंधन
+openyida data                                  # एकीकृत डेटा प्रबंधन
+openyida query-data                            # फॉर्म इंस्टेंस डेटा क्वेरी करें
+
+# अनुमति और प्रक्रिया
+openyida get-permission                        # फॉर्म अनुमति कॉन्फ़िग देखें
+openyida save-permission                       # फॉर्म अनुमति कॉन्फ़िग सहेजें
+openyida configure-process                     # प्रक्रिया कॉन्फ़िगर करें और पब्लिश करें
+openyida create-process                        # प्रक्रिया फॉर्म बनाएं
+
+# कनेक्टर (HTTP)
+openyida connector list                        # HTTP कनेक्टर्स की सूची बनाएं
+openyida connector create                      # कनेक्टर बनाएं
+openyida connector detail                      # कनेक्टर विवरण देखें
+openyida connector delete                      # कनेक्टर हटाएं
+openyida connector add-action                  # कनेक्टर में ऐक्शन जोड़ें
+openyida connector test                        # कनेक्टर ऐक्शन टेस्ट करें
+openyida connector smart-create                # curl कमांड से स्मार्ट बनाएं
+
+# रिपोर्ट
+openyida create-report                         # चार्ट के साथ Yida रिपोर्ट बनाएं
+openyida append-chart                          # रिपोर्ट में चार्ट जोड़ें
+
+# CDN
+openyida cdn-config                            # CDN इमेज अपलोड कॉन्फ़िगर करें
+openyida cdn-upload                            # CDN पर इमेज अपलोड करें
+openyida cdn-refresh                           # CDN कैश रिफ्रेश करें
 ```
 
 ---
