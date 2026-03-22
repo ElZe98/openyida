@@ -991,7 +991,7 @@ openyida publish <源文件路径> <appType> <formUuid>
 ```
 
 **处理流程**：
-1. 通过 `@ali/vu-babel-transform` 将 JSX 转换为 ES5 + UglifyJS 压缩
+1. 通过 `@babel/standalone` 将 JSX 转换为 ES5 + UglifyJS 压缩
 2. 通过代码动态构建完整的 Schema JSON，将 `source` 和 `compiled` 填入 `actions.module`
 3. 调用 `yida-login` 获取登录态（Cookie 持久化，首次需扫码登录）
 4. 通过 HTTP POST 调用 `saveFormSchema` 接口保存 Schema
@@ -1002,7 +1002,7 @@ openyida publish <源文件路径> <appType> <formUuid>
 openyida publish <源文件路径> <appType> <formUuid>
 ```
 
-输入 JSX 源文件，输出编译压缩后的 `<name>.compile.js`（与源文件同目录）。
+输入 JSX 源文件，通过 Babel 编译 + UglifyJS 压缩后输出到 `pages/dist/` 目录。
 
 ---
 ## 素材资源指南
