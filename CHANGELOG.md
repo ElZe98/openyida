@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2026.03.22-2] - 2026-03-22
+
+### Changed
+- 修正 `yida-custom-page` 技能编译工具名称（`@ali/vu-babel-transform` → `@babel/standalone`）
+
 ## [2026.03.22-1] - 2026-03-22
 
 ### Added
@@ -129,7 +134,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - 优化 Babel 编译错误提示信息
 - 修复 `SKILL.md` 编号问题
 
-[Unreleased]: https://github.com/openyida/openyida/compare/v2026.03.22-1...HEAD
+[Unreleased]: https://github.com/openyida/openyida/compare/v2026.03.22-2...HEAD
+[2026.03.22-2]: https://github.com/openyida/openyida/compare/v2026.03.22-1...v2026.03.22-2
 [2026.03.22-1]: https://github.com/openyida/openyida/compare/v2026.03.22...v2026.03.22-1
 [2026.03.22]: https://github.com/openyida/openyida/compare/v2026.03.21-1...v2026.03.22
 [2026.03.21]: https://github.com/openyida/openyida/compare/v2026.03.20-2...v2026.03.21

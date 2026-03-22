@@ -38,6 +38,7 @@ Thumbs.db
 coverage/
 
 # AI 工具配置（保留 CLAUDE.md）
+.qoder/*
 .claude/*
 !.claude/CLAUDE.md
 # ── openyida 用户工作区 ────────────────────────────
