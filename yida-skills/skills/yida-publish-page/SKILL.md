@@ -29,48 +29,33 @@ metadata:
 - 用户修改了页面代码，需要重新部署
 - 开发流程中的最后一步：发布页面
 
-## 使用示例
-
-### 示例 1：发布自定义页面
-**场景**：将 JSX 源码编译并发布到宜搭
-**命令**：
-```bash
-node <skill_root>/yida-publish-page/scripts/publish.js APP_XXX FORM-XXX pages/src/my-page.js
-```
-**输出**：
-```json
-{"success":true,"formUuid":"FORM-XXX","version":0}
-```
-
 ## 使用方式
 
 ```bash
-cd <skill_root>/yida-publish/scripts
-npm install  # 首次需要安装依赖
-node publish.js <appType> <formUuid> <源文件路径>
+openyida publish <源文件路径> <appType> <formUuid>
 ```
 
 **参数说明**：
 
 | 参数 | 说明 | 示例 |
 | --- | --- | --- |
+| `源文件路径` | 源码文件路径（相对于项目根目录） | `pages/src/xxx.js` |
 | `appType` | 应用 ID | `APP_E0MZ4VB75ZMB1BIGNVT4` |
 | `formUuid` | 自定义页面 ID | `FORM-XXX` |
-| `源文件路径` | 源码文件路径（相对于项目根目录） | `pages/src/xxx.js` |
 
-> `baseUrl` 无需手动传入，脚本会自动从 `.cache/cookies.json` 读取登录态（若不存在或接口返回 302，则自动触发扫码登录），并从中读取 `base_url`。
+> `baseUrl` 无需手动传入，命令会自动从 `.cache/cookies.json` 读取登录态（若不存在或接口返回 302，则自动触发扫码登录），并从中读取 `base_url`。
 
 **示例**：
 
 ```bash
-node publish.js APP_XXX FORM-XXXXXX pages/src/xxx.js
+openyida publish pages/src/my-page.js APP_XXX FORM-XXXXXX
 ```
 
 ## 工作流程
 
-1. **编译源码**：通过 `@ali/vu-babel-transform` 将 JSX 转换为 ES5，再通过 UglifyJS 压缩
+1. **编译源码**：通过 `@babel/standalone` 将 JSX 转换为 ES5（兼容 IE11），再通过 UglifyJS 压缩
 2. **构建 Schema**：通过代码动态构建完整的 Schema JSON，将编译后的 `source` 和 `compiled` 填入 `actions.module`
-3. **读取登录态**：读取项目根目录的 `.cache/cookies.json`；若不存在则自动调用 `login.py` 触发扫码登录
+3. **读取登录态**：读取项目根目录的 `.cache/cookies.json`；若不存在则自动调用 yida-login 触发扫码登录
 4. **发布 Schema**：通过 HTTP POST 调用 `saveFormSchema` 接口保存 Schema；根据响应体 `errorCode` 自动处理异常（详见 `yida-login` 技能文档「错误处理机制」章节）
 5. **更新表单配置**：调用 `updateFormConfig` 接口，设置 `MINI_RESOURCE` 配置为 `8`；同样根据响应体 `errorCode` 自动处理异常
 
@@ -112,9 +97,7 @@ body { background-color: #f2f3f5; }
 - Python 3.12+（用于调用 yida-login）
 - playwright（Python 版，yida-login 依赖）
 
-```bash
-cd <skill_root>/yida-publish-page/scripts && npm install
-```
+> openyida CLI 已包含所有 Node.js 依赖，无需单独安装。
 
 ## 文件结构
 
@@ -132,6 +115,10 @@ yida-publish/
 `saveFormSchema` 和 `updateFormConfig` 接口的完整参数、返回值和错误处理机制，请参考 `../../reference/yida-api.md` 文档中的「表单设计类 API」章节。
 
 > **注意**：自定义页面发布时，`updateFormConfig` 的 `value` 参数固定为 `8`（区别于表单页面的 `0`）。
+
+## 遇到编译错误？
+
+发布时如果遇到 JSX 编译错误，请查看 `yida-custom-page` 技能的「⚠️ JSX 编译错误自查清单」章节，详细列出了常见错误原因和解决方案。
 
 ## 与其他技能配合
 

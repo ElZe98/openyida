@@ -245,6 +245,7 @@ describe("detectActiveTool", () => {
     delete process.env.CLAUDE_CODE;
     delete process.env.OPENCODE;
     delete process.env.QODER_IDE;
+    delete process.env.QODER_AGENT;
     delete process.env.CURSOR_TRACE_ID;
     process.env.AGENT_WORK_ROOT = "/home/user/.real/workspace";
     const result = detectActiveTool();
@@ -299,3 +300,66 @@ describe("detectActiveTool", () => {
     fs.existsSync = originalExistsSync;
   });
 });
+
+// ── findProjectRoot ──────────────────────────────────────────────────
+
+describe("findProjectRoot", () => {
+  const { findProjectRoot } = require("../lib/core/utils");
+  const originalEnv = { ...process.env };
+
+  afterEach(() => {
+    Object.keys(process.env).forEach((key) => {
+      if (!(key in originalEnv)) delete process.env[key];
+    });
+    Object.assign(process.env, originalEnv);
+  });
+
+  test("Qoder 环境且 project 目录存在时返回 workspace/project", () => {
+    delete process.env.OPENCODE;
+    delete process.env.CLAUDE_CODE;
+    delete process.env.CURSOR_TRACE_ID;
+    delete process.env.AGENT_WORK_ROOT;
+    delete process.env.TERM_PROGRAM;
+    process.env.QODER_IDE = "1";
+    
+    const result = findProjectRoot();
+    expect(result).toBe(path.join(process.cwd(), "project"));
+  });
+
+  test("Claude Code 环境时返回当前目录下的 project", () => {
+    delete process.env.QODER_IDE;
+    delete process.env.QODER_AGENT;
+    delete process.env.OPENCODE;
+    delete process.env.CURSOR_TRACE_ID;
+    delete process.env.AGENT_WORK_ROOT;
+    delete process.env.TERM_PROGRAM;
+    process.env.CLAUDE_CODE = "1";
+    
+    const result = findProjectRoot();
+    expect(result).toBe(path.join(process.cwd(), "project"));
+  });
+
+  test("无活跃工具时返回当前工作目录", () => {
+    delete process.env.QODER_IDE;
+    delete process.env.QODER_AGENT;
+    delete process.env.OPENCODE;
+    delete process.env.CLAUDE_CODE;
+    delete process.env.CURSOR_TRACE_ID;
+    delete process.env.AGENT_WORK_ROOT;
+    delete process.env.TERM_PROGRAM;
+    
+    // 确保 .aone_copilot 目录不存在
+    const originalExistsSync = fs.existsSync;
+    fs.existsSync = (p) => {
+      if (p.includes(".aone_copilot")) return false;
+      return originalExistsSync(p);
+    };
+    
+    const result = findProjectRoot();
+    expect(result).toBe(process.cwd());
+    
+    fs.existsSync = originalExistsSync;
+  });
+});
+
+// ── findProjectRoot ──────────────────────────────────────────────────

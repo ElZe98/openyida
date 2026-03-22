@@ -6,6 +6,8 @@ const {
   genNodeId,
   genFieldAlias,
   genFieldId,
+  inferDataType,
+  deriveFilterFieldCode,
 } = require("../lib/report/constants");
 
 // ── CHART_COMPONENT_MAP ───────────────────────────────────
@@ -123,5 +125,118 @@ describe("genFieldId", () => {
     const fieldId = genFieldId("Chart");
     const suffix = fieldId.split("_")[1];
     expect(suffix).toMatch(/^[a-z0-9]{8}$/);
+  });
+});
+
+// ── inferDataType ───────────────────────────────────────────
+
+describe("inferDataType", () => {
+  test("EmployeeField 推断为 ARRAY", () => {
+    expect(inferDataType("EmployeeField")).toBe("ARRAY");
+  });
+
+  test("DepartmentSelectField 推断为 ARRAY", () => {
+    expect(inferDataType("DepartmentSelectField")).toBe("ARRAY");
+  });
+
+  test("MultiSelectField 推断为 ARRAY", () => {
+    expect(inferDataType("MultiSelectField")).toBe("ARRAY");
+  });
+
+  test("CheckboxField 推断为 ARRAY", () => {
+    expect(inferDataType("CheckboxField")).toBe("ARRAY");
+  });
+
+  test("DateField 推断为 DATE", () => {
+    expect(inferDataType("DateField")).toBe("DATE");
+  });
+
+  test("CascadeDateField 推断为 DATE", () => {
+    expect(inferDataType("CascadeDateField")).toBe("DATE");
+  });
+
+  test("NumberField 推断为 DOUBLE", () => {
+    expect(inferDataType("NumberField")).toBe("DOUBLE");
+  });
+
+  test("RateField 推断为 DOUBLE", () => {
+    expect(inferDataType("RateField")).toBe("DOUBLE");
+  });
+
+  test("TextField 推断为 STRING", () => {
+    expect(inferDataType("TextField")).toBe("STRING");
+  });
+
+  test("TextareaField 推断为 STRING", () => {
+    expect(inferDataType("TextareaField")).toBe("STRING");
+  });
+
+  test("SelectField 推断为 STRING", () => {
+    expect(inferDataType("SelectField")).toBe("STRING");
+  });
+
+  test("RadioField 推断为 STRING", () => {
+    expect(inferDataType("RadioField")).toBe("STRING");
+  });
+
+  test("未知类型默认返回 STRING", () => {
+    expect(inferDataType("UnknownField")).toBe("STRING");
+  });
+
+  test("显式指定 dataType 时优先使用", () => {
+    expect(inferDataType("TextField", "NUMBER")).toBe("NUMBER");
+    expect(inferDataType("NumberField", "STRING")).toBe("STRING");
+  });
+});
+
+// ── deriveFilterFieldCode ──────────────────────────────────
+
+describe("deriveFilterFieldCode", () => {
+  test("selectField_xxx 自动添加 _value 后缀", () => {
+    expect(deriveFilterFieldCode("selectField_abc123")).toBe("selectField_abc123_value");
+  });
+
+  test("multiSelectField_xxx 自动添加 _value 后缀", () => {
+    expect(deriveFilterFieldCode("multiSelectField_xyz")).toBe("multiSelectField_xyz_value");
+  });
+
+  test("radioField_xxx 自动添加 _value 后缀", () => {
+    expect(deriveFilterFieldCode("radioField_test")).toBe("radioField_test_value");
+  });
+
+  test("checkboxField_xxx 自动添加 _value 后缀", () => {
+    expect(deriveFilterFieldCode("checkboxField_opt")).toBe("checkboxField_opt_value");
+  });
+
+  test("employeeField_xxx 自动添加 _value 后缀", () => {
+    expect(deriveFilterFieldCode("employeeField_emp")).toBe("employeeField_emp_value");
+  });
+
+  test("departmentSelectField_xxx 自动添加 _value 后缀", () => {
+    expect(deriveFilterFieldCode("departmentSelectField_dept")).toBe("departmentSelectField_dept_value");
+  });
+
+  test("textField_xxx 不添加后缀", () => {
+    expect(deriveFilterFieldCode("textField_text")).toBe("textField_text");
+  });
+
+  test("numberField_xxx 不添加后缀", () => {
+    expect(deriveFilterFieldCode("numberField_num")).toBe("numberField_num");
+  });
+
+  test("未知类型无后缀", () => {
+    expect(deriveFilterFieldCode("unknownField_xxx")).toBe("unknownField_xxx");
+  });
+
+  test("显式传入 SelectField 类型时添加后缀", () => {
+    expect(deriveFilterFieldCode("anyField_xxx", "SelectField")).toBe("anyField_xxx_value");
+  });
+
+  test("显式传入 TextField 类型时不添加后缀", () => {
+    expect(deriveFilterFieldCode("anyField_xxx", "TextField")).toBe("anyField_xxx");
+  });
+
+  test("显式传入 MultiSelectField 类型时添加后缀", () => {
+    expect(deriveFilterFieldCode("anyField_xxx", "MultiSelectField")).toBe("anyField_xxx_value");
   });
 });

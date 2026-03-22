@@ -147,6 +147,21 @@ openyida copy
 
 ## 关键规则
 
+### 0. 编写代码前必须学习 JSX 编译规范（最重要）
+
+> **发布前必读**：遇到 JSX 编译错误时，90% 是因为代码中使用了禁止的语法。请务必在编写代码前完整阅读 `skills/yida-custom-page/SKILL.md` 中的「⚠️ JSX 编译错误自查清单」章节。
+
+**绝对禁止的语法**：
+- ❌ Class Fields 语法（`count = 0`）
+- ❌ `import` 语句
+- ❌ `export default`
+- ❌ Optional Chaining（`obj?.prop`）
+- ❌ Nullish Coalescing（`a ?? b`）
+
+**极易出错的地方**：
+- ⚠️ 事件绑定必须用箭头函数：`onClick={(e) => { this.handle(e); }}`
+- ⚠️ style 属性必须用 camelCase：`style={{ backgroundColor: 'red' }}`
+
 ### 1. 执行子技能前必须完整的读取其 SKILL.md
 
 每个子技能的详细参数、注意事项、示例均在其 SKILL.md 中。**执行任何子技能前，必须先完整的读取对应的 SKILL.md**，不要凭记忆猜测参数格式。
