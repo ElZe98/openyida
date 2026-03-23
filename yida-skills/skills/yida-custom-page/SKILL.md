@@ -22,12 +22,8 @@ metadata:
 
 本技能提供在阿里宜搭低代码平台上开发**自定义页面**的完整能力，涵盖从编码到部署的全流程：
 
-| 能力 | 说明 |
-| --- | --- |
-| **表单数据操作** | 通过宜搭前端 JS API（`this.utils.yida.*`）对表单数据进行增删改查 |
-| **JSX 组件开发** | 编写 React 16 兼容的 JSX 代码，实现个性化定制页面 |
-| **AI 能力集成** | 调用大模型 AI 接口（`/query/intelligent/txtFromAI.json`）实现智能文本生成 |
-| **自动编译部署** | 通过工具链将源码编译、压缩，并自动合并到宜搭 Schema 中保存 |
+1. 编写符合宜搭开发规范的 jsx 代码。
+2. 使用 `openyida compile` 编译代码，或使用 `openyida publish` 编译并发布到宜搭平台。
 
 ## 何时使用
 
@@ -36,6 +32,410 @@ metadata:
 - 用户需要实现复杂的页面交互逻辑
 - 用户需要调用宜搭 JS API 进行数据操作
 - 已有自定义页面，需要编写或修改 JSX 代码
+
+---
+
+## 开发规范
+
+> **以下规范是编写宜搭自定义页面代码的核心约束，必须严格遵守。**
+
+### 运行环境与约束
+
+宜搭自定义页面的 JSX 组件本质上是 **React 类组件中的 render 方法**，而非独立的 React 组件。因此存在以下关键约束：
+
+| 约束 | 说明 |
+| --- | --- |
+| **React 版本** | 必须兼容 **React 16**，禁止使用 Hooks（`useState`、`useEffect` 等） |
+| **单文件** | 所有代码写在一个文件中（如 `index.js`）|
+| **三方包引入** | 禁止使用 `import/require` 语法，如需使用第三方库，必须通过 `this.utils.loadScript` 加载 CDN 脚本，参考 [yida-api.md](../../reference/yida-api.md) 的「工具类 API」章节。|
+| **函数声明格式** | 必须使用 `export function xxx() {}` 格式声明函数，使用 this.xxx 调用函数。 |
+| **样式** | 所有 css 必须写在 renderJsx 的方法中，通过 style 的方式引入 |
+| **JavaScript 版本** | 默认使用 ES2015 (ES6) 语法 |
+| **必须定义 renderJsx 函数** | renderJsx 是宜搭自定义页面核心渲染函数，也是入口函数，必须严格定义，不要改为其他名称 |
+| **禁止使用 `this.setState` 管理业务状态** | `this.setState` 已被覆盖，使用 `this.setCustomState` |
+| **`this` 上下文** | 只有使用了 export 声明的函数中才能使用 `this` |
+
+### 代码结构
+
+**一个完整的宜搭自定义页面必须定义一个全局变量和 6 个 export 导出的方法**
+
+> 🚨 **`_customState` 是全局变量，绝对不能写成 `export function _customState() {}`！必须写成 `const _customState = { ... }` 的变量形式。**
+- 全局变量：
+  ``` js
+  const _customState = {
+    count: 0,
+    loading: false,
+  };
+  ```
+- `export function getCustomState () {}` — 读取自定义状态，传入 key 返回单个值，不传返回全部状态的浅拷贝
+- `export function setCustomState () {}` — 合并更新状态并自动触发重新渲染（内部调用 `forceUpdate`）
+- `export function forceUpdate () {}` — 通过更新 `timestamp` 强制触发 React 重渲染
+- `export function didMount () {}` — 组件挂载后执行（等同于 `componentDidMount`），用于初始化数据、启动定时器
+- `export function didUnmount () {}` — 组件卸载时执行，用于清理定时器、解绑事件，防止内存泄漏
+- `export function renderJsx () {}` — 页面渲染入口（等同于 `render`），返回 JSX。⚠️ **每个 `return` 分支都必须包含 `<div style={{ display: 'none' }}>{this.state.timestamp}</div>`**，否则 `forceUpdate` 调用 `this.setState({ timestamp })` 后 React 无法检测到输出变化，页面将无法更新。
+
+> 🚨 **强制要求：所有生成的代码必须以下面的示例为基础进行扩展，禁止从零自行构造页面骨架。**
+**完整示例：**
+```javascript
+
+// ⚠️ 注意：_customState 是全局变量，不是 export function
+// 正确写法如下：
+const _customState = {
+  // 在此定义所有业务状态的初始值
+  count: 0,
+  loading: false,
+};
+
+/**
+ * 获取状态
+ * @param {string} [key] - 传入 key 返回单个值，不传返回全部状态的浅拷贝
+ */
+export function getCustomState(key) {
+  if (key) {
+    return _customState[key];
+  }
+  return { ..._customState };
+}
+
+/**
+ * 设置状态（合并更新，自动触发重新渲染）
+ * @param {Object} newState - 需要更新的状态键值对
+ */
+export function setCustomState(newState) {
+  Object.keys(newState).forEach(function(key) {
+    _customState[key] = newState[key];
+  });
+  this.forceUpdate();
+}
+
+/**
+ * 强制重新渲染（通过更新 timestamp 触发 React 重渲染）
+ */
+export function forceUpdate() {
+  this.setState({ timestamp: new Date().getTime() });
+}
+
+// ============================================================
+// 生命周期
+// ============================================================
+
+/**
+ * 组件挂载到 DOM 后（等同于 componentDidMount）
+ * 用于：初始化数据、启动定时器、绑定事件等
+ */
+export function didMount() {
+  // 初始化逻辑
+}
+
+/**
+ * 页面卸载时调用
+ * 用于：清理定时器、解绑事件、释放资源等
+ */
+export function didUnmount() {
+  // 清理逻辑
+}
+
+export function handleSubmit(e) {
+  this.setCustomState({ submitted: true });
+  this.utils.toast({ title: '提交成功', type: 'success' });
+}
+// ============================================================
+// 渲染
+// ============================================================
+
+/**
+ * 页面渲染函数（等同于 React 类组件的 render 方法）
+ * 注意：必须包含隐藏的 timestamp div 以支持 forceUpdate 机制
+ * 
+ */
+// ⚠️ **关键约束：`renderJsx` 的每个 `return` 分支都必须包含 `<div style={{ display: 'none' }}>{this.state.timestamp}</div>`**，否则 `forceUpdate` 调用 `this.setState({ timestamp })` 后，React 无法检测到输出变化，`renderJsx` 不会被重新执行，页面将无法更新。这是宜搭渲染引擎触发重渲染的核心机制。
+export function renderJsx() {
+  const { timestamp } = this.state;
+
+  return (
+    <div>
+      {/* 必须保留：用于触发重新渲染 */}
+      <div style={{ display: "none" }}>{timestamp}</div>
+
+      {/* 页面内容写在这里 */}
+      <div onClick={(e) => { this.handleSubmit(e) }}>提交</div>
+    </div>
+  );
+}
+
+```
+
+### 状态管理使用方式
+
+```javascript
+// 获取全部状态（返回浅拷贝）
+const state = this.getCustomState();
+
+// 获取单个状态值
+const count = this.getCustomState('count');
+
+// 设置状态并自动触发重新渲染
+this.setCustomState({ count: count + 1, loading: true });
+
+// 仅触发重新渲染（不修改状态）
+this.forceUpdate();
+```
+
+### 生命周期钩子
+
+| 钩子函数 | 触发时机 | 典型用途 |
+| --- | --- | --- |
+| `export function didMount()` | 组件挂载到 DOM 后（等同于 componentDidMount）| 初始化数据加载、启动定时器、绑定事件 |
+| `export function didUnmount()` | 页面节点从 DOM 移除 | 清理 `setInterval` / `setTimeout`、解绑事件 |
+
+### 全局变量
+
+| 变量 | 类型 | 说明 |
+| --- | --- | --- |
+| `window.g_config._csrf_token` | `String` | CSRF Token，调用需认证的接口（如 AI 接口、Schema 保存）时必须携带 |
+| `window.loginUser.userId` | `String` | 当前登录用户的工号 |
+| `window.loginUser.userName` | `String` | 当前登录用户的姓名 |
+| `this.state.urlParams` | `Object` | 页面 URL 中的查询参数 |
+
+### 编码注意事项
+
+1. **自定义方法必须用 `export function` 定义**：凡是需要在方法内部使用 `this`（包括 `this.utils.yida.*`、`this.setCustomState` 等）的自定义方法，**必须且只能**使用 `export function 方法名() {}` 的形式定义，调用时使用 `this.方法名()`。**禁止**使用 `const fn = () => {}`、`const fn = function() {}` 等形式定义需要访问 `this` 的方法，这些形式无法被宜搭运行时正确绑定 `this`：
+   ```javascript
+   // ✅ 正确：export function + this.方法名() 调用
+   export function didMount() {
+     this.loadStatistics();
+   }
+   export function loadStatistics() {
+     this.utils.yida.searchFormDatas({ formUuid: 'FORM-XXX', pageSize: 10 });
+   }
+
+   // ❌ 错误①：缺少 export，无法被宜搭运行时识别，this 丢失
+   export function didMount() {
+     loadStatistics();  // 直接调用，this 丢失
+   }
+   function loadStatistics() {
+     this.utils.yida.searchFormDatas(...);  // 报错：this is undefined
+   }
+
+   // ❌ 错误②：箭头函数/函数表达式形式，缺少 export，无法被宜搭运行时绑定 this，禁止使用
+   const loadStatistics = () => {
+     this.utils.yida.searchFormDatas(...);  // 报错：this is undefined
+   };
+   const loadStatistics = function() {
+     this.utils.yida.searchFormDatas(...);  // 报错：this is undefined
+   };
+   ```
+2. **事件绑定必须使用箭头函数包裹**：在 `renderJsx` 中绑定任何事件处理器（`onClick`、`onChange`、`onSubmit` 等）时，**必须且只能**使用箭头函数 `(e) => { this.方法名(e) }` 的形式，**严禁**直接写 `this.方法名` 作为事件处理器，否则 `this` 会丢失导致运行时报错：
+
+   ```javascript
+   export function handleSubmit(e) {
+     this.setCustomState({ submitted: true });
+     this.utils.toast({ title: '提交成功', type: 'success' });
+   }
+
+   // ✅ 正确：箭头函数包裹，this 正确捕获
+   export function renderJsx() {
+     return <button onClick={(e) => { this.handleSubmit(e); }}>提交</button>;
+   }
+
+   // ❌ 错误①：直接传方法引用，this 丢失，运行时报错，绝对禁止！
+   export function renderJsx() {
+     return <button onClick={this.handleSubmit}>提交</button>;
+   }
+
+   // ❌ 错误②：使用 .bind(this) 绑定，虽然能运行但不符合规范，禁止使用！
+   export function renderJsx() {
+     return <button onClick={function() { this.handleSubmit(); }.bind(this)}>提交</button>;
+   }
+   ```
+
+   > **生成代码时的自检清单**：检查 `renderJsx` 中所有 `onClick`、`onChange`、`onSubmit` 等事件属性，确保每一个都是 `(e) => { this.xxx(e) }` 形式，不存在任何 `onClick={this.xxx}` 的写法。
+
+3. **输入法组合输入处理**：使用 `_isComposing` 标记配合 `compositionstart` / `compositionend` 事件，正确处理中文输入法的组合输入状态，避免输入过程中触发提交
+4. **定时器清理**：在 `didUnmount` 中必须清理所有通过 `setInterval` / `setTimeout` 创建的定时器，防止内存泄漏
+5. **错误处理**：所有 API 调用（`this.utils.yida.*`、`fetch`）必须使用 `.catch()` 处理异常，并通过 `this.utils.toast({ title: message, type: 'error' })` 向用户展示错误提示
+6. **样式方式**：所有样式通过 JavaScript 对象定义（内联样式），在 `renderJsx` 中通过 `style` 属性应用，不使用外部 CSS 文件
+7. **异步操作**：可以使用 `async/await` 语法，Babel 编译会自动转换为 ES5 兼容代码
+8. **pageSize 上限**：调用 `searchFormDatas`、`searchFormDataIds`、`getProcessInstances`、`getProcessInstanceIds` 等分页接口时，`pageSize` 最大值为 **100**，超过会导致接口报错。禁止将 `pageSize` 设置为超过 100 的值，推荐使用 `10`～`100` 之间的合理值。
+9. **输入框使用非受控组件**：在宜搭环境中，`<input>` 的 `value` 属性绑定状态后会触发重渲染导致输入异常。**正确做法**：使用 `defaultValue`，在 `onChange` 中更新 `_customState` 而不调用 `setCustomState`：
+   ```javascript
+   // ❌ 错误：受控组件，每次输入都触发重渲染导致无法输入
+   <input value={userAnswer} onChange={(e) => { this.setCustomState({ userAnswer: e.target.value }); }} />
+
+   // ✅ 正确：非受控组件，仅静默更新状态，不触发重渲染
+   <input id="my-input" defaultValue="" onChange={(e) => { _customState.userAnswer = e.target.value; }} />
+
+   // 需要清空时通过 DOM 操作
+   var inputEl = document.getElementById("my-input");
+   if (inputEl) { inputEl.value = ""; }
+   ```
+
+10. **DateField 时间戳格式**：保存日期字段时，值必须是 **时间戳（毫秒）**，不能是字符串：
+    ```javascript
+    // ❌ 错误：字符串格式
+    dateField_xxx: '2024-01-15'
+
+    // ✅ 正确：时间戳格式
+    dateField_xxx: new Date().getTime()
+    ```
+
+11. **多端适配**：宜搭自定义页面会在 PC 端和移动端同时展示，使用 `this.utils.isMobile()` 判断设备类型：
+    ```javascript
+    const isMobile = this.utils.isMobile();
+    var styles = {
+      container: { padding: isMobile ? '12px' : '16px', minHeight: '100vh' },
+      card: { padding: isMobile ? '12px' : '16px', marginBottom: isMobile ? '8px' : '12px' },
+    };
+    ```
+
+12. **清除默认样式**：宜搭自定义页面容器有默认 padding 和圆角，需要强制覆盖：
+    ```javascript
+    var styles = {
+      container: { padding: '0 16px', borderRadius: '0 !important', minHeight: '100vh' },
+    };
+    ```
+
+13. **调试技巧**：
+    ```javascript
+    // 打印当前状态到控制台
+    console.log('当前状态:', _customState);
+
+    // 弹窗提示（适合快速验证逻辑）
+    this.utils.toast({ title: '调试信息', type: 'info' });
+    ```
+
+14. **iframe 嵌入表单 URL 规范**：在自定义页面中通过 iframe 嵌入宜搭表单时，需使用正确的 URL 格式：
+
+    | 场景 | URL 格式 |
+    |------|----------|
+    | 表单提交页 | `{base_url}/{appType}/submission/{formUuid}?isRenderNav=false` |
+    | 数据管理页（列表） | `{base_url}/{appType}/workbench/{formUuid}?iframe=true` |
+    | 数据管理页（指定视图） | `{base_url}/{appType}/workbench/{formUuid}?viewUuid={viewUuid}&iframe=true` |
+
+    ```javascript
+    // ❌ 错误：formDetail 是表单详情页，不是数据列表
+    const wrongUrl = `${baseUrl}/${appType}/formDetail/${formUuid}`;
+
+    // ✅ 正确：workbench 是运行态数据管理页
+    const listUrl = `${baseUrl}/${appType}/workbench/${formUuid}?iframe=true`;
+    ```
+
+    > `viewUuid` 可选，从宜搭「数据管理」→「报表视图」页面的 URL 中获取，不传则使用默认视图。
+    > `base_url` 可从 window.location.origin 获取，或通过 openyida 登录态中读取。
+
+15. **下拉选项控制选项卡（Tabs）表格页显示/隐藏**：当页面中存在选项卡组件包含多个表格页，需要根据下拉选择框的值动态控制特定表格页的显示或隐藏时，使用状态驱动的条件渲染实现。
+
+    **实现要点**：
+    - 用 `_customState.selectedType` 记录下拉选中值，`onChange` 时调用 `setCustomState` 触发重渲染
+    - 用 `_customState.activeTab` 记录当前激活的 Tab，切换时直接写入 `_customState` 并调用 `forceUpdate()`
+    - 下拉值变更后，若当前激活的 Tab 被隐藏，自动回退到第一个可见 Tab，避免空白页面
+    - Tab 内容区使用 `display: none` 而非条件渲染，保留 DOM 避免 iframe 重复加载
+    - 所有 Tab 均被隐藏时展示兜底提示，提升用户体验
+
+16. 字段 ID 语义化别名约定
+
+    宜搭表单字段 ID 通常是随机字符串（如 `textField_k8j2n3m4`），直接在代码中使用可读性差、维护困难。**推荐在文件顶部统一定义字段别名常量**，在代码中始终使用别名引用字段 ID。
+
+    **约定规范**：
+
+    ```javascript
+    // ✅ 推荐：在文件顶部统一定义字段别名
+    // 字段 ID 来自 openyida get-schema 的输出，或 .cache/<项目名>-schema.json
+    var FIELDS = {
+      userName: 'textField_k8j2n3m4',       // 姓名
+      department: 'selectField_a3b9c1d2',    // 部门
+      applyDate: 'dateField_x7y2z5w1',       // 申请日期
+      amount: 'numberField_p4q8r3s6',        // 金额
+      status: 'radioField_m1n5o9p3',         // 审批状态
+      remark: 'textareaField_v2w6x1y4',      // 备注
+    };
+
+    // ✅ 使用别名引用字段，代码清晰易读
+    this.utils.yida.searchFormDatas({
+      formUuid: 'FORM-XXX',
+      searchFieldJson: JSON.stringify({
+        [FIELDS.department]: '研发部',
+        [FIELDS.status]: '待审批',
+      }),
+      currentPage: 1,
+      pageSize: 20,
+    });
+
+    // ✅ 构建提交数据时使用别名
+    var formDataJson = {};
+    formDataJson[FIELDS.userName] = _customState.inputName;
+    formDataJson[FIELDS.department] = _customState.selectedDept;
+    formDataJson[FIELDS.amount] = _customState.inputAmount;
+    ```
+
+    **❌ 避免的写法**：
+
+    ```javascript
+    // ❌ 直接在业务逻辑中散落字段 ID，难以维护
+    this.utils.yida.searchFormDatas({
+      formUuid: 'FORM-XXX',
+      searchFieldJson: JSON.stringify({
+        selectField_a3b9c1d2: '研发部',   // 这是什么字段？
+        radioField_m1n5o9p3: '待审批',    // 完全看不懂
+      }),
+    });
+    ```
+
+    **AI 生成代码时的规则**：
+    1. 获取表单 Schema 后，**必须先在文件顶部定义 `FIELDS` 常量**，将所有用到的字段 ID 映射为语义化名称
+    2. 后续所有代码中**禁止直接写字段 ID 字符串**，统一通过 `FIELDS.xxx` 引用
+    3. `FIELDS` 的 key 使用 camelCase 命名，与字段的中文含义对应
+
+---
+
+## 页面发布
+
+### 前置条件
+
+- Node.js 16+（用于 Babel 编译和发布）
+
+### 命令说明
+
+```bash
+# 编译 + 发布（一步完成，推荐）
+openyida publish <源文件路径> <appType> <formUuid>
+
+# 仅编译，不发布（用于本地调试、预检语法）
+openyida compile <源文件路径>
+```
+
+- `compile` 命令只做 Babel 编译 + UglifyJS 压缩，产物输出到 `pages/dist/`，**不需要登录态**，也不会发起任何网络请求
+- `publish` 命令在编译基础上额外完成 Schema 构建 + 登录态获取 + 接口发布
+
+**编译流程**：
+
+```
+源文件(.js) → @babel/standalone (Babel 转换) → UglifyJS (压缩) → <name>.js
+```
+
+**发布参数说明**（仅 `publish` 命令需要）：
+
+| 参数 | 说明 | 示例 |
+| --- | --- | --- |
+| `appType` | 应用 ID | `APP_XXX` |
+| `formUuid` | 表单 ID | `FORM-XXX` |
+| `源文件路径` | 源码文件路径 | `pages/src/xxx.js` |
+
+> `baseUrl` 无需手动传入，`openyida` 会自动获取登录态并从中读取 `base_url`。
+
+**发布流程**：
+
+```
+编译源码（Babel + UglifyJS） → 代码动态构建 Schema JSON（填入 source/compiled）
+→ 调用 yida-login 获取登录态（Cookie 持久化） → 调用 saveFormSchema 接口保存
+```
+
+---
+
+## ⚠️ JSX 编译错误自查清单（发布前必读）
+
+> 详细的编译错误排查规则、禁止语法、事件绑定规范等，请完整阅读：
+> **[→ jsx-compile-checklist.md](./jsx-compile-checklist.md)**
 
 ---
 
@@ -345,559 +745,6 @@ empty: {
 
 ---
 
-## ⚠️ JSX 编译错误自查清单（发布前必读）
-
-> **遇到 JSX 编译错误时，按以下顺序逐项排查**，90% 的编译错误都由以下原因引起：
-
-### 🔴 第 1 优先级：禁止使用的语法（绝对红线）
-
-| 语法 | 错误代码 | 正确代码 | 说明 |
-|------|---------|---------|------|
-| ❌ 类属性声明 | `class App { state = {} }` | 必须使用 `_customState` 全局变量 | Babel 编译不过 |
-| ❌ Class Fields 语法 | `count = 0` | `var count = 0` | React 16 不支持 |
-| ❌ `import` 语句 | `import React from 'react'` | 禁止使用 import | 三方包引入需用 `loadScript` |
-| ❌ `export default` | `export default function` | 使用 `export function` | export default 编译后无法正确挂载 |
-| ❌ Optional Chaining | `obj?.prop` | `obj && obj.prop` | 部分版本 Babel 不支持 |
-| ❌ Nullish Coalescing | `a ?? b` | `a !== null ? a : b` | 同上 |
-| ❌ 装饰器语法 | `@decorator class X` | 禁止使用装饰器 | 需要额外 Babel 插件 |
-
-### 🟡 第 2 优先级：极易出错的地方
-
-#### 2.1 事件绑定（最容易出错）
-
-```javascript
-// ❌ 错误：直接传方法引用，this 丢失
-<button onClick={this.handleClick}>点击</button>
-
-// ❌ 错误：使用 .bind()，不符合规范
-<button onClick={function() { this.handleClick(); }.bind(this)}>点击</button>
-
-// ✅ 正确：箭头函数包裹
-<button onClick={(e) => { this.handleClick(e); }}>点击</button>
-
-// ✅ 正确：如果是简单调用（仅修改状态）
-<button onClick={() => { this.setCustomState({ count: 1 }); }}>点击</button>
-```
-
-#### 2.2 JSX 中的 style 属性
-
-```javascript
-// ❌ 错误：CSS 属性名使用 kebab-case
-<div style={{ "background-color": "red" }}></div>
-
-// ❌ 错误：数字值未加引号
-<div style={{ width: 100 }}></div>  // 会变成 "100px" 但某些情况有问题
-
-// ✅ 正确：JS 写法（camelCase + 字符串值）
-<div style={{ backgroundColor: 'red', width: '100%' }}></div>
-
-// ✅ 正确：带单位用字符串
-<div style={{ padding: '12px', marginTop: '8px' }}></div>
-```
-
-#### 2.3 箭头函数 vs 普通函数
-
-```javascript
-// ❌ 错误：在需要 this 的地方用箭头函数
-const handleClick = () => {
-  this.utils.toast({ title: 'hi' });  // this 丢失
-};
-
-// ✅ 正确：需要 this 的方法必须用 export function
-export function handleClick() {
-  this.utils.toast({ title: 'hi' });
-}
-```
-
-### 🟢 第 3 优先级：常见小问题
-
-#### 3.1 标签必须闭合
-
-```javascript
-// ❌ 错误：自闭合标签缺少斜线
-<input type="text">
-<br>
-
-// ✅ 正确
-<input type="text" />
-<br />
-```
-
-#### 3.2 className 而非 class
-
-```javascript
-// ❌ 错误
-<div class="container">...</div>
-
-// ✅ 正确
-<div className="container">...</div>
-```
-
-#### 3.3 注释语法
-
-```javascript
-// ✅ JSX 内只能使用这种注释
-<div>
-  {/* 这是注释 */}
-  <span>内容</span>
-</div>
-
-// ❌ 不要用 HTML 注释（可能编译出错）
-// <div>...</div>
-```
-
-#### 3.4 三元表达式陷阱
-
-```javascript
-// ❌ 错误：三元表达式返回 null/undefined 可能导致白屏
-{condition && null}  // 某些情况下编译有问题
-
-// ✅ 正确：确保返回有效 JSX
-{condition && <div>内容</div>}
-
-// ✅ 更好：显式处理
-{condition ? <div>内容</div> : <span />}
-```
-
-### 📋 快速验证脚本
-
-发布前可以用以下命令预检查源码语法：
-
-```bash
-# 仅编译不发布，检查是否有语法错误
-node -e "
-const fs = require('fs');
-const babel = require('@babel/standalone');
-const source = fs.readFileSync('pages/src/demo.js', 'utf-8');
-try {
-  babel.transform(source, { presets: ['react', ['env', { targets: { browsers: ['ie >= 11'] } }] ] });
-  console.log('✅ 语法检查通过');
-} catch(e) {
-  console.error('❌ 编译错误:', e.message);
-  if (e.loc) console.error('位置:', e.loc.line + '行', e.loc.column + '列');
-  process.exit(1);
-}
-"
-```
-
----
-
-## 快速开始
-
-### 前置条件
-
-- Node.js 16+（用于 Babel 编译和发布）
-- Python 3.12+ + `playwright`（用于登录态管理）
-- 首次使用需安装依赖：
-
-```bash
-# openyida 已包含所有依赖，无需单独安装
-pip install playwright && playwright install chromium
-```
-
-### 编译源码
-
-```bash
-# 方式 1：使用 openyida 命令（推荐，自动处理编译+发布）
-openyida publish <源文件路径> <appType> <formUuid>
-
-# 方式 2：仅编译不发布
-node -e "
-const babelTransform = require('./lib/core/babel-transform').default;
-const fs = require('fs');
-const source = fs.readFileSync('pages/src/demo.js', 'utf-8');
-const result = babelTransform(source, {}, false, { RE_VERSION: '7.4.0' });
-if (result.error) {
-  console.error('编译失败:', result.error.message);
-  process.exit(1);
-}
-fs.writeFileSync('pages/dist/demo.js', result.compiled, 'utf-8');
-console.log('编译成功');
-"
-```
-
-**编译流程**：
-
-```
-源文件(.js) → @babel/standalone (Babel 转换) → UglifyJS (压缩) → <name>.js
-```
-
-### 部署到宜搭
-
-```bash
-openyida publish <源文件路径> <appType> <formUuid>
-```
-
-**部署流程**：
-
-```
-编译源码（Babel + UglifyJS） → 代码动态构建 Schema JSON（填入 source/compiled）
-→ 调用 yida-login 获取登录态（Cookie 持久化） → 调用 saveFormSchema 接口保存
-```
-
-**参数说明**：
-
-| 参数 | 说明 | 示例 |
-| --- | --- | --- |
-| `appType` | 应用 ID | `APP_XXX` |
-| `formUuid` | 表单 ID | `FORM-XXX` |
-| `源文件路径` | 源码文件路径 | `pages/src/xxx.js` |
-
-> `baseUrl` 无需手动传入，`openyida` 会自动获取登录态并从中读取 `base_url`。
-
----
-
-## 开发规范
-
-> **以下规范是编写宜搭自定义页面代码的核心约束，必须严格遵守。**
-
-### 运行环境与约束
-
-宜搭自定义页面的 JSX 组件本质上是 **React 类组件中的 render 方法**，而非独立的 React 组件。因此存在以下关键约束：
-
-| 约束 | 说明 |
-| --- | --- |
-| **React 版本** | 必须兼容 **React 16**，禁止使用 Hooks（`useState`、`useEffect` 等） |
-| **单文件** | 所有代码写在一个文件中（如 `index.js`）|
-| **三方包引入** | 禁止使用 `import/require` 语法，如需使用第三方库，必须通过 `this.utils.loadScript` 加载 CDN 脚本，参考 [yida-api.md](../../reference/yida-api.md) 的「工具类 API」章节。|
-| **函数导出格式** | 使用 `export function xxx() {}` 格式导出函数 |
-| **样式** | 所有 css 必须写在 renderJsx 的方法中，通过 style 的方式引入 |
-| **`this` 上下文** | 所有导出函数中的 `this` 指向宜搭页面的 React 类实例 |
-| **禁止使用 `this.setState` 管理业务状态** | `this.setState` 已被覆盖，仅用于 `forceUpdate`（通过更新 `timestamp`） |
-| **JavaScript 版本** | 使用 ES2015 (ES6) 语法，不能高于 ES2015 版本 |
-| **必须定义 renderJsx 函数** | renderJsx 是宜搭自定义页面核心渲染函数，也是入口函数，必须严格定义，不要改为其他名称 |
-
-### 文件结构
-
-**一个完整的宜搭自定义页面源文件必须包含：**
-- `_customState` 变量
-- getCustomState 函数
-- setCustomState 函数
-- forceUpdate 函数
-- didMount 函数
-- didUnmount 函数
-- renderJsx 函数
-
-> ⚠️ **关键约束：`renderJsx` 的每个 `return` 分支都必须包含 `<div style={{ display: 'none' }}>{this.state.timestamp}</div>`**，否则 `forceUpdate` 调用 `this.setState({ timestamp })` 后，React 无法检测到输出变化，`renderJsx` 不会被重新执行，页面将无法更新。这是宜搭渲染引擎触发重渲染的核心机制。
-
-以下是一个完整自定义页面示例，包含状态管理、生命周期钩子、渲染函数
-
-```jsx
-// ============================================================
-// 状态管理
-// ============================================================
-
-const _customState = {
-  // 在此定义所有业务状态的初始值
-  count: 0,
-  loading: false,
-};
-
-/**
- * 获取状态
- * @param {string} [key] - 传入 key 返回单个值，不传返回全部状态的浅拷贝
- */
-export function getCustomState(key) {
-  if (key) {
-    return _customState[key];
-  }
-  return { ..._customState };
-}
-
-/**
- * 设置状态（合并更新，自动触发重新渲染）
- * @param {Object} newState - 需要更新的状态键值对
- */
-export function setCustomState(newState) {
-  Object.keys(newState).forEach(function(key) {
-    _customState[key] = newState[key];
-  });
-  this.forceUpdate();
-}
-
-/**
- * 强制重新渲染（通过更新 timestamp 触发 React 重渲染）
- */
-export function forceUpdate() {
-  this.setState({ timestamp: new Date().getTime() });
-}
-
-// ============================================================
-// 生命周期
-// ============================================================
-
-/**
- * 页面加载完成时调用
- * 用于：初始化数据、启动定时器、绑定事件等
- */
-export function didMount() {
-  // 初始化逻辑
-}
-
-/**
- * 页面卸载时调用
- * 用于：清理定时器、解绑事件、释放资源等
- */
-export function didUnmount() {
-  // 清理逻辑
-}
-
-export function handleSubmit(e) {
-  this.setCustomState({ submitted: true });
-  this.utils.toast({ title: '提交成功', type: 'success' });
-}
-// ============================================================
-// 渲染
-// ============================================================
-
-/**
- * 页面渲染函数（等同于 React 类组件的 render 方法）
- * 注意：必须包含隐藏的 timestamp div 以支持 forceUpdate 机制
- */
-export function renderJsx() {
-  const { timestamp } = this.state;
-
-  return (
-    <div>
-      {/* 必须保留：用于触发重新渲染 */}
-      <div style={{ display: "none" }}>{timestamp}</div>
-
-      {/* 页面内容写在这里 */}
-      <div onClick={(e) => {this.handleSubmit(e)}>提交</div>
-    </div>
-  );
-}
-```
-
-### 状态管理使用方式
-
-```javascript
-// 获取全部状态（返回浅拷贝）
-const state = this.getCustomState();
-
-// 获取单个状态值
-const count = this.getCustomState('count');
-
-// 设置状态并自动触发重新渲染
-this.setCustomState({ count: count + 1, loading: true });
-
-// 仅触发重新渲染（不修改状态）
-this.forceUpdate();
-```
-
-### 生命周期钩子
-
-| 钩子函数 | 触发时机 | 典型用途 |
-| --- | --- | --- |
-| `didMount()` | 页面 DOM 加载渲染完毕 | 初始化数据加载、启动定时器、绑定事件 |
-| `didUnmount()` | 页面节点从 DOM 移除 | 清理 `setInterval` / `setTimeout`、解绑事件 |
-
-### 全局变量
-
-| 变量 | 类型 | 说明 |
-| --- | --- | --- |
-| `window.g_config._csrf_token` | `String` | CSRF Token，调用需认证的接口（如 AI 接口、Schema 保存）时必须携带 |
-| `window.loginUser.userId` | `String` | 当前登录用户的工号 |
-| `window.loginUser.userName` | `String` | 当前登录用户的姓名 |
-| `this.state.urlParams` | `Object` | 页面 URL 中的查询参数 |
-
-### 编码注意事项
-
-1. **自定义方法必须用 `export function` 定义**：凡是需要在方法内部使用 `this`（包括 `this.utils.yida.*`、`this.setCustomState` 等）的自定义方法，**必须且只能**使用 `export function 方法名() {}` 的形式定义，调用时使用 `this.方法名()`。**禁止**使用 `const fn = () => {}`、`const fn = function() {}` 等形式定义需要访问 `this` 的方法，这些形式无法被宜搭运行时正确绑定 `this`：
-   ```javascript
-   // ✅ 正确：export function + this.方法名() 调用
-   export function didMount() {
-     this.loadStatistics();
-   }
-   export function loadStatistics() {
-     this.utils.yida.searchFormDatas({ formUuid: 'FORM-XXX', pageSize: 10 });
-   }
-
-   // ❌ 错误①：缺少 export，无法被宜搭运行时识别，this 丢失
-   export function didMount() {
-     loadStatistics();  // 直接调用，this 丢失
-   }
-   function loadStatistics() {
-     this.utils.yida.searchFormDatas(...);  // 报错：this is undefined
-   }
-
-   // ❌ 错误②：箭头函数/函数表达式形式，缺少 export，无法被宜搭运行时绑定 this，禁止使用
-   const loadStatistics = () => {
-     this.utils.yida.searchFormDatas(...);  // 报错：this is undefined
-   };
-   const loadStatistics = function() {
-     this.utils.yida.searchFormDatas(...);  // 报错：this is undefined
-   };
-   ```
-2. **【严格禁止】事件绑定必须使用箭头函数包裹**：在 `renderJsx` 中绑定任何事件处理器（`onClick`、`onChange`、`onSubmit` 等）时，**必须且只能**使用箭头函数 `(e) => { this.方法名(e) }` 的形式，**严禁**直接写 `this.方法名` 作为事件处理器，否则 `this` 会丢失导致运行时报错：
-
-   ```javascript
-   export function handleSubmit(e) {
-     this.setCustomState({ submitted: true });
-     this.utils.toast({ title: '提交成功', type: 'success' });
-   }
-
-   // ✅ 正确：箭头函数包裹，this 正确捕获
-   export function renderJsx() {
-     return <button onClick={(e) => { this.handleSubmit(e); }}>提交</button>;
-   }
-
-   // ❌ 错误①：直接传方法引用，this 丢失，运行时报错，绝对禁止！
-   export function renderJsx() {
-     return <button onClick={this.handleSubmit}>提交</button>;
-   }
-
-   // ❌ 错误②：使用 .bind(this) 绑定，虽然能运行但不符合规范，禁止使用！
-   export function renderJsx() {
-     return <button onClick={function() { this.handleSubmit(); }.bind(this)}>提交</button>;
-   }
-   ```
-
-   > **生成代码时的自检清单**：检查 `renderJsx` 中所有 `onClick`、`onChange`、`onSubmit` 等事件属性，确保每一个都是 `(e) => { this.xxx(e) }` 形式，不存在任何 `onClick={this.xxx}` 的写法。
-
-3. **输入法组合输入处理**：使用 `_isComposing` 标记配合 `compositionstart` / `compositionend` 事件，正确处理中文输入法的组合输入状态，避免输入过程中触发提交
-4. **定时器清理**：在 `didUnmount` 中必须清理所有通过 `setInterval` / `setTimeout` 创建的定时器，防止内存泄漏
-5. **错误处理**：所有 API 调用（`this.utils.yida.*`、`fetch`）必须使用 `.catch()` 处理异常，并通过 `this.utils.toast({ title: message, type: 'error' })` 向用户展示错误提示
-6. **样式方式**：所有样式通过 JavaScript 对象定义（内联样式），在 `renderJsx` 中通过 `style` 属性应用，不使用外部 CSS 文件
-7. **异步操作**：可以使用 `async/await` 语法，Babel 编译会自动转换为 ES5 兼容代码
-8. **pageSize 上限**：调用 `searchFormDatas`、`searchFormDataIds`、`getProcessInstances`、`getProcessInstanceIds` 等分页接口时，`pageSize` 最大值为 **100**，超过会导致接口报错。禁止将 `pageSize` 设置为超过 100 的值，推荐使用 `10`～`100` 之间的合理值。
-9. **输入框使用非受控组件**：在宜搭环境中，`<input>` 的 `value` 属性绑定状态后会触发重渲染导致输入异常。**正确做法**：使用 `defaultValue`，在 `onChange` 中更新 `_customState` 而不调用 `setCustomState`：
-   ```javascript
-   // ❌ 错误：受控组件，每次输入都触发重渲染导致无法输入
-   <input value={userAnswer} onChange={function(e) { this.setCustomState({ userAnswer: e.target.value }); }} />
-
-   // ✅ 正确：非受控组件，仅静默更新状态，不触发重渲染
-   <input id="my-input" defaultValue="" onChange={function(e) { _customState.userAnswer = e.target.value; }} />
-
-   // 需要清空时通过 DOM 操作
-   var inputEl = document.getElementById("my-input");
-   if (inputEl) { inputEl.value = ""; }
-   ```
-
-10. **DateField 时间戳格式**：保存日期字段时，值必须是 **时间戳（毫秒）**，不能是字符串：
-    ```javascript
-    // ❌ 错误：字符串格式
-    dateField_xxx: '2024-01-15'
-
-    // ✅ 正确：时间戳格式
-    dateField_xxx: new Date().getTime()
-    ```
-
-11. **多端适配**：宜搭自定义页面会在 PC 端和移动端同时展示，使用 `this.utils.isMobile()` 判断设备类型：
-    ```javascript
-    const isMobile = this.utils.isMobile();
-    var styles = {
-      container: { padding: isMobile ? '12px' : '16px', minHeight: '100vh' },
-      card: { padding: isMobile ? '12px' : '16px', marginBottom: isMobile ? '8px' : '12px' },
-    };
-    ```
-
-12. **清除默认样式**：宜搭自定义页面容器有默认 padding 和圆角，需要强制覆盖：
-    ```javascript
-    var styles = {
-      container: { padding: '0 16px', borderRadius: '0 !important', minHeight: '100vh' },
-    };
-    ```
-
-13. **性能优化**：
-    - 不要在每次 `onChange` 都调用 `setCustomState`，可直接写入 `_customState` 静默更新
-    - 只在需要触发重渲染时才调用 `forceUpdate`
-    - 在 `renderJsx` 顶部定义事件处理函数，避免每次渲染都创建新的内联函数
-
-14. **调试技巧**：
-    ```javascript
-    // 打印当前状态到控制台
-    console.log('当前状态:', _customState);
-
-    // 弹窗提示（适合快速验证逻辑）
-    this.utils.toast({ title: '调试信息', type: 'info' });
-    ```
-
-15. **iframe 嵌入表单 URL 规范**：在自定义页面中通过 iframe 嵌入宜搭表单时，需使用正确的 URL 格式：
-
-    | 场景 | URL 格式 |
-    |------|----------|
-    | 表单提交页 | `{base_url}/{appType}/submission/{formUuid}` |
-    | 数据管理页（列表） | `{base_url}/{appType}/workbench/{formUuid}?iframe=true` |
-    | 数据管理页（指定视图） | `{base_url}/{appType}/workbench/{formUuid}?viewUuid={viewUuid}&iframe=true` |
-
-    ```javascript
-    // ❌ 错误：formDetail 是表单详情页，不是数据列表
-    const wrongUrl = `${baseUrl}/${appType}/formDetail/${formUuid}`;
-
-    // ✅ 正确：workbench 是运行态数据管理页
-    const listUrl = `${baseUrl}/${appType}/workbench/${formUuid}?iframe=true`;
-    ```
-
-    > `viewUuid` 可选，从宜搭「数据管理」→「报表视图」页面的 URL 中获取，不传则使用默认视图。
-
-16. **下拉选项控制选项卡（Tabs）表格页显示/隐藏**：当页面中存在选项卡组件包含多个表格页，需要根据下拉选择框的值动态控制特定表格页的显示或隐藏时，使用状态驱动的条件渲染实现。
-
-    **实现要点**：
-    - 用 `_customState.selectedType` 记录下拉选中值，`onChange` 时调用 `setCustomState` 触发重渲染
-    - 用 `_customState.activeTab` 记录当前激活的 Tab，切换时直接写入 `_customState` 并调用 `forceUpdate()`
-    - 下拉值变更后，若当前激活的 Tab 被隐藏，自动回退到第一个可见 Tab，避免空白页面
-    - Tab 内容区使用 `display: none` 而非条件渲染，保留 DOM 避免 iframe 重复加载
-    - 所有 Tab 均被隐藏时展示兜底提示，提升用户体验
-
-    完整示例代码见：[`examples/tabs-visibility-control.js`](./examples/tabs-visibility-control.js)
-
-### 17. 字段 ID 语义化别名约定
-
-宜搭表单字段 ID 通常是随机字符串（如 `textField_k8j2n3m4`），直接在代码中使用可读性差、维护困难。**推荐在文件顶部统一定义字段别名常量**，在代码中始终使用别名引用字段 ID。
-
-**约定规范**：
-
-```javascript
-// ✅ 推荐：在文件顶部统一定义字段别名
-// 字段 ID 来自 openyida get-schema 的输出，或 .cache/<项目名>-schema.json
-var FIELDS = {
-  userName: 'textField_k8j2n3m4',       // 姓名
-  department: 'selectField_a3b9c1d2',    // 部门
-  applyDate: 'dateField_x7y2z5w1',       // 申请日期
-  amount: 'numberField_p4q8r3s6',        // 金额
-  status: 'radioField_m1n5o9p3',         // 审批状态
-  remark: 'textareaField_v2w6x1y4',      // 备注
-};
-
-// ✅ 使用别名引用字段，代码清晰易读
-this.utils.yida.searchFormDatas({
-  formUuid: 'FORM-XXX',
-  searchFieldJson: JSON.stringify({
-    [FIELDS.department]: '研发部',
-    [FIELDS.status]: '待审批',
-  }),
-  currentPage: 1,
-  pageSize: 20,
-});
-
-// ✅ 构建提交数据时使用别名
-var formDataJson = {};
-formDataJson[FIELDS.userName] = _customState.inputName;
-formDataJson[FIELDS.department] = _customState.selectedDept;
-formDataJson[FIELDS.amount] = _customState.inputAmount;
-```
-
-**❌ 避免的写法**：
-
-```javascript
-// ❌ 直接在业务逻辑中散落字段 ID，难以维护
-this.utils.yida.searchFormDatas({
-  formUuid: 'FORM-XXX',
-  searchFieldJson: JSON.stringify({
-    selectField_a3b9c1d2: '研发部',   // 这是什么字段？
-    radioField_m1n5o9p3: '待审批',    // 完全看不懂
-  }),
-});
-```
-
-**AI 生成代码时的规则**：
-1. 获取表单 Schema 后，**必须先在文件顶部定义 `FIELDS` 常量**，将所有用到的字段 ID 映射为语义化名称
-2. 后续所有代码中**禁止直接写字段 ID 字符串**，统一通过 `FIELDS.xxx` 引用
-3. `FIELDS` 的 key 使用 camelCase 命名，与字段的中文含义对应
-
----
-
 ## API 参考
 
 ### 表单数据操作
@@ -978,123 +825,18 @@ this.utils.yida.searchFormDatas({
 
 ## 工具链
 
-| Skill | 说明 | 用法 |
+| 命令 | 说明 | 用法 |
 | --- | --- | --- |
-| **yida-login** | 登录态管理（Cookie 持久化 + 扫码登录） | `openyida login` |
-| **yida-publish-page** | 编译源码 + 构建 Schema + 发布到宜搭 | `openyida publish <源文件路径> <appType> <formUuid>` |
-| **yida-page-config** | 页面配置（URL 验证、公开访问/分享配置） | 详见 `yida-page-config` 技能文档 |
-
-### 编译 + 发布（一键完成）
-
-```bash
-openyida publish <源文件路径> <appType> <formUuid>
-```
-
-**处理流程**：
-1. 通过 `@babel/standalone` 将 JSX 转换为 ES5 + UglifyJS 压缩
-2. 通过代码动态构建完整的 Schema JSON，将 `source` 和 `compiled` 填入 `actions.module`
-3. 调用 `yida-login` 获取登录态（Cookie 持久化，首次需扫码登录）
-4. 通过 HTTP POST 调用 `saveFormSchema` 接口保存 Schema
-
-### 仅编译（不发布）
-
-```bash
-openyida publish <源文件路径> <appType> <formUuid>
-```
-
-输入 JSX 源文件，通过 Babel 编译 + UglifyJS 压缩后输出到 `pages/dist/` 目录。
+| **openyida login** | 登录态管理（Cookie 持久化 + 扫码登录） | `openyida login` |
+| **openyida compile** | 仅编译源码（Babel + UglifyJS），不发布，无需登录 | `openyida compile <源文件路径>` |
+| **openyida publish** | 编译源码 + 构建 Schema + 发布到宜搭 | `openyida publish <源文件路径> <appType> <formUuid>` |
+| **openyida page-config** | 页面配置（URL 验证、公开访问/分享配置） | 详见 `yida-page-config` 技能文档 |
 
 ---
 ## 素材资源指南
 
-在自定义页面开发中，经常需要使用图片、音乐/音效、Icon 等素材资源。以下是推荐的素材获取方案，确保素材来源稳定、合规、风格一致。
+在自定义页面开发中，经常需要使用图片、音乐/音效、Icon 等素材资源，涵盖图片库、音效库、图标库的选型建议、合规要求及 CDN 安全规范。
 
-### 图片素材
-
-| 素材库 | API | 授权方式 | 推荐场景 |
-| --- | --- | --- | --- |
-| [Unsplash](https://unsplash.com) | ✅ | 免费商用，无需署名 | 高质量背景图、Banner、配图 |
-| [Pexels](https://pexels.com) | ✅ | 免费商用，无需署名 | 人物、场景、商务类配图 |
-| [Pixabay](https://pixabay.com) | ✅ | 免费商用，无需署名 | 插画、矢量图、通用配图 |
-| [Lorem Picsum](https://picsum.photos) | ✅ | 免费 | 开发阶段占位图 |
-| [Wikimedia Commons](https://commons.wikimedia.org) | ⚠️ | 授权类型多样，需按条目核对 | 知识类/历史类配图 |
-
-### 音乐/音效素材
-
-| 素材库 | 授权方式 | 署名要求 | 推荐场景 |
-| --- | --- | --- | --- |
-| [Pixabay Music](https://pixabay.com/music/) | 免费商用 | 无需 | 背景音乐、氛围音效 |
-| [Mixkit](https://mixkit.co/free-sound-effects/) | 免费商用 | 无需 | 短音效、UI 交互音 |
-| [Freesound](https://freesound.org) | CC0 / CC BY | ⚠️ 部分需署名 | 按钮音效、提示音、环境音 |
-| [Incompetech](https://incompetech.com/music/) | CC BY 4.0 | ⚠️ 需署名 Kevin MacLeod | 游戏、活动页背景音乐 |
-| [Free Music Archive](https://freemusicarchive.org) | 多种 CC | ⚠️ 需按条目核对 | 曲库大，适合按分类批量拉取 |
-
-- 优先使用 Pixabay Music 和 Mixkit（无署名要求）
-- 使用 CC BY 素材时，需在页面底部添加署名，格式：`Music: "曲名" by 作者 — Licensed under CC BY 4.0`
-- 音频文件建议上传到 CDN，移动端使用压缩后的 MP3 格式
-
-### Icon 素材
-
-> 优先使用 `this.utils.loadStyleSheet(url)` 加载 CSS 图标库，详见 [yida-api.md](../../reference/yida-api.md) 的「loadStyleSheet」章节。
-
-| 图标库 | 授权方式 | 推荐场景 |
-| --- | --- | --- |
-| [iconfont（阿里）](https://www.iconfont.cn) | 免费 | **首选**，国内访问最稳定，支持自定义图标集 |
-| [Remix Icon](https://remixicon.com) | Apache 2.0 | 开源免费，风格现代，无需注册 |
-| [Font Awesome](https://fontawesome.com) | MIT（免费版） | 覆盖面广，通用 UI 图标 |
-| [Material Icons](https://fonts.google.com/icons) | Apache 2.0 | 数量大，适合中后台工具类产品 |
-| [Bootstrap Icons](https://icons.getbootstrap.com) | MIT | 轻量，SVG 为主 |
-| [Heroicons](https://heroicons.com) | MIT | 线性/实心两套，现代极简风 |
-
-**SVG 内联**（少量图标，无外部依赖）：
-
-```javascript
-function renderIcon(iconPath, size, color) {
-  return (
-    <svg width={size || 24} height={size || 24} viewBox="0 0 24 24" fill="none" stroke={color || 'currentColor'} strokeWidth="2">
-      <path d={iconPath} />
-    </svg>
-  );
-}
-```
-
-### 素材使用通用建议
-
-**稳定性**
-- 生产环境的图片/音频应上传到自有 CDN，避免第三方外链失效
-- 图片/音频优先使用有官方 API 的站点（Unsplash / Pexels / Pixabay / Freesound），避免爬虫方式
-- 同一关键词可并行查 2-3 个库，失败自动切换；对外链下载做本地缓存
-
-**合规性**
-- 优先使用无署名要求的素材库（Unsplash、Pexels、Pixabay、Mixkit）
-- 使用 CC BY 素材时必须添加署名，至少记录以下字段：`source`（来源站点）、`author`（作者）、`license`（许可证类型）、`requiredAttribution`（是否需要署名）、`sourceUrl`（原始链接）
-- Wikimedia Commons / Freesound / FMA 等站点授权类型多样，务必按条目核对 License
-
-**一致性**
-- 同一项目中统一使用一个图标库，避免混用多个图标库导致风格不一致
-- 准备「语义→图标名」映射表（如 `search → ri-search-line`、`settings → ri-settings-3-line`），避免随机挑选
-
-**性能**
-- 图片使用合适尺寸（避免加载 4K 大图）；音频使用压缩后的 MP3 格式
-- 图标优先使用 CDN 字体方案（iconfont / Remix Icon），少量图标可用 SVG 内联
-
-> ⚠️ **安全风险警告：禁止引用未知或不可信的 CDN 地址**
->
-> 引用来源不明的第三方 CDN 链接（如随意从搜索结果或论坛复制的 JS/CSS 链接）存在严重安全隐患：
->
-> - **网络劫持风险**：不可信 CDN 可能被中间人攻击，注入恶意脚本，导致用户数据泄露或页面被篡改
-> - **供应链攻击**：第三方 CDN 资源随时可能被替换为恶意内容，且难以察觉（2024年曾发生木马化 jQuery 通过知名免费 CDN 传播的真实案例）
-> - **服务不稳定**：免费 CDN 可能随时宕机或 SSL 证书过期，导致页面资源加载失败
->
-> **安全规范：**
-> - ✅ 仅使用以下经过验证的可信 CDN：
->   - `cdnjs.cloudflare.com` — Cloudflare 官方维护，支持 SRI 完整性校验，国内可访问，**首选**
->   - `unpkg.com` — npm 官方镜像，适合加载 npm 包资源，国内可访问
->   - 阿里云 CDN（`alicdn.com`）— 国内访问最稳定，适合生产环境
-> - ✅ 引用第三方 CDN 资源时，建议添加 `integrity` 属性（SRI 校验），防止资源被篡改
-> - ❌ **禁止使用 `cdn.jsdelivr.net`**：2024年发生过木马化 jQuery 供应链攻击事件，且有 SSL 证书过期记录，存在安全风险
-> - ❌ **禁止使用 `fonts.googleapis.com`**：国内大陆无法访问，字体资源需下载到本地后上传自有 CDN
-> - ❌ 禁止引用来源不明的 CDN 地址，即使该链接当前可以正常访问
-> - ❌ 禁止直接使用从搜索引擎、论坛、博客中复制的 CDN 链接，需先核实来源
+详见：[yida-assets-guide.md](./yida-assets-guide.md)
 
 ---

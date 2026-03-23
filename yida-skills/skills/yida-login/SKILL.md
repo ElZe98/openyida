@@ -5,6 +5,8 @@ license: MIT
 compatibility:
   - opencode
   - claude-code
+  - qoder
+  - wukong
 metadata:
   audience: developers
   workflow: yida-auth
@@ -58,6 +60,11 @@ cat config.json  # 获取 loginUrl 字段
 - 悟空环境内置浏览器控制能力，可直接打开 URL（使用悟空的 `open_url` 或浏览器工具）
 - 登录地址即 `config.json` 中的 `loginUrl`（如 `https://www.aliwork.com/workPlatform`）
 - 等待用户在内置浏览器中完成钉钉扫码登录后，再进行步骤 3
+
+**步骤 2.5**：判断用户是否已完成扫码登录
+- 等待用户主动告知（如用户说「我已经扫码了」「登录好了」）
+- 或等待固定时间（建议 30 秒）后直接执行步骤 3，若提取失败再提示用户重试
+- **不要无限等待**：若用户未响应，30 秒后自动尝试提取，失败则提示用户确认是否已完成登录
 
 **步骤 3**：登录完成后，运行命令从内置浏览器提取 Cookie
 ```bash

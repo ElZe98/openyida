@@ -7,6 +7,8 @@ compatibility:
   - claude-code
   - qoder
   - wukong
+  - qoder
+  - wukong
 metadata:
   audience: developers
   workflow: yida-development

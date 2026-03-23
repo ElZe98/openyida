@@ -5,6 +5,8 @@ license: MIT
 compatibility:
   - opencode
   - claude-code
+  - qoder
+  - wukong
 metadata:
   audience: developers
   workflow: yida-development
@@ -545,6 +547,18 @@ yida-create-form-page/
 
 
 ## 注意事项
+
+> ⛔ **强制规则（违反将导致数据丢失，不可恢复）**
+>
+> 1. **禁止全量覆盖 Schema**：update 模式必须先通过 `getFormSchema` 获取当前完整 Schema，在原有 Schema 基础上进行增量修改后再保存，严禁用全新构建的 Schema 直接覆盖原有页面的 Schema。
+>
+> 2. **禁止删除字段**：即使用户要求"删除"某字段，也不得执行 `delete` 操作。正确做法是：
+>    - 若字段类型需要变更：将原字段的 `behavior` 设置为 `HIDDEN`（隐藏），再新增一个新类型的字段
+>    - 若字段仅需隐藏：将 `behavior` 设置为 `HIDDEN` 即可
+>    - 原因：已提交的表单数据与字段 ID 绑定，删除字段会导致历史数据永久丢失
+>
+> 3. **有数据时必须二次确认**：执行 update 操作前，必须先调用 `searchFormDataIds` 检测表单是否有数据。若表单已有数据，**必须暂停执行，向用户展示影响说明并等待明确确认**，用户取消则终止操作。严禁在未经确认的情况下直接修改有数据的表单结构。
+
 - **临时文件写在当前工程根目录的 .cache 文件夹中，如果没有就创建一个文件夹，注意不要写在系统的其他文件夹中**
 - update 模式中，修改定义 JSON 的操作按顺序执行，注意操作间的依赖关系（如先删后加）
 - 字段匹配基于中文标签（`label.zh_CN`），确保标签名称准确

@@ -21,6 +21,7 @@
  *   openyida create-form create <appType> "<表单名>" <字段JSON> [--layout <布局>] [--theme <主题>] [--label-align <对齐>]  创建表单页面
  *   openyida create-form update <appType> <formUuid> <修改JSON>  更新表单页面
  *   openyida get-schema <appType> <formUuid>            获取表单 Schema
+ *   openyida compile <源文件路径>                        仅编译自定义页面（不发布，产物输出到 pages/dist/）
  *   openyida publish <源文件路径> <appType> <formUuid>   编译并发布自定义页面
  *   openyida verify-short-url <appType> <formUuid> <url>           验证短链接 URL 是否可用
  *   openyida save-share-config <appType> <formUuid> <url> <isOpen> [openAuth]  保存公开访问/分享配置
@@ -265,6 +266,18 @@ async function main() {
       break;
     }
 
+    case 'compile': {
+      // 参数顺序：<源文件路径>
+      if (args.length < 1) {
+        console.error(t('cli.compile_usage'));
+        console.error(t('cli.compile_example'));
+        process.exit(1);
+      }
+      const { run: runCompile } = require('../lib/app/compile');
+      await runCompile(args);
+      break;
+    }
+
     case 'publish': {
       // 参数顺序：<源文件路径> <appType> <formUuid>
       // publish.js 内部读取顺序：argv[2]=appType, argv[3]=formUuid, argv[4]=sourceFile
@@ -275,7 +288,8 @@ async function main() {
       }
       const [sourceFile, appType, formUuid] = args;
       process.argv = [process.argv[0], process.argv[1], appType, formUuid, sourceFile];
-      require('../lib/app/publish');
+      const { main: publishMain } = require('../lib/app/publish');
+      await publishMain();
       break;
     }
 
@@ -329,7 +343,7 @@ async function main() {
         console.error(t('cli.data_example'));
         process.exit(1);
       }
-      const { run: runDataManagement } = require('../lib/data-management');
+      const { run: runDataManagement } = require('../lib/core/query-data');
       await runDataManagement(args);
       break;
     }
@@ -472,16 +486,6 @@ async function main() {
 
       const { run: runConnector } = require(modulePath);
       await runConnector(subArgs);
-      break;
-    }
-
-    case 'query-data': {
-      if (args.length < 2) {
-        console.error(t('cli.query_data_usage'));
-        process.exit(1);
-      }
-      const { run: runQueryData } = require('../lib/core/query-data');
-      await runQueryData(args);
       break;
     }
 

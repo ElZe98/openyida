@@ -5,6 +5,8 @@ license: MIT
 compatibility:
   - opencode
   - claude-code
+  - qoder
+  - wukong
 metadata:
   audience: developers
   workflow: yida-development
@@ -71,13 +73,6 @@ openyida get-schema "APP_XXX" "FORM-XXX"
 1. 读取项目根目录的 `.cache/cookies.json` 获取登录态；若不存在则自动触发扫码登录
 2. 调用 `getFormSchema` 接口获取表单 Schema；根据响应体 `errorCode` 自动处理异常（详见 `yida-login` 技能文档「错误处理机制」章节）
 3. 将 Schema 输出到 stdout
-
-## 文件结构
-
-```
-yida-get-schema/
-└── SKILL.md                      # 本文档
-```
 
 ## 接口说明
 

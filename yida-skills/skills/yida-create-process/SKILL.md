@@ -5,6 +5,8 @@ license: MIT
 compatibility:
   - opencode
   - claude-code
+  - qoder
+  - wukong
 metadata:
   audience: developers
   workflow: yida-development
@@ -29,6 +31,15 @@ metadata:
 - 用户需要创建一个带审批流程的表单
 - 用户需要一步到位完成表单创建和流程配置
 - 已通过 `yida-create-form-page` 创建了表单，需要将其转为流程表单并配置流程
+
+## 与 yida-process-rule 的区别
+
+| 场景 | 使用技能 |
+|------|---------|
+| **从零创建**：需要新建表单 + 配置审批流程（一步到位） | **本技能（yida-create-process）** |
+| **已有流程表单**：只需修改/配置已有表单的审批流程规则 | **yida-process-rule** |
+
+> 简单判断：有没有现成的流程表单？有 → ；没有 → 本技能。
 
 ## 使用方式
 

@@ -1,3 +1,28 @@
+---
+name: yida-report
+description: >
+  宜搭原生报表技能，用于创建宜搭平台内置的原生报表页面（vc-yida-report 组件库），支持 16 种开箱即用的图表/表格/筛选器组件，通过 openyida create-report 命令生成报表 Schema 并发布。
+  本技能定位：创建宜搭原生报表（作为数据源），普通的「报表」「统计」需求默认使用本技能。
+  如需更美观的 ECharts 自定义可视化大屏，请使用 yida-chart 技能（依赖本技能创建的原生报表作为数据源）。
+license: MIT
+compatibility:
+  - opencode
+  - claude-code
+  - qoder
+  - wukong
+  - qoder
+  - wukong
+metadata:
+  audience: developers
+  workflow: yida-report
+  version: 1.0.0
+  tags:
+    - yida
+    - report
+    - chart
+    - visualization
+---
+
 # 宜搭原生报表 + ECharts 自定义看板 技能文档
 
 ## 概述

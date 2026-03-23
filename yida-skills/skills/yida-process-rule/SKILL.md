@@ -5,6 +5,8 @@ license: MIT
 compatibility:
   - opencode
   - claude-code
+  - qoder
+  - wukong
 metadata:
   audience: developers
   workflow: yida-development
@@ -31,7 +33,14 @@ metadata:
 - 用户需要配置条件分支、嵌套分支等复杂流程
 - 已通过 `yida-create-form-page` 创建表单后，需要配置流程规则
 
-> **提示**：如果需要一步到位创建表单 + 配置流程，请使用 `yida-create-process` 技能。
+## 与 yida-create-process 的区别
+
+| 场景 | 使用技能 |
+|------|---------|
+| **已有流程表单**：只需修改/配置已有表单的审批流程规则 | **本技能（yida-process-rule）** |
+| **从零创建**：需要新建表单 + 配置审批流程（一步到位） | **yida-create-process** |
+
+> 简单判断：有没有现成的流程表单？有 → 本技能；没有 → `yida-create-process`。
 
 ## 使用方式
 
