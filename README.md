@@ -128,33 +128,55 @@ openyida connector smart-create # Smart create connector from curl command
 openyida create-report        # Create a Yida report with charts
 openyida append-chart         # Append chart(s) to an existing report
 
-# CDN
-openyida graph               # Manage system relationship graph
+# Map
+openyida map                # Manage business relation map
 openyida cdn-config           # Configure CDN image upload (Aliyun OSS + CDN)
 openyida cdn-upload           # Upload images to CDN
 openyida cdn-refresh          # Refresh CDN cache
 ```
 
-### Relationship Graph
+### Business Relation Map
 
 ```bash
-openyida graph rebuild APP_XXX
-openyida graph link APP_XXX FORM_A field_a FORM_B field_b --type logical_fk
-openyida graph show APP_XXX
-openyida graph show APP_XXX --json
-openyida graph check APP_XXX
-openyida graph check APP_XXX --json
-openyida graph visualize APP_XXX
-openyida graph visualize APP_XXX ./graph.html
+# Rebuild map from actual app objects and page source
+openyida map rebuild APP_XXX
+
+# Show summary
+openyida map show APP_XXX
+openyida map show APP_XXX --json
+
+# Export HTML map
+openyida map visualize APP_XXX
+openyida map visualize APP_XXX ./map.html
+
+# Add a business relation manually
+openyida map link APP_XXX page:APP_XXX:FORM_PAGE form:APP_XXX:FORM_ORDER --type writes --summary "submit writes order"
+
+# Remove an obsolete relation
+openyida map unlink APP_XXX page:APP_XXX:FORM_PAGE form:APP_XXX:FORM_ORDER --type writes
 ```
 
-`graph check` validates missing node links, broken page references, and missing form/process/field targets referenced by graph relations.
+`map rebuild` scans app objects and custom page source code, then rebuilds the business map in `.cache/maps/<appType>.json`.
 
-`graph visualize` exports an interactive HTML graph view. By default it writes to `.cache/graphs/<appType>.html`.
+`map show` prints a quick summary so you can confirm node and edge counts before opening the visualization.
 
-Relationship links are now **manual-first**. `graph rebuild` only rebuilds nodes and `contains` edges. Cross-form relations should be created by the agent with `graph link` when it knows the business relationship from the development context.
+`map visualize` exports an interactive HTML map view. By default it writes to `.cache/maps/<appType>.html`.
 
-After successful `create-form`, `create-page`, `publish`, `configure-process`, and `create-process` commands, OpenYida automatically refreshes the relationship graph in the background.
+Recommended workflow:
+
+1. Run `map rebuild` after creating forms, pages, or publishing custom pages.
+2. Use `map visualize` to inspect the result.
+3. Use `map link` to add important business relations that source scanning cannot infer precisely.
+4. Use `map unlink` to remove outdated relations after logic changes.
+
+In short:
+
+- `rebuild` = rebuild structure and basic relations
+- `link` = add or update business relations
+- `unlink` = remove obsolete relations
+- `visualize` = review the map in HTML
+
+After successful `create-form`, `create-page`, `publish`, `configure-process`, and `create-process` commands, OpenYida automatically refreshes the business relation map in the background.
 
 ---
 

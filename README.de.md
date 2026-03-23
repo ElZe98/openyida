@@ -37,6 +37,10 @@ Baue mir ein CRM
 Erstelle eine persönliche Gehaltsrechner-App
 ```
 
+### Geschäftsbeziehungs-Karte
+
+`openyida map` dient dazu, die Geschäftsbeziehungen zwischen Seiten, Formularen und Prozessen zu pflegen. Häufige Befehle: `map rebuild`, `map show`, `map visualize`, `map link`, `map unlink`.
+
 ---
 
 ## Unterstützte KI-Coding-Tools
@@ -90,6 +94,7 @@ openyida verify-short-url     # Prüfen ob eine Kurz-URL erreichbar ist
 openyida save-share-config    # Öffentlichen Zugang / Freigabe-Konfiguration speichern
 openyida get-page-config      # Öffentlichen Zugang / Freigabe-Konfiguration einer Seite abfragen
 openyida update-form-config   # Formularkonfiguration aktualisieren
+openyida map                  # Geschäftsbeziehungs-Karte verwalten
 openyida cdn-config           # CDN-Bild-Upload konfigurieren (Aliyun OSS + CDN)
 openyida cdn-upload           # Bilder zum CDN hochladen
 openyida cdn-refresh          # CDN-Cache aktualisieren

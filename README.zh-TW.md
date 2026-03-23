@@ -37,6 +37,10 @@ npm install -g openyida
 幫我搭建個人薪資計算器應用
 ```
 
+### 業務關係地圖
+
+`openyida map` 用於維護頁面、表單、流程之間的業務關係。常用指令：`map rebuild`、`map show`、`map visualize`、`map link`、`map unlink`。
+
 ---
 
 ## 支援的 AI 程式設計工具
@@ -90,6 +94,7 @@ openyida verify-short-url     # 驗證短網址是否可用
 openyida save-share-config    # 儲存公開存取 / 分享設定
 openyida get-page-config      # 查詢頁面公開存取 / 分享設定
 openyida update-form-config   # 更新表單設定
+openyida map                  # 維護業務關係地圖
 openyida cdn-config           # 設定 CDN 圖片上傳（阿里雲 OSS + CDN）
 openyida cdn-upload           # 上傳圖片到 CDN
 openyida cdn-refresh          # 重新整理 CDN 快取

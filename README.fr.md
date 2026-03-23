@@ -37,6 +37,10 @@ Construis-moi un CRM
 Crée une application de calcul de salaire personnel
 ```
 
+### Carte des relations métier
+
+`openyida map` sert à organiser les relations métier entre pages, formulaires et processus. Commandes courantes : `map rebuild`, `map show`, `map visualize`, `map link`, `map unlink`.
+
 ---
 
 ## Outils IA supportés
@@ -90,6 +94,7 @@ openyida verify-short-url     # Vérifier si une URL courte est accessible
 openyida save-share-config    # Sauvegarder la config d'accès public / partage
 openyida get-page-config      # Consulter la config d'accès public / partage d'une page
 openyida update-form-config   # Mettre à jour la configuration du formulaire
+openyida map                  # Gérer la carte des relations métier
 openyida cdn-config           # Configurer l'upload d'images CDN (Aliyun OSS + CDN)
 openyida cdn-upload           # Uploader des images vers le CDN
 openyida cdn-refresh          # Rafraîchir le cache CDN

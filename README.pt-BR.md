@@ -37,6 +37,10 @@ Construa um CRM
 Crie um aplicativo de calculadora de salário pessoal
 ```
 
+### Mapa de relações de negócio
+
+`openyida map` serve para organizar as relações entre páginas, formulários e processos. Comandos mais usados: `map rebuild`, `map show`, `map visualize`, `map link`, `map unlink`.
+
 ---
 
 ## Ferramentas de IA suportadas
@@ -90,6 +94,7 @@ openyida verify-short-url     # Verificar se uma URL curta está acessível
 openyida save-share-config    # Salvar configuração de acesso público / compartilhamento
 openyida get-page-config      # Consultar configuração de acesso público / compartilhamento de uma página
 openyida update-form-config   # Atualizar configuração do formulário
+openyida map                  # Gerenciar o mapa de relações de negócio
 openyida cdn-config           # Configurar upload de imagens CDN (Aliyun OSS + CDN)
 openyida cdn-upload           # Fazer upload de imagens para o CDN
 openyida cdn-refresh          # Atualizar cache do CDN

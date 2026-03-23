@@ -37,6 +37,10 @@ npm install -g openyida
 أنشئ تطبيق حاسبة الراتب الشخصي
 ```
 
+### خريطة علاقات الأعمال
+
+يُستخدم `openyida map` لتنظيم العلاقات بين الصفحات والنماذج والعمليات. الأوامر الشائعة: `map rebuild` و`map show` و`map visualize` و`map link` و`map unlink`.
+
 ---
 
 ## أدوات الذكاء الاصطناعي المدعومة
@@ -90,6 +94,7 @@ openyida verify-short-url     # التحقق من إمكانية الوصول إ
 openyida save-share-config    # حفظ إعدادات الوصول العام / المشاركة
 openyida get-page-config      # الاستعلام عن إعدادات الوصول العام / المشاركة لصفحة
 openyida update-form-config   # تحديث إعدادات النموذج
+openyida map                  # إدارة خريطة علاقات الأعمال
 openyida cdn-config           # إعداد رفع الصور إلى CDN (Aliyun OSS + CDN)
 openyida cdn-upload           # رفع الصور إلى CDN
 openyida cdn-refresh          # تحديث ذاكرة CDN المؤقتة

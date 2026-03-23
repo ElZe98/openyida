@@ -32,7 +32,11 @@
  *   openyida import <file> [name]                       导入迁移包，在目标环境重建应用
  *   openyida get-permission <appType> <formUuid>        查询表单权限配置
  *   openyida save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]  保存表单权限配置
- *   openyida graph <subcommand> ...                     系统关系图谱管理（含 HTML 可视化导出）
+ *   openyida map rebuild <appType>                      重建业务关系地图
+ *   openyida map show <appType> [--json]                查看业务关系地图摘要
+ *   openyida map visualize <appType> [outputHtml]       导出业务关系地图 HTML
+ *   openyida map link <appType> <fromNodeId> <toNodeId> --type <relationType> [--summary <text>] [--from-field-id <id>] [--from-field-label <label>] [--to-field-id <id>] [--to-field-label <label>] [--scope <internal|cross_app>] [--confidence <level>] [--source-app <appType>] [--target-app <appType>]  手动建立关系边
+ *   openyida map unlink <appType> <fromNodeId> <toNodeId> --type <relationType>  手动断开关系边
  *   openyida connector list [选项]                       列出 HTTP 连接器
  *   openyida connector create "名称" "域名" --operations <file> [选项]  创建连接器
  *   openyida connector detail <connector-id>             查看连接器详情
@@ -387,9 +391,9 @@ async function main() {
       break;
     }
 
-    case 'graph': {
-      const { run: runGraph } = require('../lib/graph');
-      await runGraph(args);
+    case 'map': {
+      const { run: runMap } = require('../lib/map');
+      await runMap(args);
       break;
     }
 

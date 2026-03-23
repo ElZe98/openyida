@@ -37,6 +37,10 @@ CRMシステムを構築して
 個人給与計算アプリを作って
 ```
 
+### 業務関係マップ
+
+`openyida map` は、ページ・フォーム・プロセス間の業務関係を整理するための機能です。よく使うコマンド：`map rebuild`、`map show`、`map visualize`、`map link`、`map unlink`。
+
 ---
 
 ## 対応AIコーディングツール
@@ -90,6 +94,7 @@ openyida verify-short-url     # 短縮URLが利用可能か確認
 openyida save-share-config    # 公開アクセス / 共有設定を保存
 openyida get-page-config      # ページの公開アクセス / 共有設定を照会
 openyida update-form-config   # フォーム設定を更新
+openyida map                  # 業務関係マップを管理
 openyida cdn-config           # CDN画像アップロードを設定（Aliyun OSS + CDN）
 openyida cdn-upload           # CDNに画像をアップロード
 openyida cdn-refresh          # CDNキャッシュを更新

@@ -37,6 +37,10 @@ Xây dựng hệ thống CRM
 Tạo ứng dụng tính lương cá nhân
 ```
 
+### Bản đồ quan hệ nghiệp vụ
+
+`openyida map` dùng để tổ chức quan hệ giữa trang, biểu mẫu và quy trình. Các lệnh thường dùng: `map rebuild`, `map show`, `map visualize`, `map link`, `map unlink`.
+
 ---
 
 ## Công cụ AI được hỗ trợ
@@ -90,6 +94,7 @@ openyida verify-short-url     # Kiểm tra URL rút gọn có khả dụng khôn
 openyida save-share-config    # Lưu cấu hình truy cập công khai / chia sẻ
 openyida get-page-config      # Truy vấn cấu hình truy cập công khai / chia sẻ của trang
 openyida update-form-config   # Cập nhật cấu hình biểu mẫu
+openyida map                  # Quản lý bản đồ quan hệ nghiệp vụ
 openyida cdn-config           # Cấu hình tải ảnh CDN (Aliyun OSS + CDN)
 openyida cdn-upload           # Tải ảnh lên CDN
 openyida cdn-refresh          # Làm mới cache CDN

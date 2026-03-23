@@ -37,6 +37,10 @@ CRM 시스템 구축해줘
 개인 급여 계산기 앱 만들어줘
 ```
 
+### 업무 관계 맵
+
+`openyida map` 은 페이지, 폼, 프로세스 사이의 업무 관계를 정리하는 기능입니다. 자주 쓰는 명령: `map rebuild`, `map show`, `map visualize`, `map link`, `map unlink`.
+
 ---
 
 ## 지원하는 AI 코딩 도구
@@ -90,6 +94,7 @@ openyida verify-short-url     # 단축 URL 사용 가능 여부 확인
 openyida save-share-config    # 공개 접근 / 공유 설정 저장
 openyida get-page-config      # 페이지 공개 접근 / 공유 설정 조회
 openyida update-form-config   # 폼 설정 업데이트
+openyida map                  # 업무 관계 맵 관리
 openyida cdn-config           # CDN 이미지 업로드 설정 (Aliyun OSS + CDN)
 openyida cdn-upload           # CDN에 이미지 업로드
 openyida cdn-refresh          # CDN 캐시 갱신
