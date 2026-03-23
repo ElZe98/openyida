@@ -32,6 +32,7 @@
  *   openyida import <file> [name]                       导入迁移包，在目标环境重建应用
  *   openyida get-permission <appType> <formUuid>        查询表单权限配置
  *   openyida save-permission <appType> <formUuid> [--data-permission <json>] [--action-permission <json>]  保存表单权限配置
+ *   openyida graph <subcommand> ...                     系统关系图谱管理（含 HTML 可视化导出）
  *   openyida connector list [选项]                       列出 HTTP 连接器
  *   openyida connector create "名称" "域名" --operations <file> [选项]  创建连接器
  *   openyida connector detail <connector-id>             查看连接器详情
@@ -383,6 +384,12 @@ async function main() {
       }
       const { run: runSavePermission } = require('../lib/permission/save-permission');
       await runSavePermission(args);
+      break;
+    }
+
+    case 'graph': {
+      const { run: runGraph } = require('../lib/graph');
+      await runGraph(args);
       break;
     }
 

@@ -138,6 +138,7 @@ openyida copy
 | `yida-page-config` | `skills/yida-page-config/SKILL.md` | 页面公开访问/组织内分享配置 | `openyida verify-short-url <appType> <formUuid> <url>` |
 | `yida-form-permission` | `skills/yida-form-permission/SKILL.md` | 表单权限配置（字段/数据/操作权限） | `openyida get-permission <appType> <formUuid>` |
 | `yida-data-management` | `skills/yida-data-management/SKILL.md` | 数据管理（表单实例/流程实例/任务中心的查询、新增、更新） | `openyida data query form <appType> <formUuid>` |
+| `yida-graph` | `skills/yida-graph/SKILL.md` | 系统关系图谱管理（重建、候选审核、手工建链、自检） | `openyida graph rebuild <appType>` |
 | `yida-connector` | `skills/yida-connector/SKILL.md` | 宜搭 HTTP 连接器管理（创建/编辑/测试/智能生成） | `openyida connector list` |
 | `yida-report` | `skills/yida-report/SKILL.md` | 创建宜搭报表、追加图表 | `openyida create-report APP_XXX "报表名" charts.json` |
 

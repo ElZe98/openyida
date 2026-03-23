@@ -129,10 +129,32 @@ openyida create-report        # Create a Yida report with charts
 openyida append-chart         # Append chart(s) to an existing report
 
 # CDN
+openyida graph               # Manage system relationship graph
 openyida cdn-config           # Configure CDN image upload (Aliyun OSS + CDN)
 openyida cdn-upload           # Upload images to CDN
 openyida cdn-refresh          # Refresh CDN cache
 ```
+
+### Relationship Graph
+
+```bash
+openyida graph rebuild APP_XXX
+openyida graph link APP_XXX FORM_A field_a FORM_B field_b --type logical_fk
+openyida graph show APP_XXX
+openyida graph show APP_XXX --json
+openyida graph check APP_XXX
+openyida graph check APP_XXX --json
+openyida graph visualize APP_XXX
+openyida graph visualize APP_XXX ./graph.html
+```
+
+`graph check` validates missing node links, broken page references, and missing form/process/field targets referenced by graph relations.
+
+`graph visualize` exports an interactive HTML graph view. By default it writes to `.cache/graphs/<appType>.html`.
+
+Relationship links are now **manual-first**. `graph rebuild` only rebuilds nodes and `contains` edges. Cross-form relations should be created by the agent with `graph link` when it knows the business relationship from the development context.
+
+After successful `create-form`, `create-page`, `publish`, `configure-process`, and `create-process` commands, OpenYida automatically refreshes the relationship graph in the background.
 
 ---
 
