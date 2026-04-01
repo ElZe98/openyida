@@ -20,6 +20,12 @@
 4. 组装附件对象数组
 5. 调用 `this.utils.yida.saveFormData`，将附件数组写入 `AttachmentField`
 
+说明：
+
+- 这套链路同样适用于 `ImageField`
+- `Content-Disposition` 不要自行按文件名拼接
+- 上传时应优先复用 `policy` 中签名要求的 `Content-Disposition`
+
 ## 第一步：调用 `/ossSign`
 
 请求方式：`GET`
@@ -96,6 +102,57 @@ export function requestAttachmentSign(file) {
 - `Content-Disposition`
 - `file`
 
+其中 `Content-Disposition` 不能简单写成 `attachment; filename=` 加文件名。更稳妥的方式是：
+
+1. 先把 `policy` 按 UTF-8 解码
+2. 从签名内容中提取真正要求的 `Content-Disposition`
+3. 上传时原样回传给 OSS
+
+辅助函数：
+
+```javascript
+export function decodeBase64Utf8(base64Text) {
+  try {
+    var binary = atob(base64Text || '');
+    var bytes = [];
+    for (var i = 0; i < binary.length; i += 1) {
+      bytes.push(binary.charCodeAt(i));
+    }
+    if (typeof TextDecoder !== 'undefined') {
+      return new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+    }
+    return decodeURIComponent(bytes.map(function(byte) {
+      return '%' + ('00' + byte.toString(16)).slice(-2);
+    }).join(''));
+  } catch (error) {
+    return atob(base64Text || '');
+  }
+}
+
+export function resolveSignedContentDisposition(signInfo, file) {
+  try {
+    var policyText = this.decodeBase64Utf8(signInfo.policy || '');
+    var matchedText = policyText.match(/"Content-Disposition":"([^"]+)"/);
+    if (matchedText && matchedText[1]) {
+      return matchedText[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    }
+    var normalizedPolicyText = policyText.replace(/\\\$/g, '$');
+    var policy = JSON.parse(normalizedPolicyText);
+    var conditions = policy && policy.conditions || [];
+    var matched = '';
+    conditions.forEach(function(item) {
+      if (item && typeof item === 'object' && item['Content-Disposition']) {
+        matched = item['Content-Disposition'];
+      }
+    });
+    if (matched) {
+      return matched;
+    }
+  } catch (error) {}
+  return 'attachment; filename=' + encodeURIComponent(file.name);
+}
+```
+
 示例代码：
 
 ```javascript
@@ -107,7 +164,7 @@ export function uploadSingleAttachment(file) {
     form.append('OSSAccessKeyId', signInfo.accessid);
     form.append('signature', signInfo.signature);
     form.append('success_action_status', '200');
-    form.append('Content-Disposition', 'attachment; filename=' + encodeURIComponent(file.name));
+    form.append('Content-Disposition', this.resolveSignedContentDisposition(signInfo, file));
     form.append('file', file, file.name);
 
     return fetch(signInfo.host, {
@@ -223,6 +280,47 @@ export function requestAttachmentSign(file) {
   });
 }
 
+export function decodeBase64Utf8(base64Text) {
+  try {
+    var binary = atob(base64Text || '');
+    var bytes = [];
+    for (var i = 0; i < binary.length; i += 1) {
+      bytes.push(binary.charCodeAt(i));
+    }
+    if (typeof TextDecoder !== 'undefined') {
+      return new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+    }
+    return decodeURIComponent(bytes.map(function(byte) {
+      return '%' + ('00' + byte.toString(16)).slice(-2);
+    }).join(''));
+  } catch (error) {
+    return atob(base64Text || '');
+  }
+}
+
+export function resolveSignedContentDisposition(signInfo, file) {
+  try {
+    var policyText = this.decodeBase64Utf8(signInfo.policy || '');
+    var matchedText = policyText.match(/"Content-Disposition":"([^"]+)"/);
+    if (matchedText && matchedText[1]) {
+      return matchedText[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    }
+    var normalizedPolicyText = policyText.replace(/\\\$/g, '$');
+    var policy = JSON.parse(normalizedPolicyText);
+    var conditions = policy && policy.conditions || [];
+    var matched = '';
+    conditions.forEach(function(item) {
+      if (item && typeof item === 'object' && item['Content-Disposition']) {
+        matched = item['Content-Disposition'];
+      }
+    });
+    if (matched) {
+      return matched;
+    }
+  } catch (error) {}
+  return 'attachment; filename=' + encodeURIComponent(file.name);
+}
+
 export function uploadSingleAttachment(file) {
   return this.requestAttachmentSign(file).then(function(signInfo) {
     var form = new FormData();
@@ -231,7 +329,7 @@ export function uploadSingleAttachment(file) {
     form.append('OSSAccessKeyId', signInfo.accessid);
     form.append('signature', signInfo.signature);
     form.append('success_action_status', '200');
-    form.append('Content-Disposition', 'attachment; filename=' + encodeURIComponent(file.name));
+    form.append('Content-Disposition', this.resolveSignedContentDisposition(signInfo, file));
     form.append('file', file, file.name);
 
     return fetch(signInfo.host, {
@@ -339,6 +437,20 @@ payload.attachmentField_xxx = '附件说明';
 
 OSS 上传成功后，只是文件已存在临时附件地址。
 仍需在 `saveFormData` 时把附件对象写入 `AttachmentField`。
+
+### 5. 中文文件名上传可能触发 OSS `403`
+
+如果上传中文文件名时遇到 `403`，优先排查两件事：
+
+- 是否自己重拼了 `Content-Disposition`
+- 是否把 `policy` 错当普通字符串解码，而没有按 UTF-8 还原
+
+推荐直接使用本文前面的统一实现：
+
+- `decodeBase64Utf8`
+- `resolveSignedContentDisposition`
+
+这样英文文件名和中文文件名都走同一套上传逻辑，不需要再额外分支处理。
 
 ## 推荐搭配阅读
 
