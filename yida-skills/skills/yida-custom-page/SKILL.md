@@ -61,6 +61,11 @@ openyida publish <源文件> <appType> <formUuid>  # 发布
 
 > 完整编码规范详见 [编码指南](references/coding-guide.md)。
 
+## 常见场景示例
+
+- 自定义页面附件上传：见 [AttachmentField 上传指南](references/attachment-upload-guide.md)
+- 对应最小代码示例：见 [attachment-upload.js](examples/attachment-upload.js)
+
 ## API 速查
 
 ### 表单数据（`this.utils.yida.<方法>(params)`）

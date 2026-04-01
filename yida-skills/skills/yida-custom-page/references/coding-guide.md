@@ -273,6 +273,12 @@ dateField_xxx: '2024-01-15'
 dateField_xxx: new Date().getTime()
 ```
 
+### 10.1 AttachmentField 上传不是直接写 File
+
+在自定义页面中，`AttachmentField` 不能直接写浏览器 `File` 对象，也不能写普通文本。正确做法是先走 `ossSign -> OSS 直传 -> AttachmentField 对象数组` 的链路，再在 `saveFormData` 时提交。
+
+详见：[AttachmentField 上传指南](./attachment-upload-guide.md)
+
 ### 11. 多端适配
 
 宜搭自定义页面会在 PC 端和移动端同时展示，使用 `this.utils.isMobile()` 判断设备类型：
