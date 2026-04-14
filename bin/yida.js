@@ -388,6 +388,12 @@ async function main() {
       break;
     }
 
+    case 'list-forms': {
+      const { run } = require('../lib/app/list-forms');
+      await run(args);
+      break;
+    }
+
     case 'get-schema': {
       const { run } = require('../lib/app/get-schema');
       await run(args);
