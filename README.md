@@ -100,6 +100,7 @@ openyida create-page          # Create a custom display page
 openyida create-process       # Create a process form (integrated)
 openyida create-report        # Create a Yida report
 openyida data                 # Unified data management (form/process/task/subform)
+openyida data check <appType> <formUuid> <rules.json> [options]  # Detect anomalous records in process forms based on custom rules
 openyida doctor               # Environment diagnostics and auto-repair
 openyida dws <command> [args]                              # DingTalk CLI (Contacts/Calendar/Todo/Approval, etc.)
 openyida env                  # Detect current AI tool environment and login status

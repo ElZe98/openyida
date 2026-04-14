@@ -369,10 +369,17 @@ async function main() {
       if (args.length < 2) {
         console.error('用法: openyida data <action> <resource> [args] [options]');
         console.error('示例: openyida data query form APP_XXX FORM_XXX --page 1 --size 20');
+        console.error('示例: openyida data check APP_XXX FORM_XXX rules.json');
         process.exit(1);
       }
-      const { run: runDataManagement } = require('../lib/core/query-data');
-      await runDataManagement(args);
+      // data check 子命令路由到独立的检测模块
+      if (args[0] === 'check') {
+        const { run: runCheckData } = require('../lib/core/check-data');
+        await runCheckData(args.slice(1));
+      } else {
+        const { run: runDataManagement } = require('../lib/core/query-data');
+        await runDataManagement(args);
+      }
       break;
     }
 
