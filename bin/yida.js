@@ -20,6 +20,7 @@
  *   openyida create-page <appType> "<页面名>"            创建自定义页面
  *   openyida create-form create <appType> "<表单名>" <字段JSON> [--layout <布局>] [--theme <主题>] [--label-align <对齐>]  创建表单页面
  *   openyida create-form update <appType> <formUuid> <修改JSON>  更新表单页面
+ *   openyida list-forms <appType> [--keyword <关键词>]  列出应用下的表单/页面
  *   openyida get-schema <appType> <formUuid>            获取表单 Schema
  *   openyida publish <源文件路径> <appType> <formUuid>   编译并发布自定义页面
  *   openyida verify-short-url <appType> <formUuid> <url>           验证短链接 URL 是否可用
@@ -83,6 +84,7 @@ openyida - 宜搭命令行工具
   create-page <appType> "<页面名>"                             创建自定义页面，输出 pageId
   create-form create <appType> "<表单名>" <字段JSON> [--layout <布局>] [--theme <主题>] [--label-align <对齐>]  创建表单页面
   create-form update <appType> <formUuid> <修改JSON>           更新表单页面
+  list-forms <appType> [--keyword <关键词>]                    列出应用下的表单/页面
   get-schema <appType> <formUuid>                              获取表单 Schema
   publish <源文件路径> <appType> <formUuid>                    编译并发布自定义页面
   verify-short-url <appType> <formUuid> <url>                  验证短链接 URL 是否可用
@@ -143,6 +145,8 @@ openyida - 宜搭命令行工具
   openyida create-page APP_XXX "游戏主页"
   openyida create-form create APP_XXX "员工信息" fields.json
   openyida create-form update APP_XXX FORM-XXX '[{"action":"add","field":{"type":"TextField","label":"备注"}}]'
+  openyida list-forms APP_XXX
+  openyida list-forms APP_XXX --keyword 客户
   openyida get-schema APP_XXX FORM-XXX
   openyida publish pages/src/home.jsx APP_XXX FORM-XXX
   openyida verify-short-url APP_XXX FORM-XXX /o/myapp
@@ -364,6 +368,12 @@ async function main() {
       // create-form.js 通过 process.argv.slice(2) 读取参数，注入子命令及其参数
       process.argv = [process.argv[0], process.argv[1], ...args];
       require('../lib/app/create-form');
+      break;
+    }
+
+    case 'list-forms': {
+      const { run } = require('../lib/app/list-forms');
+      await run(args);
       break;
     }
 
