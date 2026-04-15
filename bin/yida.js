@@ -21,6 +21,7 @@
  *   openyida create-form create <appType> "<表单名>" <字段JSON> [--layout <布局>] [--theme <主题>] [--label-align <对齐>]  创建表单页面
  *   openyida create-form update <appType> <formUuid> <修改JSON>  更新表单页面
  *   openyida list-forms <appType> [--keyword <关键词>]  列出应用下的表单/页面
+ *   openyida nav-group <sub-command> <appType> [options] 导航分组管理
  *   openyida get-schema <appType> <formUuid>            获取表单 Schema
  *   openyida publish <源文件路径> <appType> <formUuid>   编译并发布自定义页面
  *   openyida verify-short-url <appType> <formUuid> <url>           验证短链接 URL 是否可用
@@ -125,6 +126,7 @@ function printHelp() {
     ['create-form create <appType> ...',       t('help.cmd_create_form')],
     ['create-form update <appType> ...',       t('help.cmd_update_form')],
     ['list-forms <appType> [--keyword ...]',   t('help.cmd_list_forms')],
+    ['nav-group <sub-command> <appType> ...',  t('help.cmd_nav_group')],
     ['get-schema <appType> <formUuid>',        t('help.cmd_get_schema')],
     ['create-page <appType> "<name>"',         t('help.cmd_create_page')],
     ['publish <src> <appType> <formUuid>',     t('help.cmd_publish')],
@@ -393,6 +395,12 @@ async function main() {
 
     case 'list-forms': {
       const { run } = require('../lib/app/list-forms');
+      await run(args);
+      break;
+    }
+
+    case 'nav-group': {
+      const { run } = require('../lib/app/nav-group');
       await run(args);
       break;
     }
