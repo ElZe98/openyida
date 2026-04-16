@@ -13,6 +13,7 @@ const {
   loadCookieData,
   detectActiveTool,
   resolveWukongWorkspaceRoot,
+  triggerLogin,
 } = require('../lib/core/utils');
 
 // ── extractInfoFromCookies ────────────────────────────────────────────
@@ -200,6 +201,31 @@ describe('loadCookieData', () => {
     fs.writeFileSync(cookieFile, 'not-json', 'utf-8');
     const result = loadCookieData(tmpDir);
     expect(result).toBeNull();
+  });
+});
+
+// ── triggerLogin ─────────────────────────────────────────────────────
+
+describe('triggerLogin', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  test('强制调用 interactiveLogin，而不是复用 ensureLogin 缓存逻辑', () => {
+    const loginModule = require('../lib/auth/login');
+    const interactiveResult = { csrf_token: 'fresh-token' };
+    const interactiveSpy = jest.spyOn(loginModule, 'interactiveLogin').mockReturnValue(interactiveResult);
+    const ensureSpy = jest.spyOn(loginModule, 'ensureLogin').mockImplementation(() => {
+      throw new Error('ensureLogin should not be called');
+    });
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = triggerLogin();
+
+    expect(result).toBe(interactiveResult);
+    expect(interactiveSpy).toHaveBeenCalledTimes(1);
+    expect(ensureSpy).not.toHaveBeenCalled();
+    expect(consoleErrorSpy).toHaveBeenCalled();
   });
 });
 
