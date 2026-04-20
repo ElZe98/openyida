@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2026.04.20] - 2026-04-20
+
+### Fixed
+- **登录无限循环问题**: 修复 `ReferenceError: warn is not defined` 错误，恢复正常的登录流程（提交 `fdb5dd5`）
+  - `login.js`: 将子进程模板字符串中的 `warn()` 改回 `console.error()`（3 处）
+  - `qr-login.js`: 添加缺失的 `warn` import 语句
+  - 解决了因登录失败导致的潜在无限循环问题
+
 ## [2026.04.02-beta.12] - 2026-04-02
 
 ### Fixed
