@@ -211,6 +211,162 @@ describe('run() query form', () => {
     mockExit.mockRestore();
     mockError.mockRestore();
   });
+
+  test('query form --inst-id 时，instValue 为 JSON 字符串可回填完整 TableField', async () => {
+    utils.requestWithAutoLogin.mockResolvedValue({
+      success: true,
+      content: {
+        formInstId: 'INST-001',
+        formData: {
+          tableField_1: [
+            { textField_1: '第1行' },
+          ],
+        },
+        instValue: JSON.stringify([
+          {
+            componentName: 'TableField',
+            fieldId: 'tableField_1',
+            fieldData: {
+              value: [
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '第1行' } },
+                ],
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '第2行' } },
+                ],
+              ],
+            },
+          },
+        ]),
+      },
+    });
+
+    const mockLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const mockError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await run(['query', 'form', 'APP_XXX', 'FORM-XXX', '--inst-id', 'INST-001']);
+
+    const output = JSON.parse(mockLog.mock.calls[0][0]);
+    expect(output.content.formData.tableField_1).toEqual([
+      { textField_1: '第1行' },
+      { textField_1: '第2行' },
+    ]);
+
+    mockLog.mockRestore();
+    mockError.mockRestore();
+  });
+
+  test('query form --inst-id 时，instValue 为数组也可回填，且不会把已有完整数据写短', async () => {
+    utils.requestWithAutoLogin.mockResolvedValue({
+      success: true,
+      content: {
+        formInstId: 'INST-002',
+        formData: {
+          tableField_1: [
+            { textField_1: '第1行' },
+            { textField_1: '第2行' },
+            { textField_1: '第3行' },
+          ],
+        },
+        instValue: [
+          {
+            componentName: 'TableField',
+            fieldId: 'tableField_1',
+            fieldData: {
+              value: [
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '第1行' } },
+                ],
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '第2行' } },
+                ],
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const mockLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const mockError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await run(['query', 'form', 'APP_XXX', 'FORM-XXX', '--inst-id', 'INST-002']);
+
+    const output = JSON.parse(mockLog.mock.calls[0][0]);
+    expect(output.content.formData.tableField_1).toEqual([
+      { textField_1: '第1行' },
+      { textField_1: '第2行' },
+      { textField_1: '第3行' },
+    ]);
+
+    mockLog.mockRestore();
+    mockError.mockRestore();
+  });
+
+  test('query form --inst-id 时，非法 JSON 或非 TableField 保持原结果不变', async () => {
+    utils.requestWithAutoLogin.mockResolvedValue({
+      success: true,
+      content: {
+        formInstId: 'INST-003',
+        formData: {
+          tableField_1: [
+            { textField_1: '保留原值' },
+          ],
+        },
+        instValue: '[not-valid-json',
+      },
+    });
+
+    const mockLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const mockError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await run(['query', 'form', 'APP_XXX', 'FORM-XXX', '--inst-id', 'INST-003']);
+
+    let output = JSON.parse(mockLog.mock.calls[0][0]);
+    expect(output.content.formData.tableField_1).toEqual([
+      { textField_1: '保留原值' },
+    ]);
+
+    mockLog.mockClear();
+    utils.requestWithAutoLogin.mockResolvedValueOnce({
+      success: true,
+      content: {
+        formInstId: 'INST-004',
+        formData: {
+          tableField_1: [
+            { textField_1: '仍然保留' },
+          ],
+        },
+        instValue: JSON.stringify([
+          {
+            componentName: 'TextField',
+            fieldId: 'textField_1',
+            fieldData: { value: '不会回填到子表' },
+          },
+          {
+            componentName: 'TableField',
+            fieldData: {
+              value: [
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '缺少 fieldId 的子表' } },
+                ],
+              ],
+            },
+          },
+        ]),
+      },
+    });
+
+    await run(['query', 'form', 'APP_XXX', 'FORM-XXX', '--inst-id', 'INST-004']);
+
+    output = JSON.parse(mockLog.mock.calls[0][0]);
+    expect(output.content.formData.tableField_1).toEqual([
+      { textField_1: '仍然保留' },
+    ]);
+
+    mockLog.mockRestore();
+    mockError.mockRestore();
+  });
 });
 
 // ── get form（--inst-id）场景 ─────────────────────────────────────────
@@ -263,6 +419,54 @@ describe('run() get form', () => {
     expect(mockExit).toHaveBeenCalledWith(1);
 
     mockExit.mockRestore();
+    mockError.mockRestore();
+  });
+
+  test('get form --inst-id 时，仅在 instValue 行数更多时覆盖 formData 子表', async () => {
+    utils.requestWithAutoLogin.mockResolvedValue({
+      success: true,
+      content: {
+        formInstId: 'INST-005',
+        formData: {
+          tableField_1: [
+            { textField_1: '第1行' },
+          ],
+        },
+        instValue: JSON.stringify([
+          {
+            componentName: 'TableField',
+            fieldId: 'tableField_1',
+            fieldData: {
+              value: [
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '第1行' } },
+                ],
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '第2行' } },
+                ],
+                [
+                  { fieldId: 'textField_1', fieldData: { value: '第3行' } },
+                ],
+              ],
+            },
+          },
+        ]),
+      },
+    });
+
+    const mockLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const mockError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await run(['get', 'form', 'APP_XXX', '--inst-id', 'INST-005']);
+
+    const output = JSON.parse(mockLog.mock.calls[0][0]);
+    expect(output.content.formData.tableField_1).toEqual([
+      { textField_1: '第1行' },
+      { textField_1: '第2行' },
+      { textField_1: '第3行' },
+    ]);
+
+    mockLog.mockRestore();
     mockError.mockRestore();
   });
 });
