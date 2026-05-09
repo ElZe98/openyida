@@ -4,21 +4,30 @@
 
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 
 const ROOT = path.resolve(__dirname, '..');
 const SOURCE_ROOT = path.join(ROOT, 'yida-skills');
 const SOURCE_SUBSKILLS_ROOT = path.join(SOURCE_ROOT, 'skills');
 const DEFAULT_OUTPUT_ROOT = path.join(ROOT, 'dist', 'skills', 'openyida');
+const DEFAULT_ZIP_OUT = path.join(ROOT, 'openyida-skills.zip');
 
 function parseArgs(argv) {
   const options = {
     out: DEFAULT_OUTPUT_ROOT,
+    zipOut: DEFAULT_ZIP_OUT,
+    zip: true,
   };
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--out') {
       options.out = path.resolve(ROOT, argv[++i]);
+    } else if (arg === '--zip-out') {
+      options.zipOut = path.resolve(ROOT, argv[++i]);
+      options.zip = true;
+    } else if (arg === '--no-zip') {
+      options.zip = false;
     }
   }
 
@@ -226,11 +235,172 @@ function buildSkillsPackage(outputRoot) {
   return count;
 }
 
+function buildZipPackage(outputRoot, zipOut) {
+  if (!fs.existsSync(outputRoot)) {
+    throw new Error('Missing generated skills package directory: ' + path.relative(ROOT, outputRoot));
+  }
+
+  fs.mkdirSync(path.dirname(zipOut), { recursive: true });
+  fs.rmSync(zipOut, { force: true });
+
+  const zipBuffer = createZipBuffer(outputRoot);
+  fs.writeFileSync(zipOut, zipBuffer);
+
+  const stat = fs.statSync(zipOut);
+  if (!stat.size) {
+    throw new Error('Created Wukong zip package is empty: ' + path.relative(ROOT, zipOut));
+  }
+
+  return stat.size;
+}
+
+const CRC32_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let crc = i;
+    for (let j = 0; j < 8; j++) {
+      crc = (crc & 1) ? (0xEDB88320 ^ (crc >>> 1)) : (crc >>> 1);
+    }
+    table[i] = crc >>> 0;
+  }
+  return table;
+})();
+
+function crc32(buffer) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < buffer.length; i++) {
+    crc = CRC32_TABLE[(crc ^ buffer[i]) & 0xFF] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function toDosDateTime(date) {
+  const year = Math.max(1980, date.getFullYear());
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = Math.floor(date.getSeconds() / 2);
+  return {
+    time: ((hours << 11) | (minutes << 5) | seconds) & 0xFFFF,
+    date: (((year - 1980) << 9) | (month << 5) | day) & 0xFFFF,
+  };
+}
+
+function collectZipEntries(absPath, entryName, entries) {
+  const stat = fs.statSync(absPath);
+  if (stat.isDirectory()) {
+    const dirName = entryName.endsWith('/') ? entryName : entryName + '/';
+    entries.push({ absPath, entryName: dirName, stat, isDirectory: true });
+    const names = fs.readdirSync(absPath).filter(function(name) {
+      return name !== '.DS_Store';
+    }).sort();
+    for (const name of names) {
+      collectZipEntries(path.join(absPath, name), dirName + name, entries);
+    }
+  } else if (stat.isFile() && path.basename(absPath) !== '.DS_Store') {
+    entries.push({ absPath, entryName, stat, isDirectory: false });
+  }
+}
+
+function writeLocalHeader(entry, nameBuffer, compressed, uncompressed, crc, method) {
+  const { time, date } = toDosDateTime(entry.stat.mtime);
+  const header = Buffer.alloc(30);
+  header.writeUInt32LE(0x04034b50, 0);
+  header.writeUInt16LE(20, 4);
+  header.writeUInt16LE(0x0800, 6);
+  header.writeUInt16LE(method, 8);
+  header.writeUInt16LE(time, 10);
+  header.writeUInt16LE(date, 12);
+  header.writeUInt32LE(crc, 14);
+  header.writeUInt32LE(compressed.length, 18);
+  header.writeUInt32LE(uncompressed.length, 22);
+  header.writeUInt16LE(nameBuffer.length, 26);
+  header.writeUInt16LE(0, 28);
+  return header;
+}
+
+function writeCentralHeader(entry, nameBuffer, compressed, uncompressed, crc, method, localOffset) {
+  const { time, date } = toDosDateTime(entry.stat.mtime);
+  const header = Buffer.alloc(46);
+  header.writeUInt32LE(0x02014b50, 0);
+  header.writeUInt16LE(0x031E, 4);
+  header.writeUInt16LE(20, 6);
+  header.writeUInt16LE(0x0800, 8);
+  header.writeUInt16LE(method, 10);
+  header.writeUInt16LE(time, 12);
+  header.writeUInt16LE(date, 14);
+  header.writeUInt32LE(crc, 16);
+  header.writeUInt32LE(compressed.length, 20);
+  header.writeUInt32LE(uncompressed.length, 24);
+  header.writeUInt16LE(nameBuffer.length, 28);
+  header.writeUInt16LE(0, 30);
+  header.writeUInt16LE(0, 32);
+  header.writeUInt16LE(0, 34);
+  header.writeUInt16LE(0, 36);
+  const unixMode = entry.isDirectory ? 0o40755 : 0o100644;
+  const dosAttributes = entry.isDirectory ? 0x10 : 0;
+  header.writeUInt32LE(((unixMode << 16) | dosAttributes) >>> 0, 38);
+  header.writeUInt32LE(localOffset, 42);
+  return header;
+}
+
+function createZipBuffer(outputRoot) {
+  const entries = [];
+  collectZipEntries(outputRoot, path.basename(outputRoot), entries);
+
+  const chunks = [];
+  const centralChunks = [];
+  let offset = 0;
+
+  for (const entry of entries) {
+    const nameBuffer = Buffer.from(entry.entryName.replace(/\\/g, '/'), 'utf8');
+    const uncompressed = entry.isDirectory ? Buffer.alloc(0) : fs.readFileSync(entry.absPath);
+    const method = entry.isDirectory ? 0 : 8;
+    const compressed = entry.isDirectory ? Buffer.alloc(0) : zlib.deflateRawSync(uncompressed);
+    const crc = entry.isDirectory ? 0 : crc32(uncompressed);
+    const localOffset = offset;
+
+    const localHeader = writeLocalHeader(entry, nameBuffer, compressed, uncompressed, crc, method);
+    chunks.push(localHeader, nameBuffer, compressed);
+    offset += localHeader.length + nameBuffer.length + compressed.length;
+
+    const centralHeader = writeCentralHeader(entry, nameBuffer, compressed, uncompressed, crc, method, localOffset);
+    centralChunks.push(centralHeader, nameBuffer);
+  }
+
+  const centralOffset = offset;
+  const centralSize = centralChunks.reduce(function(sum, chunk) {
+    return sum + chunk.length;
+  }, 0);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(0, 4);
+  end.writeUInt16LE(0, 6);
+  end.writeUInt16LE(entries.length, 8);
+  end.writeUInt16LE(entries.length, 10);
+  end.writeUInt32LE(centralSize, 12);
+  end.writeUInt32LE(centralOffset, 16);
+  end.writeUInt16LE(0, 20);
+
+  return Buffer.concat(chunks.concat(centralChunks, end));
+}
+
+function formatBytes(size) {
+  if (size < 1024) {return size + ' B';}
+  if (size < 1024 * 1024) {return (size / 1024).toFixed(1) + ' KB';}
+  return (size / 1024 / 1024).toFixed(1) + ' MB';
+}
+
 function run() {
   const options = parseArgs(process.argv.slice(2));
   const count = buildSkillsPackage(options.out);
   console.log('Built OpenYida skills package: ' + path.relative(ROOT, options.out));
   console.log('Files copied: ' + count);
+  if (options.zip) {
+    const zipSize = buildZipPackage(options.out, options.zipOut);
+    console.log('Built Wukong upload zip: ' + path.relative(ROOT, options.zipOut) + ' (' + formatBytes(zipSize) + ')');
+  }
 }
 
 run();

@@ -121,7 +121,7 @@ openyida/
 │   ├── skills/              # 子技能目录（每个 skill 自包含 SKILL.md + references/）
 │   └── references/           # 跨 skill 共享参考文档（yida-api、model-api、query-condition-guide）
 └── scripts/
-    ├── build-skills-package.js # 生成悟空可上传的 dist/skills/openyida 技能包
+    ├── build-skills-package.js # 生成悟空可上传的 dist/skills/openyida 技能目录和 openyida-skills.zip
     ├── postinstall.js       # 安装后脚本（环境检测 + 配置注入）
     ├── validate-ci.sh       # CI 校验脚本
     └── validate-structure.js # 项目结构校验
@@ -146,9 +146,9 @@ openyida/
 - 不同环境的 Cookie 提取方式不同（CDP 协议 / 文件读取 / 扫码）
 
 ### Codex 特殊说明
-- Codex 环境下 `openyida login` 默认缓存优先；没有有效缓存时进入 Codex 内置浏览器登录模式（等同 `openyida login --codex`）
-- Codex 登录模式不依赖 Playwright 或额外 Chromium
-- 如需测试终端二维码链路，显式使用 `openyida login --qr`
+- Codex 环境下 `openyida login` 默认缓存优先；没有有效缓存时优先使用本地 Chrome / Edge / Chromium CDP 登录，CDP 不可用时返回 AI 对话框二维码 handoff
+- Codex 默认登录不依赖 Playwright；显式 `openyida login --browser` 时 CDP 不可用才使用 Playwright 兜底
+- 如需测试终端二维码链路，显式使用 `openyida login --qr`；如需强制 AI 对话框二维码 handoff，使用 `openyida login --agent-qr`
 - 多组织账号测试终端二维码登录时，优先传入 `--corp-id <corpId>`，不要由 AI 代理代替用户选择组织
 
 ### 悟空（Wukong）特殊说明
@@ -156,7 +156,7 @@ openyida/
 - `lib/core/utils.js` 的 `detectActiveTool()` 直接读取 `AGENT_WORK_ROOT` 作为工作区根目录
 - `openyida copy` 在**空目录**时会直接把 `project/` 内容铺入工作区（不创建 `project/` 子目录层级）
 - 悟空通过手动上传技能包，`postinstall` 不会自动安装 `yida-skills/`
-- 悟空发布包由 `npm run build:skills` 生成到 `dist/skills/openyida/`。该包只保留一个根 `SKILL.md`，frontmatter 只能包含 `name` 和 `description`，子技能文档会被转换到 `references/subskills/`。
+- 悟空发布包由 `npm run build:skills` 生成到 `dist/skills/openyida/`，同时输出可直接上传悟空的 `openyida-skills.zip`。该包只保留一个根 `SKILL.md`，frontmatter 只能包含 `name` 和 `description`，子技能文档会被转换到 `references/subskills/`。
 - 悟空自带 node/npm 路径：macOS/Linux 为 `~/.real/.bin/node/bin/`，Windows 为 `%USERPROFILE%\.real\.bin\node\bin\`。执行任何 `npm`/`node`/`npx` 命令前**必须**先设置 PATH：
   - macOS/Linux：`export PATH="$HOME/.real/.bin/node/bin:$PATH"`
   - Windows (PowerShell)：`$env:PATH = "$env:USERPROFILE\.real\.bin\node\bin;$env:PATH"`

@@ -104,9 +104,7 @@ metadata:
    searchUser 真实路径 data.data.content + 前端 `self.utils.yida.saveFormData` 写入派单触发表 + 集成自动化后端自动调用待办连接器
            ↓
 [Step 7] 本地校验 + 发布
-   源码默认保存为 pages/src/<看板名>.oyd.jsx
    openyida check-page <源文件>
-   openyida compile <源文件>
    openyida publish <源文件> <appType> <formUuid> --health-check
            ↓
 [Step 8] 组织内短链 + 隐藏导航 + 卡片截图验证
@@ -135,16 +133,15 @@ metadata:
 ## 强制要求（MUST DO）
 
 1. **先 explore 两个成品样本**：
-   - `project/pages/src/supply-chain-dashboard.js`（历史深色紫蓝标杆，2356 行）
-   - `project/pages/src/shangri-la-executive-dashboard.js`（历史金蓝奢华样本，1796 行）
-   - 读取关键段学结构，不要凭空设计；新交付源码仍保存为 `.oyd.jsx`，并按 `yida-custom-page` 规范修正旧样本里的事件/数组回调写法
+   - `project/pages/src/supply-chain-dashboard.js`（深色紫蓝标杆，2356 行）
+   - `project/pages/src/shangri-la-executive-dashboard.js`（金蓝奢华样本，1796 行）
+   - 读取关键段学结构，不要凭空设计
 2. **审计表单字段 ID 在 FORM_CONFIG 常量集中声明**，便于一次性替换；`FORM_CONFIG.todoTrigger` 必须标注出 subject/executor/description/dueTime/priority 5 个字段 ID 与集成自动化 `--connector-assignment` 的映射完全一致
 3. **前端派单统一走 `self.utils.yida.saveFormData`** 写入派单触发表，禁止引用已不存在的 `this.dataSourceMap.createDingTodo`。没有配置集成自动化时前端要 toast "派单触发表未配置集成自动化"，不要静默降级
 4. **每次数据请求必写 catch + 降级渲染**，不要静默失败
 5. **发布前用 `openyida check-page` 跑一次规范扫描**
-6. **发布前用 `openyida compile` 做本地 Babel/UglifyJS 校验**；`.oyd.jsx` 会先执行 OpenYida 兼容构建
-7. **首次发布必带 `--health-check`** 做首屏 HTTP 健康检查
-8. **交付物验收必须包含组织内短链 URL**，纯 aliwork.com 链接不算交付
+6. **首次发布必带 `--health-check`** 做首屏 HTTP 健康检查
+7. **交付物验收必须包含组织内短链 URL**，纯 aliwork.com 链接不算交付
 
 ---
 

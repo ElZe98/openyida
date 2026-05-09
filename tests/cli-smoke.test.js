@@ -29,6 +29,17 @@ function cliEnv() {
     // 清除可能从父进程继承的 AI 工具环境变量，避免干扰测试
     QODER_IDE: '',
     QODER_AGENT: '',
+    CODEX_SHELL: '',
+    CODEX_CI: '',
+    CODEX_THREAD_ID: '',
+    CODEX_HOME: '',
+    CLAUDE_CODE: '',
+    CLAUDE_CODE_ENTRYPOINT: '',
+    OPENCODE: '',
+    CURSOR_TRACE_ID: '',
+    VSCODE_GIT_ASKPASS_NODE: '',
+    AGENT_WORK_ROOT: '',
+    OPENYIDA_AGENT_MODE: '',
   };
 }
 
@@ -89,7 +100,7 @@ describe('CLI offline smoke', () => {
     const output = runOk(['--help']);
     expect(output).toContain('OpenYida');
     expect(output).toContain('env [--json]');
-    expect(output).toContain('login [--qr|--codex|--codex-qr|--browser] [--corp-id <corpId>]');
+    expect(output).toContain('login [--qr|--agent-qr|--codex|--browser] [--corp-id <corpId>]');
     expect(output).toContain('create-form');
     expect(output).toContain('list-forms');
     expect(output).toContain('connector');
@@ -175,28 +186,102 @@ describe('CLI offline smoke', () => {
     expect(result.output).toContain('未知的 env 子命令');
   });
 
-  test('login auto-selects Codex browser handoff in Codex environment', () => {
+  test('login falls back to QR handoff in Codex environment when CDP is unavailable', () => {
     const workspace = createCodexWorkspace();
     try {
       const output = runOkWithEnv(['login'], {
         CODEX_SHELL: '1',
         OPENYIDA_ENV: 'public',
         OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
+        OPENYIDA_DISABLE_CDP_LOGIN: '1',
+        OPENYIDA_CODEX_QR_FAKE: '1',
       }, workspace);
       const parsed = JSON.parse(output.trim());
       expect(parsed).toMatchObject({
-        status: 'need_codex_browser_login',
-        handoff_type: 'browser',
-        agent_action: 'open_in_app_browser',
-        browser_open_strategy: 'browser_use_iab',
-        browser_use_local_redirect_fallback: true,
-        required_agent_tool: 'browser-use:browser',
-        required_runtime_tool: 'mcp__node_repl__js',
-        browser: 'codex',
-        login_url: 'https://example.test/workPlatform',
+        status: 'need_qr_scan',
+        handoff_type: 'qr',
         can_auto_use: false,
       });
-      expect(parsed.fallback_command).toBe('openyida login --browser');
+      expect(parsed.qr_url).toContain('https://login.example.test/qr');
+      expect(parsed.qr_image_file).toContain('test-session.png');
+      expect(parsed.qr_image_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.qr_image_markdown).toContain('test-session.png');
+      expect(parsed.agent_response_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.agent_response_markdown).toContain('poll_command:');
+      expect(parsed.poll_command).toContain('openyida login --agent-poll');
+    } finally {
+      fs.rmSync(workspace, { recursive: true, force: true });
+    }
+  });
+
+  test('login falls back to QR handoff in Qoder environment when CDP is unavailable', () => {
+    const workspace = createCodexWorkspace();
+    try {
+      const output = runOkWithEnv(['login'], {
+        QODER_IDE: '1',
+        OPENYIDA_ENV: 'public',
+        OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
+        OPENYIDA_DISABLE_CDP_LOGIN: '1',
+        OPENYIDA_CODEX_QR_FAKE: '1',
+      }, workspace);
+      const parsed = JSON.parse(output.trim());
+      expect(parsed).toMatchObject({
+        status: 'need_qr_scan',
+        handoff_type: 'qr',
+        can_auto_use: false,
+      });
+      expect(parsed.qr_url).toContain('https://login.example.test/qr');
+      expect(parsed.qr_image_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.agent_response_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.poll_command).toContain('openyida login --agent-poll');
+    } finally {
+      fs.rmSync(workspace, { recursive: true, force: true });
+    }
+  });
+
+  test('login falls back to QR handoff in Claude Code environment when CDP is unavailable', () => {
+    const workspace = createCodexWorkspace();
+    try {
+      const output = runOkWithEnv(['login'], {
+        CLAUDE_CODE: '1',
+        OPENYIDA_ENV: 'public',
+        OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
+        OPENYIDA_DISABLE_CDP_LOGIN: '1',
+        OPENYIDA_CODEX_QR_FAKE: '1',
+      }, workspace);
+      const parsed = JSON.parse(output.trim());
+      expect(parsed).toMatchObject({
+        status: 'need_qr_scan',
+        handoff_type: 'qr',
+        can_auto_use: false,
+      });
+      expect(parsed.qr_image_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.agent_response_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.poll_command).toContain('openyida login --agent-poll');
+    } finally {
+      fs.rmSync(workspace, { recursive: true, force: true });
+    }
+  });
+
+  test('login falls back to QR handoff in OpenCode environment when CDP is unavailable', () => {
+    const workspace = createCodexWorkspace();
+    try {
+      const output = runOkWithEnv(['login'], {
+        OPENCODE: '1',
+        OPENYIDA_ENV: 'public',
+        OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
+        OPENYIDA_DISABLE_CDP_LOGIN: '1',
+        OPENYIDA_CODEX_QR_FAKE: '1',
+      }, workspace);
+      const parsed = JSON.parse(output.trim());
+      expect(parsed).toMatchObject({
+        status: 'need_qr_scan',
+        handoff_type: 'qr',
+        can_auto_use: false,
+      });
+      expect(parsed.qr_image_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.agent_response_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.poll_command).toContain('openyida login --agent-poll');
     } finally {
       fs.rmSync(workspace, { recursive: true, force: true });
     }
@@ -253,10 +338,10 @@ describe('CLI offline smoke', () => {
     }
   });
 
-  test('login --codex-qr returns QR handoff', () => {
+  test('login --agent-qr returns QR handoff', () => {
     const workspace = createCodexWorkspace();
     try {
-      const output = runOkWithEnv(['login', '--codex-qr'], {
+      const output = runOkWithEnv(['login', '--agent-qr'], {
         CODEX_SHELL: '1',
         OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
         OPENYIDA_CODEX_QR_FAKE: '1',
@@ -269,44 +354,50 @@ describe('CLI offline smoke', () => {
       });
       expect(parsed.qr_url).toContain('https://login.example.test/qr');
       expect(parsed.qr_image_file).toContain('test-session.png');
-      expect(parsed.poll_command).toContain('openyida login --codex-poll');
+      expect(parsed.qr_image_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.agent_response_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.poll_command).toContain('openyida login --agent-poll');
     } finally {
       fs.rmSync(workspace, { recursive: true, force: true });
     }
   });
 
-  test('login --codex-qr keeps explicit corpId in QR poll command', () => {
+  test('login --agent-qr keeps explicit corpId in QR poll command', () => {
     const workspace = createCodexWorkspace();
     try {
-      const output = runOkWithEnv(['login', '--codex-qr', '--corp-id', 'ding-main'], {
+      const output = runOkWithEnv(['login', '--agent-qr', '--corp-id', 'ding-main'], {
         CODEX_SHELL: '1',
         OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
         OPENYIDA_CODEX_QR_FAKE: '1',
       }, workspace);
       const parsed = JSON.parse(output.trim());
-      expect(parsed.poll_command).toContain('openyida login --codex-poll');
+      expect(parsed.poll_command).toContain('openyida login --agent-poll');
       expect(parsed.poll_command).toContain("--corp-id 'ding-main'");
     } finally {
       fs.rmSync(workspace, { recursive: true, force: true });
     }
   });
 
-  test('login auto-selects Wukong browser handoff in Wukong environment', () => {
+  test('login falls back to QR handoff in Wukong environment when CDP is unavailable', () => {
     const wukong = createWukongWorkRoot();
     try {
       const output = runOkWithEnv(['login'], {
         AGENT_WORK_ROOT: wukong.agentWorkRoot,
         OPENYIDA_ENV: 'public',
         OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
+        OPENYIDA_DISABLE_CDP_LOGIN: '1',
+        OPENYIDA_CODEX_QR_FAKE: '1',
       }, wukong.projectDir);
       const parsed = JSON.parse(output.trim());
       expect(parsed).toMatchObject({
-        status: 'need_codex_browser_login',
-        handoff_type: 'browser',
-        browser: 'wukong',
-        login_url: 'https://example.test/workPlatform',
+        status: 'need_qr_scan',
+        handoff_type: 'qr',
         can_auto_use: false,
       });
+      expect(parsed.qr_url).toContain('https://login.example.test/qr');
+      expect(parsed.qr_image_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.agent_response_markdown).toContain('![OpenYida login QR code](');
+      expect(parsed.poll_command).toContain('openyida login --agent-poll');
     } finally {
       fs.rmSync(wukong.base, { recursive: true, force: true });
     }
@@ -360,6 +451,26 @@ describe('CLI offline smoke', () => {
       });
     } finally {
       fs.rmSync(wukong.base, { recursive: true, force: true });
+    }
+  });
+
+  test('login --qoder explicitly returns Qoder browser handoff', () => {
+    const workspace = createCodexWorkspace();
+    try {
+      const output = runOkWithEnv(['login', '--qoder'], {
+        OPENYIDA_LOGIN_URL: 'https://example.test/workPlatform',
+      }, workspace);
+      const parsed = JSON.parse(output.trim());
+      expect(parsed).toMatchObject({
+        status: 'need_codex_browser_login',
+        handoff_type: 'browser',
+        browser: 'qoder',
+        login_url: 'https://example.test/workPlatform',
+        can_auto_use: false,
+      });
+      expect(parsed.message).toContain('Qoder');
+    } finally {
+      fs.rmSync(workspace, { recursive: true, force: true });
     }
   });
 

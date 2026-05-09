@@ -73,7 +73,6 @@ export function renderJsx() {
   var state = this.getCustomState();
   var isMobile = window.innerWidth < 768;
   var isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-  var timestamp = this.state && this.state.timestamp;
 
   // 样式对象（响应式），详见下文 s.XXX 结构
   var s = buildStyles(isMobile, isTablet);
@@ -82,7 +81,7 @@ export function renderJsx() {
   if (state.loading) {
     return (
       <div>
-        <div style={{ display: 'none' }}>{timestamp}</div>
+        <div style={{ display: 'none' }}>{this.state.timestamp}</div>
         <div style={s.loadingWrap}>加载中…</div>
       </div>
     );
@@ -90,7 +89,7 @@ export function renderJsx() {
 
   return (
     <div style={s.page}>
-      <div style={{ display: 'none' }}>{timestamp}</div>
+      <div style={{ display: 'none' }}>{this.state.timestamp}</div>
 
       {/* 1. header */}
       <div style={s.header}>
@@ -113,7 +112,7 @@ export function renderJsx() {
 
       {/* 3. carbonBar */}
       <div style={s.carbonBar}>
-        {CARBON_BAR_ITEMS.map((item) => {
+        {CARBON_BAR_ITEMS.map(function(item) {
           return renderCarbonItem(item, s);
         })}
       </div>
@@ -122,23 +121,23 @@ export function renderJsx() {
       <div style={s.dashboardTriangle}>
         <div style={s.healthCard}>{renderHealthIndex(state, s)}</div>
         <div style={s.modulesGrid}>
-          {DASHBOARD_MODULES.map((m) => {
+          {DASHBOARD_MODULES.map(function(m) {
             return renderModuleCard(self, m, s);
           })}
         </div>
         <div style={s.actionsAndRisks}>
           <div style={s.actionsPanel}>
-            {DASHBOARD_ACTIONS.map((a) => { return renderAction(self, a, s); })}
+            {DASHBOARD_ACTIONS.map(function(a) { return renderAction(self, a, s); })}
           </div>
           <div style={s.risksPanel}>
-            {DASHBOARD_RISKS.map((r) => { return renderRisk(self, r, s); })}
+            {DASHBOARD_RISKS.map(function(r) { return renderRisk(self, r, s); })}
           </div>
         </div>
       </div>
 
       {/* 5. KPI */}
       <div style={s.kpiGrid}>
-        {state.kpiList.map((k) => {
+        {state.kpiList.map(function(k) {
           return renderKpiCard(self, k, s);
         })}
       </div>

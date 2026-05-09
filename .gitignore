@@ -7,6 +7,7 @@ node_modules/
 /dist/
 mcp-app/dist/
 *.tgz
+openyida-skills.zip
 
 # TypeScript build outputs
 **/*.d.ts

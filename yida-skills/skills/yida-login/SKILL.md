@@ -45,43 +45,50 @@ description: 宜搭登录态管理。扫码登录，Cookie 持久化到 .cache/c
 openyida login
 ```
 
-默认登录路径不需要 Playwright：优先复用缓存；Codex、Qoder、悟空使用内置浏览器 handoff；其他终端环境使用二维码登录。
+默认登录路径不需要 Playwright：优先复用缓存；Codex、Qoder、悟空、Claude Code、OpenCode、Cursor 等可检测到的 AI 工具先尝试本地 Chrome/Edge/Chromium CDP 登录，CDP 不可用时再使用二维码 handoff；其他终端环境使用二维码登录。`openyida login --browser` 优先使用本地 Chrome/Edge/Chromium CDP，CDP 不可用时才用 Playwright 兜底。
 
-### Codex 内置浏览器登录模式
+### AI 工具二维码登录模式
 
-在 Codex 中没有有效缓存时，`openyida login` 或 `openyida login --codex` 会返回 `need_codex_browser_login` JSON，包含 `agent_action: "open_in_app_browser"`、`login_url`、`required_agent_tool: "browser-use:browser"` 和 `post_login_check_command`。
+在 AI 对话框环境中没有有效缓存，且本地 CDP 浏览器登录不可用时，`openyida login` 返回 `need_qr_scan` JSON，包含 `qr_image_markdown`、`agent_response_markdown`、`qr_image_file`、`qr_url`、`poll_command` 和 `session_file`。
 
-收到 `need_codex_browser_login` 后：
+收到 `need_qr_scan` 后：
 
-1. 使用 Browser Use 的 in-app browser 打开 `login_url`，让钉钉/宜搭页面自己承接扫码、组织选择和跳转
-2. 若 Browser Use 直接打开外部 URL 失败，先启动一个临时 `127.0.0.1` 本地 redirect 页面，再用 in-app browser 打开本地 URL，由页面跳转到 `login_url`
-3. 用户扫码并完成页面内组织选择后，执行 `post_login_check_command`
-4. 若 `post_login_check_command` 仍显示未登录，说明当前 Codex 浏览器缺少 Cookie 导出到 CLI 缓存的桥接能力；不要手动编造或写入 Cookie
+1. 必须在对话框中直接渲染 `qr_image_markdown`，或原样粘贴 `agent_response_markdown`；不要只展示 `qr_image_file` 文件路径或 `qr_url`
+2. 让用户使用钉钉扫码并确认登录
+3. 用户确认后执行 `poll_command`
+4. 若返回 `need_corp_selection`，优先调用 OpenYida MCP 工具 `select_yida_login_organization`，传入 `session_file`，由 MCP 原生选择控件完成组织选择和 Cookie 写入
 
-不要把组织列表塞进普通聊天选择控件；多组织选择应发生在钉钉/宜搭真实登录页面内。
+不要手动编造或写入 Cookie。多组织选择优先使用 `--corp-id <corpId>` 或 MCP 原生组织选择控件，不要把组织列表塞进普通聊天选择控件。
 
-### Codex 二维码兜底模式
+### 显式浏览器模式
 
-只有用户明确要求二维码兜底，或内置浏览器完全不可用时，才使用：
-
-```bash
-openyida login --codex-qr
-```
-
-该命令返回 `need_qr_scan` JSON，包含 `qr_image_file`、`qr_url`、`poll_command`、`session_file`。扫码后执行 `poll_command`；如返回 `need_corp_selection`，优先调用 OpenYida MCP 工具 `select_yida_login_organization`，传入 `session_file`，由 MCP `elicitation/create` 展示原生组织单选并完成登录。
-
-### 内置浏览器登录模式
-
-在 Codex、Qoder、悟空中不要安装 Playwright。没有有效缓存时，登录应使用宿主自带的内置浏览器：
+需要强制本地浏览器登录时使用：
 
 ```bash
 openyida login --browser
+```
+
+`--browser` 优先使用本地 Chrome / Edge / Chromium CDP，CDP 不可用时才用 Playwright 兜底。
+
+下面这些是兼容旧版 AI 内置浏览器 handoff 的显式命令，只有用户明确要求内置浏览器 handoff 时才使用：
+
+```bash
 openyida login --codex
 openyida login --qoder
 openyida login --wukong
 ```
 
-这些命令返回 `login_url` handoff。收到 handoff 后，用当前宿主的 in-app browser 打开 `login_url`，让用户用钉钉扫码并等待跳转到宜搭工作台。若后续 CLI 仍缺少 `.cache/cookies*.json`，说明当前环境缺少浏览器 Cookie 导出桥接能力，不要手动编造或写入 Cookie。
+若宿主 in-app browser 缺少 Cookie 导出到 CLI 缓存的桥接能力，不要手动编造或写入 Cookie，改用默认登录或显式 `openyida login --agent-qr`。
+
+### 显式二维码命令
+
+需要强制使用 AI 工具二维码 handoff 时：
+
+```bash
+openyida login --agent-qr
+```
+
+该命令返回 `need_qr_scan` JSON，包含可直接渲染的 `qr_image_markdown` 和 `agent_response_markdown`。扫码后执行 `poll_command`。兼容旧命令 `openyida login --codex-qr`。
 
 ## 输出
 

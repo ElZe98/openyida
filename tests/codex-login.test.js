@@ -86,7 +86,29 @@ describe('codexLogin', () => {
       browser: 'qoder',
       login_url: 'https://www.aliwork.com/workPlatform',
       can_auto_use: false,
+      fallback_command: 'openyida login --browser',
     });
+    expect(result.message).toContain('Qoder');
+    expect(chalk.banner).toHaveBeenCalledWith(expect.stringContaining('Qoder'));
+    expect(chalk.info).toHaveBeenCalledWith(expect.stringContaining('Qoder'));
+    expect(chalk.hint).toHaveBeenCalledWith(expect.stringContaining('Qoder'));
+    expect(chalk.warn).not.toHaveBeenCalled();
+  });
+
+  test('显式指定 Qoder 时即使没有 Qoder 环境变量也返回 qoder handoff', async () => {
+    delete process.env.CODEX_SHELL;
+    delete process.env.CODEX_CI;
+    delete process.env.CODEX_THREAD_ID;
+    delete process.env.CODEX_HOME;
+
+    const result = await codexLogin({ tool: 'qoder' });
+
+    expect(result).toMatchObject({
+      status: 'need_codex_browser_login',
+      browser: 'qoder',
+      fallback_command: 'openyida login --browser',
+    });
+    expect(result.message).toContain('Qoder');
     expect(chalk.warn).not.toHaveBeenCalled();
   });
 

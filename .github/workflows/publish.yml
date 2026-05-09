@@ -82,20 +82,26 @@ jobs:
           echo "tag=latest" >> $GITHUB_OUTPUT
         fi
 
+    - name: Check npm version
+      id: npm-version
+      run: |
+        TAG="${{ github.ref_name }}"
+        VERSION="${TAG#v}"
+        if npm view "openyida@$VERSION" version >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "openyida@$VERSION already exists on npm; skipping npm publish."
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Publish to npm
+      if: steps.npm-version.outputs.exists != 'true'
       run: npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Build Wukong skills package
       run: npm run build:skills
-
-    - name: Package openyida-skills.zip
-      run: |
-        cd dist/skills
-        zip -r ../../openyida-skills.zip openyida/ -x "*.DS_Store"
-        cd ../..
-        echo "Packaged openyida-skills.zip ($(du -sh openyida-skills.zip | cut -f1))"
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
@@ -107,6 +113,14 @@ jobs:
         body: |
           ## 安装 / 更新
 
+          Beta / RC 预发布：
+
+          ```bash
+          npm install -g openyida@beta
+          ```
+
+          正式版：
+
           ```bash
           npm install -g openyida
           ```
@@ -115,7 +129,7 @@ jobs:
 
           ## OpenYida 悟空技能包
 
-          下载 `openyida-skills.zip` 后，在悟空技能中心通过「上传技能」导入。该包按悟空 SKILL.md 规范生成：
+          在本 Release 页面底部的 **Assets** 中下载 `openyida-skills.zip`，然后在悟空技能中心通过「上传技能」导入。该包按悟空 SKILL.md 规范生成：
           根目录为 `openyida/`，只包含一个根 `SKILL.md`，长文档和子能力放在 `references/` 中。
 
         generate_release_notes: true

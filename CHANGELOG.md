@@ -8,6 +8,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2026.5.9-beta.9] - 2026-05-09
+
+### Changed
+- AI 工具中的 `openyida login` 默认策略调整为：先尝试本地 Chrome / Edge / Chromium CDP 浏览器登录；本地 CDP 不可用时再兜底返回对话框二维码 handoff
+- 对话框二维码 handoff 增加 `qr_image_markdown` 和 `agent_response_markdown`，方便 Codex / Qoder / 悟空 / Claude Code / OpenCode / Cursor 等工具直接在聊天框渲染二维码，而不是只展示图片路径或 URL
+- 新增通用二维码命令别名 `openyida login --agent-qr` 和 `openyida login --agent-poll`，旧的 `--codex-qr` / `--codex-poll` 继续兼容
+
+## [2026.5.9-beta.8] - 2026-05-09
+
+### Changed
+- `npm run build:skills` 现在会同时生成悟空可直接上传的 `openyida-skills.zip`，不再只输出 `dist/skills/openyida/` 目录
+- 发布 workflow 复用构建脚本产出的 `openyida-skills.zip`，避免本地构建与 GitHub Release 打包逻辑不一致
+
+## [2026.5.9-beta.7] - 2026-05-09
+
+### Changed
+- `openyida login --browser` 改为优先使用本地 Chrome / Edge / Chromium CDP 登录，CDP 不可用时再使用 Playwright 兜底
+- Codex / Qoder / 悟空等 AI 工具中，直接执行 `openyida login` 默认返回二维码 handoff，便于在对话框展示二维码并通过 `poll_command` 写入 CLI Cookie 缓存
+- 默认二维码 handoff 不依赖本地桌面浏览器或 Playwright，阿里云 ECS 等远程服务器环境也可以直接完成扫码登录并写入 CLI Cookie 缓存
+
+## [2026.5.9-beta.6] - 2026-05-09
+
+### Fixed
+- Qoder 登录模式与 Codex 保持一致：`openyida login` 在 Qoder 环境下返回 Qoder 内置浏览器 handoff，并明确提示如需 CLI Cookie 使用 `openyida login --browser`
+- `openyida login --qoder` 现在会显式返回 `browser: "qoder"`，不再因缺少 Qoder 环境变量回退成 Codex 文案
+
+## [2026.5.9-beta.5] - 2026-05-09
+
 ### Added
 - Codex 登录模式：`openyida login` 在 Codex 环境下缓存优先，缺少有效缓存时引导使用 Codex 内置浏览器登录，无需安装 Playwright 或额外 Chromium
 - 终端二维码登录支持钉钉 OAuth 二维码链路，并支持 `openyida login --qr --corp-id <corpId>` 显式选择多组织账号的目标组织
@@ -16,6 +44,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - 终端二维码渲染不再带警告前缀，避免破坏 QRCode 对齐
 - 修复钉钉 OAuth 多组织账号扫码后停在 `chooseOrganization` 的登录凭证换取流程
+- 修复终端二维码登录未把 `--corp-id` 传入钉钉 OAuth 首次轮询，导致多组织账号二次换凭证时二维码失效的问题
+- 修正钉钉 OAuth 组织选择参数为官方 `corpId`，避免误用仅适用于专属账号登录的 `exclusiveCorpId`
+- 修复钉钉 OAuth 扫码返回 `pass: true` 但无跳转 URL 时未继续调用 `confirm_auth`，导致换取登录凭证失败的问题
+- 修复 `confirm_auth` 未携带 OAuth 页面 query 参数导致服务端报 `clientId is blank` 的问题
+- 修复直接执行 `openyida login` 时扫码后选择组织又要求再次扫码的问题
 
 ### Documentation
 - README 新增 Codex Support 说明，补充 Codex 登录、终端 QR 回退和多组织登录用法

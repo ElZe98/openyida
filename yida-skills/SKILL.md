@@ -1,10 +1,12 @@
 ---
 name: openyida
 description: >
-  OpenYida 宜搭 AI 开发助手。当用户提到宜搭、OpenYida、低代码应用、创建应用、创建表单、发布自定义页面、看板、驾驶舱、报表、连接器、流程、权限或数据管理时使用；以下情况不要触发：只是在讨论通用前端/后端代码、非宜搭平台产品、或只需要解释概念而不操作宜搭资源。
+  宜搭 AI 应用开发总入口技能。通过有 AI Coding 能力的智能体（悟空/Claude/Open Code 等）+ 宜搭低代码平台，实现一句话生成完整应用。
+  包含应用创建、表单设计、自定义页面开发、页面发布、登录态管理等完整开发流程。
+  当用户提到"宜搭"、"yida"、"低代码"、"创建应用"、"创建表单"、"发布页面"、"搭建"、"系统"、等关键词时，使用此技能；以下情况不要触发：只是在讨论通用前端/后端代码、非宜搭平台产品、或只需要解释概念而不操作宜搭资源。
 ---
 
-# OpenYida 宜搭 AI 应用开发指南
+# 宜搭 AI 应用开发指南
 
 ## 概述
 
@@ -83,7 +85,7 @@ openyida login --check-only --json
 | 当前生效环境 | 显示项目根目录路径 |
 | 登录态检测 | 显示是否已登录、域名、组织 ID |
 
-> **若显示"未登录"，先执行 `openyida login`。Codex 中默认返回内置浏览器 handoff：用 Browser Use 打开 `login_url`，让钉钉/宜搭页面承接扫码和组织选择。若 Browser Use 不能直接打开外部 URL，先打开临时本地 redirect 页面再跳转到 `login_url`。页面登录完成后必须再次执行 `openyida login --check-only --json` 验证缓存写入。不要在只读验证通过前执行真实资源创建。**
+> **若显示"未登录"，先执行 `openyida login`。AI 对话框环境中默认先尝试本地 CDP 浏览器登录；若返回二维码 handoff，必须在对话框直接渲染 `qr_image_markdown`，或原样粘贴 `agent_response_markdown`；不要只展示 `qr_image_file` 路径或 `qr_url`。用户用钉钉扫码确认后执行 `poll_command` 写入 CLI Cookie 缓存。页面登录完成后必须再次执行 `openyida login --check-only --json` 验证缓存写入。不要在只读验证通过前执行真实资源创建。**
 
 ---
 
@@ -140,7 +142,7 @@ openyida copy
               ↓
 [Step 4]（按需）创建/更新表单 → openyida create-form → 获得 formUuid（表单）
               ↓
-[Step 5] 编写自定义页面代码 → yida-custom-page 规范 → pages/src/<项目名>.oyd.jsx
+[Step 5] 编写自定义页面代码 → yida-custom-page 规范 → pages/src/<项目名>.js
               ↓
 [Step 6] 发布页面 → openyida publish
               ↓
@@ -202,7 +204,7 @@ openyida copy
 
 - **只读必要文档**：先根据用户意图选定 1 个主技能；只有该技能明确要求时，才读取对应 `references/` 文档，禁止一次性读取全部技能文档。
 - **优先复用缓存**：已创建的 `appType`、`formUuid`、`fieldId`、`reportId` 优先从 `.cache/<项目名>-schema.json` 读取；缺失或不确定时再执行 `openyida get-schema`。
-- **先本地校验再发布**：自定义页面源码优先使用 `.oyd.jsx`；发布前运行 `openyida check-page <源文件路径>` 和 `openyida compile <源文件路径>`，二者会自动把 `.oyd.jsx` 构建为宜搭兼容源码后再检查/编译；发布时留意同名双副本内容不一致警告，必要时加 `--health-check` 做首屏 HTTP 健康检查；JSON 配置写入文件后先做 JSON 解析校验，再调用平台命令。
+- **先本地校验再发布**：自定义页面发布前运行 `openyida check-page <源文件路径>` 和 `openyida compile <源文件路径>`；发布时留意同名双副本内容不一致警告，必要时加 `--health-check` 做首屏 HTTP 健康检查；JSON 配置写入文件后先做 JSON 解析校验，再调用平台命令。
 - **避免无效重试**：同一命令失败后，先根据错误信息检查登录态、组织、参数和字段 ID；不要无修改地连续重试超过 1 次。
 - **数据性能优先**：统计/聚合类需求优先使用 `yida-report` 原生报表服务端聚合；不要在自定义页面前端分页拉取大量表单数据后自行聚合。
 - **模板优先**：自定义页面、表单字段、报表配置等复杂产物优先使用 `openyida sample` 或现有示例生成骨架，再做最小改动。

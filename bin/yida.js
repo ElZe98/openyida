@@ -245,20 +245,25 @@ function printLoginResult(result) {
   console.log(JSON.stringify(summary));
 }
 
-function isBrowserHandoffEnvironment() {
+function isAgentConversationEnvironment() {
   const { detectActiveTool } = require('../lib/core/utils');
-  const activeTool = detectActiveTool();
-  return !!activeTool && (activeTool.tool === 'codex' || activeTool.tool === 'qoder' || activeTool.tool === 'wukong');
+  return !!detectActiveTool();
 }
 
 function shouldUseBrowserHandoffLogin(cliArgs) {
-  if (cliArgs.includes('--qr') || cliArgs.includes('--codex-qr')) {return false;}
+  if (cliArgs.includes('--qr') || cliArgs.includes('--codex-qr') || cliArgs.includes('--agent-qr')) {return false;}
   if (cliArgs.includes('--browser') || cliArgs.includes('--codex') || cliArgs.includes('--qoder') || cliArgs.includes('--wukong')) {return true;}
-  return isBrowserHandoffEnvironment();
+  return false;
+}
+
+function shouldUseAgentLogin(cliArgs) {
+  if (cliArgs.includes('--qr') || cliArgs.includes('--codex-qr') || cliArgs.includes('--agent-qr')) {return false;}
+  if (shouldUseBrowserHandoffLogin(cliArgs)) {return false;}
+  return isAgentConversationEnvironment();
 }
 
 function shouldUseCodexQrLogin(cliArgs) {
-  if (cliArgs.includes('--codex-qr')) {return true;}
+  if (cliArgs.includes('--codex-qr') || cliArgs.includes('--agent-qr')) {return true;}
   return false;
 }
 
@@ -332,15 +337,17 @@ async function main() {
 
     case 'login': {
       const { checkLoginOnly } = require('../lib/auth/login');
-      if (args.includes('--codex-poll')) {
+      if (args.includes('--agent-poll') || args.includes('--codex-poll')) {
+        const sessionFile = getArgValue(args, '--agent-poll') || getArgValue(args, '--codex-poll');
         const { pollCodexQrLogin } = require('../lib/auth/qr-login');
-        const result = await pollCodexQrLogin(getArgValue(args, '--codex-poll'), {
+        const result = await pollCodexQrLogin(sessionFile, {
           corpId: getArgValue(args, '--corp-id'),
         });
         printLoginResult(result);
-      } else if (args.includes('--codex-select')) {
+      } else if (args.includes('--agent-select') || args.includes('--codex-select')) {
+        const sessionFile = getArgValue(args, '--agent-select') || getArgValue(args, '--codex-select');
         const { selectCodexQrCorp } = require('../lib/auth/qr-login');
-        const result = await selectCodexQrCorp(getArgValue(args, '--codex-select'), {
+        const result = await selectCodexQrCorp(sessionFile, {
           corpId: getArgValue(args, '--corp-id'),
         });
         printLoginResult(result);
@@ -367,19 +374,34 @@ async function main() {
         }
       } else if (args.includes('--qoder') || args.includes('--wukong')) {
         const { codexLogin } = require('../lib/auth/codex-login');
-        const result = await codexLogin();
+        const result = await codexLogin({ tool: args.includes('--qoder') ? 'qoder' : 'wukong' });
         printLoginResult(result);
       } else if (args.includes('--qr')) {
         const { qrLogin } = require('../lib/auth/qr-login');
         const result = await qrLogin({ corpId: getArgValue(args, '--corp-id') });
         console.log(JSON.stringify(result));
+      } else if (shouldUseAgentLogin(args)) {
+        const cachedResult = checkLoginOnly({ includeSecrets: true });
+        if (cachedResult.status === 'ok') {
+          printLoginResult(cachedResult);
+        } else {
+          const { interactiveLogin } = require('../lib/auth/login');
+          const browserResult = interactiveLogin({ playwrightFallback: false });
+          if (browserResult) {
+            printLoginResult(browserResult);
+          } else {
+            const { startCodexQrLogin } = require('../lib/auth/qr-login');
+            const result = await startCodexQrLogin({ corpId: getArgValue(args, '--corp-id') });
+            printLoginResult(result);
+          }
+        }
       } else if (shouldUseBrowserHandoffLogin(args)) {
         const cachedResult = checkLoginOnly({ includeSecrets: true });
         if (cachedResult.status === 'ok') {
           printLoginResult(cachedResult);
         } else {
           const { codexLogin } = require('../lib/auth/codex-login');
-          const result = await codexLogin();
+          const result = await codexLogin({ tool: args.includes('--codex') ? 'codex' : undefined });
           printLoginResult(result);
         }
       } else {

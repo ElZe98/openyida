@@ -252,6 +252,146 @@ describe('cdp-browser-login 工具函数', () => {
   });
 });
 
+//─ interactiveLogin 浏览器优先级───────────────────────
+
+describe('interactiveLogin 浏览器优先级', () => {
+  const originalCwd = process.cwd();
+  const originalEnv = { ...process.env };
+  let tmpDir;
+
+  function resetToolEnv() {
+    delete process.env.QODER_IDE;
+    delete process.env.QODER_AGENT;
+    delete process.env.CODEX_SHELL;
+    delete process.env.CODEX_CI;
+    delete process.env.CODEX_THREAD_ID;
+    delete process.env.CODEX_HOME;
+    delete process.env.AGENT_WORK_ROOT;
+  }
+
+  function loadLoginWithMocks(cdpImpl, execSyncImpl) {
+    jest.resetModules();
+    jest.doMock('../lib/core/chalk', () => ({
+      c: { green: '', reset: '', dim: '' },
+      info: jest.fn(),
+      label: jest.fn(),
+      success: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    }));
+    jest.doMock('../lib/auth/cdp-browser-login', () => ({
+      cdpBrowserLogin: jest.fn(cdpImpl),
+    }));
+    jest.doMock('child_process', () => ({
+      execSync: jest.fn(execSyncImpl || (() => {
+        throw new Error('execSync should not be called');
+      })),
+    }));
+    return {
+      loginModule: require('../lib/auth/login'),
+      cdpModule: require('../lib/auth/cdp-browser-login'),
+      childProcess: require('child_process'),
+    };
+  }
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'openyida-browser-order-'));
+    process.chdir(tmpDir);
+    resetToolEnv();
+    process.env.OPENYIDA_ENV = 'public';
+    process.env.OPENYIDA_LOGIN_URL = 'https://example.test/workPlatform';
+  });
+
+  afterEach(() => {
+    process.chdir(originalCwd);
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    Object.keys(process.env).forEach((key) => {
+      if (!(key in originalEnv)) {delete process.env[key];}
+    });
+    Object.assign(process.env, originalEnv);
+    jest.dontMock('../lib/core/chalk');
+    jest.dontMock('../lib/auth/cdp-browser-login');
+    jest.dontMock('child_process');
+    jest.resetModules();
+  });
+
+  test('优先使用 CDP，CDP 成功时不查找 Playwright', () => {
+    const { loginModule, cdpModule, childProcess } = loadLoginWithMocks(() => ({
+      cookies: [
+        { name: 'tianshu_csrf_token', value: 'cdp-token-1234567890' },
+        { name: 'tianshu_corp_user', value: 'corp_cdpUser' },
+      ],
+      base_url: 'https://www.aliwork.com',
+    }));
+
+    const result = loginModule.interactiveLogin();
+
+    expect(cdpModule.cdpBrowserLogin).toHaveBeenCalledWith({
+      loginUrl: 'https://example.test/workPlatform',
+    });
+    expect(childProcess.execSync).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      csrf_token: 'cdp-token-1234567890',
+      corp_id: 'corp',
+      user_id: 'cdpUser',
+      base_url: 'https://www.aliwork.com',
+    });
+  });
+
+  test('CDP 失败后再使用 Playwright 兜底', () => {
+    const globalRoot = path.join(tmpDir, 'global-node-modules');
+    fs.mkdirSync(path.join(globalRoot, 'playwright'), { recursive: true });
+    fs.writeFileSync(path.join(globalRoot, 'playwright', 'index.js'), 'module.exports = {};', 'utf8');
+
+    const execSyncImpl = jest.fn((cmd) => {
+      if (cmd === 'npm root -g') {
+        return `${globalRoot}\n`;
+      }
+      if (cmd.startsWith('node "')) {
+        return `${JSON.stringify({
+          cookies: [
+            { name: 'tianshu_csrf_token', value: 'pw-token-1234567890' },
+            { name: 'tianshu_corp_user', value: 'corp_pwUser' },
+          ],
+          base_url: 'https://playwright.aliwork.com',
+        })}\n`;
+      }
+      throw new Error(`unexpected command: ${cmd}`);
+    });
+
+    const { loginModule, cdpModule, childProcess } = loadLoginWithMocks(() => {
+      throw new Error('No Chrome, Edge, or Chromium executable found');
+    }, execSyncImpl);
+
+    const result = loginModule.interactiveLogin();
+
+    expect(cdpModule.cdpBrowserLogin).toHaveBeenCalledTimes(1);
+    expect(childProcess.execSync).toHaveBeenCalledWith('npm root -g', { encoding: 'utf-8' });
+    expect(childProcess.execSync).toHaveBeenCalledWith(
+      expect.stringMatching(/^node ".+openyida-login-.+\.js"$/),
+      expect.objectContaining({ timeout: 660000 })
+    );
+    expect(result).toMatchObject({
+      csrf_token: 'pw-token-1234567890',
+      corp_id: 'corp',
+      user_id: 'pwUser',
+      base_url: 'https://playwright.aliwork.com',
+    });
+  });
+
+  test('关闭 Playwright 兜底时 CDP 失败直接返回空结果', () => {
+    const { loginModule, cdpModule, childProcess } = loadLoginWithMocks(() => {
+      throw new Error('No Chrome, Edge, or Chromium executable found');
+    });
+
+    const result = loginModule.interactiveLogin({ playwrightFallback: false });
+
+    expect(cdpModule.cdpBrowserLogin).toHaveBeenCalledTimes(1);
+    expect(childProcess.execSync).not.toHaveBeenCalled();
+    expect(result).toBeNull();
+  });
+});
+
 //─ checkLoginOnly 测试────────────────────────────
 
 describe('checkLoginOnly 独立测试', () => {

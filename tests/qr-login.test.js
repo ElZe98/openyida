@@ -142,6 +142,20 @@ describe('DingTalk OAuth organization selection', () => {
     })).toBe(false);
   });
 
+  test('builds OAuth post data with corpId organization selection parameter', () => {
+    const postData = __test__.buildOAuthPostData(
+      'https://login.dingtalk.com/oauth2/challenge?client_id=abc&scope=openid%20corpid',
+      { code: 'qr-code', corpId: 'ding-main', stayLogin: false }
+    );
+
+    const params = new URLSearchParams(postData);
+    expect(params.get('client_id')).toBe('abc');
+    expect(params.get('scope')).toBe('openid corpid');
+    expect(params.get('code')).toBe('qr-code');
+    expect(params.get('corpId')).toBe('ding-main');
+    expect(params.has('exclusiveCorpId')).toBe(false);
+  });
+
   test('selects OAuth organization by explicit corpId without prompting', async () => {
     const selectCorp = jest.fn();
     await expect(__test__.resolveCorpSelection([
@@ -164,26 +178,29 @@ describe('DingTalk OAuth organization selection', () => {
     })).rejects.toThrow('qr_login.target_corp_not_found: ding-missing');
   });
 
-  test('retries OAuth login with selected exclusiveCorpId before following redirect', async () => {
+  test('confirms OAuth auth with selected corpId without requiring a second QR scan', async () => {
     const loginResult = {
       chooseOrganization: true,
+      secondaryValidationResult: 'secondary-ok',
       orgList: [
         { corpId: 'ding-main', name: 'Main Org', mainOrg: true },
         { corpId: 'ding-alt', name: 'Alt Org' },
       ],
     };
     const context = {
-      loginPageUrl: 'https://login.dingtalk.com/oauth2/challenge?client_id=abc',
+      loginPageUrl: 'https://login.dingtalk.com/oauth2/challenge.htm?client_id=abc&redirect_uri=https%3A%2F%2Fwww.aliwork.com%2Fdingtalk_sso_call_back',
       origin: 'https://login.dingtalk.com',
       code: 'qr-code',
     };
     const selectCorp = jest.fn(async (corpList) => corpList[1]);
-    const postLoginWithQr = jest.fn(async () => ({
-      cookieHeader: 'sid=next',
-      parsed: {
+    const fetchPost = jest.fn(async () => ({
+      cookies: ['dd_sso=next; Path=/; HttpOnly'],
+      body: JSON.stringify({
         success: true,
-        result: 'https://www.aliwork.com/oauth/callback?ticket=ok',
-      },
+        result: {
+          url: 'https://www.aliwork.com/oauth/callback?ticket=ok',
+        },
+      }),
     }));
     const fetchGetFollowRedirects = jest.fn(async () => ({
       cookieHeader: 'tianshu_csrf_token=token; tianshu_corp_user=ding-alt_user',
@@ -195,20 +212,31 @@ describe('DingTalk OAuth organization selection', () => {
       loginResult,
       'sid=old',
       context,
-      { selectCorp, postLoginWithQr, fetchGetFollowRedirects }
+      { selectCorp, fetchPost, fetchGetFollowRedirects }
     );
 
     expect(selectCorp).toHaveBeenCalledWith([
       { corpId: 'ding-main', corpName: 'Main Org', mainOrg: true },
       { corpId: 'ding-alt', corpName: 'Alt Org', mainOrg: false },
     ]);
-    expect(postLoginWithQr).toHaveBeenCalledWith(context, 'sid=old', {
-      exclusiveCorpId: 'ding-alt',
-    });
+    expect(fetchPost).toHaveBeenCalledTimes(1);
+    expect(fetchPost).toHaveBeenCalledWith(
+      'https://login.dingtalk.com/oauth2/confirm_auth',
+      expect.any(String),
+      {
+        cookieHeader: 'sid=old',
+        referer: context.loginPageUrl,
+        origin: context.origin,
+      }
+    );
+    const confirmParams = new URLSearchParams(fetchPost.mock.calls[0][1]);
+    expect(confirmParams.get('client_id')).toBe('abc');
+    expect(confirmParams.get('corpId')).toBe('ding-alt');
+    expect(confirmParams.get('secondaryValidationResult')).toBe('secondary-ok');
     expect(fetchGetFollowRedirects).toHaveBeenCalledWith(
       'https://www.aliwork.com/oauth/callback?ticket=ok',
       {
-        cookieHeader: 'sid=next',
+        cookieHeader: 'sid=old; dd_sso=next',
         referer: context.loginPageUrl,
       }
     );
@@ -219,14 +247,16 @@ describe('DingTalk OAuth organization selection', () => {
     });
   });
 
-  test('retries OAuth login with explicit corpId when provided', async () => {
+  test('confirms OAuth auth with explicit corpId when provided', async () => {
     const selectCorp = jest.fn();
-    const postLoginWithQr = jest.fn(async () => ({
-      cookieHeader: 'sid=next',
-      parsed: {
+    const fetchPost = jest.fn(async () => ({
+      cookies: ['dd_sso=next; Path=/; HttpOnly'],
+      body: JSON.stringify({
         success: true,
-        result: 'https://www.aliwork.com/oauth/callback?ticket=ok',
-      },
+        result: {
+          url: 'https://www.aliwork.com/oauth/callback?ticket=ok',
+        },
+      }),
     }));
     const fetchGetFollowRedirects = jest.fn(async () => ({
       cookieHeader: 'tianshu_csrf_token=token; tianshu_corp_user=ding-main_user',
@@ -244,26 +274,91 @@ describe('DingTalk OAuth organization selection', () => {
       },
       'sid=old',
       {
-        loginPageUrl: 'https://login.dingtalk.com/oauth2/challenge?client_id=abc',
+        loginPageUrl: 'https://login.dingtalk.com/oauth2/challenge.htm?client_id=abc&redirect_uri=https%3A%2F%2Fwww.aliwork.com%2Fdingtalk_sso_call_back',
         origin: 'https://login.dingtalk.com',
         code: 'qr-code',
       },
       {
         corpId: 'ding-main',
         selectCorp,
-        postLoginWithQr,
+        fetchPost,
         fetchGetFollowRedirects,
       }
     );
 
     expect(selectCorp).not.toHaveBeenCalled();
-    expect(postLoginWithQr).toHaveBeenCalledWith(expect.any(Object), 'sid=old', {
-      exclusiveCorpId: 'ding-main',
-    });
+    expect(fetchPost).toHaveBeenCalledTimes(1);
+    const confirmParams = new URLSearchParams(fetchPost.mock.calls[0][1]);
+    expect(confirmParams.get('client_id')).toBe('abc');
+    expect(confirmParams.get('corpId')).toBe('ding-main');
     expect(result.selectedCorp).toEqual({
       corpId: 'ding-main',
       corpName: 'Main Org',
       mainOrg: false,
+    });
+  });
+
+  test('confirms OAuth auth when QR login returns pass result without redirect URL', async () => {
+    const loginResult = {
+      pass: true,
+      corpId: 'ding-main',
+      secondaryValidationResult: 'secondary-ok',
+      nick: 'Tester',
+    };
+    const context = {
+      loginPageUrl: 'https://login.dingtalk.com/oauth2/challenge.htm?client_id=abc&redirect_uri=https%3A%2F%2Fwww.aliwork.com%2Fdingtalk_sso_call_back%3Fcontinue%3Dhttps%253A%252F%252Fwww.aliwork.com%252FworkPlatform',
+      origin: 'https://login.dingtalk.com',
+      code: 'qr-code',
+    };
+    const fetchPost = jest.fn(async () => ({
+      cookies: ['dd_sso=next; Path=/; HttpOnly'],
+      body: JSON.stringify({
+        success: true,
+        result: {
+          url: 'https://www.aliwork.com/dingtalk_sso_call_back?code=ok',
+        },
+      }),
+    }));
+    const fetchGetFollowRedirects = jest.fn(async () => ({
+      cookieHeader: 'tianshu_csrf_token=token; tianshu_corp_user=ding-main_user',
+      finalUrl: 'https://www.aliwork.com/workPlatform',
+    }));
+
+    const result = await __test__.exchangeDingtalkOAuthResult(
+      'https://www.aliwork.com',
+      loginResult,
+      'sid=old',
+      context,
+      { fetchPost, fetchGetFollowRedirects }
+    );
+
+    expect(fetchPost).toHaveBeenCalledWith(
+      'https://login.dingtalk.com/oauth2/confirm_auth',
+      expect.any(String),
+      {
+        cookieHeader: 'sid=old',
+        referer: context.loginPageUrl,
+        origin: context.origin,
+      }
+    );
+    const confirmParams = new URLSearchParams(fetchPost.mock.calls[0][1]);
+    expect(confirmParams.get('client_id')).toBe('abc');
+    expect(confirmParams.get('corpId')).toBe('ding-main');
+    expect(confirmParams.get('secondaryValidationResult')).toBe('secondary-ok');
+    expect(confirmParams.get('redirect_uri')).toBe(
+      'https://www.aliwork.com/dingtalk_sso_call_back?continue=https%3A%2F%2Fwww.aliwork.com%2FworkPlatform'
+    );
+    expect(fetchGetFollowRedirects).toHaveBeenCalledWith(
+      'https://www.aliwork.com/dingtalk_sso_call_back?code=ok',
+      {
+        cookieHeader: 'sid=old; dd_sso=next',
+        referer: context.loginPageUrl,
+      }
+    );
+    expect(result).toEqual({
+      cookieHeader: 'tianshu_csrf_token=token; tianshu_corp_user=ding-main_user',
+      baseUrl: 'https://www.aliwork.com',
+      selectedCorp: null,
     });
   });
 
@@ -296,7 +391,7 @@ describe('DingTalk OAuth organization selection', () => {
 
     expect(postLoginWithQr).toHaveBeenCalledWith(context, 'sid=old', {
       code: 'qr-code',
-      exclusiveCorpId: 'ding-main',
+      corpId: 'ding-main',
       stayLogin: false,
     });
     expect(result).toEqual({
