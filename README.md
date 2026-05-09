@@ -394,26 +394,12 @@ Scan the QR code to join the OpenYida DingTalk user group for updates and suppor
 
 Thanks to everyone who has contributed to OpenYida. Read the [Contributing Guide](./CONTRIBUTING.md) to get involved.
 
-<p align="left">
-<a href="https://github.com/yize"><img align="left" src="https://avatars.githubusercontent.com/u/1578814?v=4&s=40" width="40" height="40" alt="九神" title="九神"/></a>
-<a href="https://github.com/alex-mm"><img align="left" src="https://avatars.githubusercontent.com/u/3302053?v=4&s=40" width="40" height="40" alt="天晟" title="天晟"/></a>
-<a href="https://github.com/nicky1108"><img align="left" src="https://avatars.githubusercontent.com/u/4279283?v=4&s=40" width="40" height="40" alt="nicky1108" title="nicky1108"/></a>
-<a href="https://github.com/angelinheys"><img align="left" src="https://avatars.githubusercontent.com/u/49426983?v=4&s=40" width="40" height="40" alt="angelinheys" title="angelinheys"/></a>
-<a href="https://github.com/yipengmu"><img align="left" src="https://avatars.githubusercontent.com/u/3232735?v=4&s=40" width="40" height="40" alt="yipengmu" title="yipengmu"/></a>
-<a href="https://github.com/Waawww"><img align="left" src="https://avatars.githubusercontent.com/u/31886449?v=4&s=40" width="40" height="40" alt="Waawww" title="Waawww"/></a>
-<a href="https://github.com/kangjiano"><img align="left" src="https://avatars.githubusercontent.com/u/54129385?v=4&s=40" width="40" height="40" alt="kangjiano" title="kangjiano"/></a>
-<a href="https://github.com/ElZe98"><img align="left" src="https://avatars.githubusercontent.com/u/35736727?v=4&s=40" width="40" height="40" alt="ElZe98" title="ElZe98"/></a>
-<a href="https://github.com/OAHyuhao"><img align="left" src="https://avatars.githubusercontent.com/u/99954323?v=4&s=40" width="40" height="40" alt="OAHyuhao" title="OAHyuhao"/></a>
-<a href="https://github.com/xiaofu704"><img align="left" src="https://avatars.githubusercontent.com/u/209416122?v=4&s=40" width="40" height="40" alt="xiaofu704" title="xiaofu704"/></a>
-<a href="https://github.com/guchenglin111"><img align="left" src="https://avatars.githubusercontent.com/u/10860875?v=4&s=40" width="40" height="40" alt="guchenglin111" title="guchenglin111"/></a>
-<a href="https://github.com/liug0911"><img align="left" src="https://avatars.githubusercontent.com/u/1578814?v=4&s=40" width="40" height="40" alt="LIUG" title="LIUG"/></a>
-<a href="https://github.com/sunliz-xiuli"><img align="left" src="https://avatars.githubusercontent.com/u/76982855?v=4&s=40" width="40" height="40" alt="sunliz-xiuli" title="sunliz-xiuli"/></a>
-<a href="https://github.com/M12REDX"><img align="left" src="https://avatars.githubusercontent.com/u/22703542?v=4&s=40" width="40" height="40" alt="M12REDX" title="M12REDX"/></a>
-<a href="https://github.com/key-668"><img align="left" src="https://avatars.githubusercontent.com/u/270536058?v=4&s=40" width="40" height="40" alt="再不喝汽水" title="再不喝汽水"/></a>
-<a href="https://github.com/dongbeixiaohuo"><img align="left" src="https://avatars.githubusercontent.com/u/73542526?v=4&s=40" width="40" height="40" alt="dongbeixiaohuo" title="dongbeixiaohuo"/></a>
-<a href="https://github.com/nandanadileep"><img align="left" src="https://avatars.githubusercontent.com/u/110280757?v=4&s=40" width="40" height="40" alt="nandanadileep" title="nandanadileep"/></a>
-<br clear="left" />
-</p>
+<!-- openyida-contributors:start -->
+
+[![九神](https://avatars.githubusercontent.com/u/1578814?v=4&s=48)](https://github.com/yize) [![天晟](https://avatars.githubusercontent.com/u/3302053?v=4&s=48)](https://github.com/alex-mm) [![nicky1108](https://avatars.githubusercontent.com/u/4279283?v=4&s=48)](https://github.com/nicky1108) [![angelinheys](https://avatars.githubusercontent.com/u/49426983?v=4&s=48)](https://github.com/angelinheys) [![yipengmu](https://avatars.githubusercontent.com/u/3232735?v=4&s=48)](https://github.com/yipengmu) [![Waawww](https://avatars.githubusercontent.com/u/31886449?v=4&s=48)](https://github.com/Waawww) [![kangjiano](https://avatars.githubusercontent.com/u/54129385?v=4&s=48)](https://github.com/kangjiano) [![ElZe98](https://avatars.githubusercontent.com/u/35736727?v=4&s=48)](https://github.com/ElZe98) [![OAHyuhao](https://avatars.githubusercontent.com/u/99954323?v=4&s=48)](https://github.com/OAHyuhao) [![xiaofu704](https://avatars.githubusercontent.com/u/209416122?v=4&s=48)](https://github.com/xiaofu704)
+[![guchenglin111](https://avatars.githubusercontent.com/u/10860875?v=4&s=48)](https://github.com/guchenglin111) [![LIUG](https://avatars.githubusercontent.com/u/1578814?v=4&s=48)](https://github.com/liug0911) [![sunliz-xiuli](https://avatars.githubusercontent.com/u/76982855?v=4&s=48)](https://github.com/sunliz-xiuli) [![M12REDX](https://avatars.githubusercontent.com/u/22703542?v=4&s=48)](https://github.com/M12REDX) [![再不喝汽水](https://avatars.githubusercontent.com/u/270536058?v=4&s=48)](https://github.com/key-668) [![dongbeixiaohuo](https://avatars.githubusercontent.com/u/73542526?v=4&s=48)](https://github.com/dongbeixiaohuo) [![nandanadileep](https://avatars.githubusercontent.com/u/110280757?v=4&s=48)](https://github.com/nandanadileep)
+
+<!-- openyida-contributors:end -->
 
 ## License
 
