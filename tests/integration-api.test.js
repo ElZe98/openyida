@@ -38,12 +38,13 @@ describe('integration api', () => {
 
     expect(result.totalCount).toBe(1);
     expect(httpGet).toHaveBeenCalledTimes(1);
-    const [, path] = httpGet.mock.calls[0];
+    const [, path,,, options] = httpGet.mock.calls[0];
     expect(path).toContain('/alibaba/web/APP_TEST/query/formLogicflowBinding/listLog.json?');
     expect(path).toContain('_api=Connector.listLog');
     expect(path).toContain('processCode=LPROC-TEST');
     expect(path).toContain('status=2');
     expect(path).toContain('dateType=modifyTime');
+    expect(options).toEqual({ silentStatus: true });
   });
 
   test('listFormLogicflows uses the form binding endpoint for grouped load-more flows', async () => {
@@ -66,9 +67,10 @@ describe('integration api', () => {
       type: '1',
     });
 
-    const [, path] = httpGet.mock.calls[0];
+    const [, path,,, options] = httpGet.mock.calls[0];
     expect(path).toContain('/alibaba/web/APP_TEST/query/formLogicflowBinding/listflow.json?');
     expect(path).toContain('_api=Connector.getTriggerList');
     expect(path).toContain('formUuid=FORM_TEST');
+    expect(options).toEqual({ silentStatus: true });
   });
 });
