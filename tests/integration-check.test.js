@@ -1,11 +1,18 @@
 'use strict';
 
 const {
+  formatProgressBar,
   normalizeLogStatus,
   collectFlowsFromListResponse,
 } = require('../lib/integration/integration-check');
 
 describe('integration check', () => {
+  test('formatProgressBar renders a horizontal progress bar', () => {
+    expect(formatProgressBar(5, 10, 10)).toBe('[#####-----]  50% (5/10)');
+    expect(formatProgressBar(10, 10, 10)).toBe('[##########] 100% (10/10)');
+    expect(formatProgressBar(0, 0, 10)).toBe('[----------]   0% (0/0)');
+  });
+
   test('normalizeLogStatus maps frontend log status aliases', () => {
     expect(normalizeLogStatus()).toBe('2');
     expect(normalizeLogStatus('exception')).toBe('2');
