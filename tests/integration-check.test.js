@@ -3,6 +3,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { SUPPORTED_LANGUAGES } = require('../lib/core/i18n');
 const {
   formatProgressBar,
   sanitizeSheetName,
@@ -16,6 +17,42 @@ const {
 } = require('../lib/integration/integration-check');
 
 describe('integration check', () => {
+  const integrationCheckLocaleKeys = [
+    'result_sheet',
+    'header_app',
+    'header_form_title',
+    'header_form_uuid',
+    'header_flow_name',
+    'header_process_code',
+    'header_flow_status',
+    'header_event_name',
+    'header_last_action',
+    'header_modifier',
+    'header_modified_time',
+    'header_abnormal_log_count',
+    'header_proc_inst_id',
+    'header_form_inst_id',
+    'header_execution_status',
+    'header_exception',
+    'header_start_time',
+    'header_finish_time',
+    'header_elapsed_ms',
+    'no_abnormal',
+    'app_failed',
+    'summary',
+    'apps_failed',
+    'no_logs',
+    'usage',
+    'example',
+    'missing_app',
+    'banner_title',
+    'status_filter',
+    'checking_app',
+    'progress',
+    'current',
+    'excel_exported',
+  ];
+
   test('formatProgressBar renders a horizontal progress bar', () => {
     expect(formatProgressBar(5, 10, 10)).toBe('[#####-----]  50% (5/10)');
     expect(formatProgressBar(10, 10, 10)).toBe('[##########] 100% (10/10)');
@@ -86,6 +123,17 @@ describe('integration check', () => {
   test('buildAppRows records no-abnormal and app-error rows', () => {
     expect(buildAppRows('APP_EMPTY', [])[1][14]).toBe('未发现执行异常日志');
     expect(buildAppRows('APP_ERR', [], [{ appType: 'APP_ERR', message: '登录态失效' }])[1][14]).toBe('应用检查失败：登录态失效');
+  });
+
+  test('all locale packs include integration check messages', () => {
+    for (const language of SUPPORTED_LANGUAGES) {
+      const locale = require(`../lib/core/locales/${language}`);
+      expect(locale.help.cmd_integration_check).toEqual(expect.any(String));
+      for (const key of integrationCheckLocaleKeys) {
+        expect(locale.integration_check[key]).toEqual(expect.any(String));
+        expect(locale.integration_check[key]).not.toBe('');
+      }
+    }
   });
 
   test('buildXlsxWorkbook creates an xlsx zip buffer', () => {
