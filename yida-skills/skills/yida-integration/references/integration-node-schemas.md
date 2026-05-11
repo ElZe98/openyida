@@ -354,9 +354,10 @@ trigger
 | `status` | String | 否 | `y`=开启，`n`=关闭，空=全部 |
 | `pageIndex` | Number | 是 | 页码，从 1 开始 |
 | `pageSize` | Number | 是 | 每页条数，**最大 10** |
-| `type` | String | 是 | 固定 `"1"` |
+| `type` | String | 是 | 触发类型：`1`=表单事件，`2`=应用事件，`3`=定时，`5`/`6`=手动触发，前端手动触发页可能传 `5,6` |
 
 > ⚠️ `totalCount` 是表单分组数（不是自动化总数），每个分组内的 `flowList` 才是具体的自动化列表。
+> ⚠️ 应用级列表对同一表单只返回首批 `flowList`；当分组 `hasMore=true` 时，需要继续调用 `/query/formLogicflowBinding/listflow.json` 拉取该表单下的剩余自动化。
 
 ---
 
@@ -375,3 +376,22 @@ trigger
 | `type` | String | 是 | 固定 `"1"` |
 
 > ⚠️ 若目标逻辑流已处于目标状态，接口仍返回 `success: true`，不会报错。
+
+---
+
+### listLogicflowLogs（查询运行日志）
+
+- **地址**：`GET /alibaba/web/{appType}/query/formLogicflowBinding/listLog.json`
+- **Query 参数**：
+
+| 参数 | 类型 | 必填 | 说明 |
+| --- | --- | --- | --- |
+| `processCode` | String | 是 | 逻辑流唯一标识（`LPROC-xxx` 格式） |
+| `dateType` | String | 否 | 前端默认 `modifyTime`，表示按完成时间筛选；也支持 `startTime` |
+| `status` | String | 否 | `3`=执行成功，`2`=执行异常，`0`=执行中；筛选“执行异常”时传 `2` |
+| `formInstId` | String | 否 | 表单实例 ID |
+| `procInstId` | String | 否 | 运行实例 ID |
+| `startTime` | Number | 否 | 时间范围起点，毫秒时间戳 |
+| `endTime` | Number | 否 | 时间范围终点，毫秒时间戳 |
+| `pageIndex` | Number | 是 | 页码，从 1 开始 |
+| `pageSize` | Number | 是 | 每页条数 |

@@ -854,6 +854,9 @@ async function main() {
       } else if (subCommand === 'disable') {
         const { runDisable } = require('../lib/integration/integration-list');
         await runDisable(subArgs);
+      } else if (subCommand === 'check') {
+        const { run: runIntegrationCheck } = require('../lib/integration/integration-check');
+        await runIntegrationCheck(subArgs);
       } else {
         warn(t('cli.integration_unknown', subCommand));
         warn(t('cli.integration_help_hint'));
