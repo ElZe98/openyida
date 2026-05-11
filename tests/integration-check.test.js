@@ -1,8 +1,17 @@
 'use strict';
 
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const {
   formatProgressBar,
+  sanitizeSheetName,
+  buildAppRows,
+  buildXlsxWorkbook,
+  exportResultToExcel,
+  formatTimestamp,
   normalizeLogStatus,
+  parseAppTypes,
   collectFlowsFromListResponse,
 } = require('../lib/integration/integration-check');
 
@@ -20,6 +29,85 @@ describe('integration check', () => {
     expect(normalizeLogStatus('running')).toBe('0');
     expect(normalizeLogStatus('2')).toBe('2');
     expect(() => normalizeLogStatus('bad')).toThrow('不支持的日志状态');
+  });
+
+  test('parseAppTypes keeps app ids while excluding valued flags', () => {
+    expect(parseAppTypes(['--json', 'APP_A', '--output', 'result.xlsx', 'APP_B'])).toEqual(['APP_A', 'APP_B']);
+    expect(parseAppTypes(['APP_A', '-o', 'result.xlsx', '--log-page-size', '1'])).toEqual(['APP_A']);
+  });
+
+  test('sanitizeSheetName removes invalid characters, truncates and deduplicates', () => {
+    const usedNames = new Set();
+    expect(sanitizeSheetName('APP/A:*?[测试]', 'fallback', usedNames)).toBe('APP A 测试');
+    expect(sanitizeSheetName('012345678901234567890123456789012345', 'fallback', usedNames)).toHaveLength(31);
+    expect(sanitizeSheetName('APP/A:*?[测试]', 'fallback', usedNames)).toBe('APP A 测试 2');
+  });
+
+  test('formatTimestamp renders millisecond timestamps as readable text', () => {
+    expect(formatTimestamp('abc')).toBe('abc');
+    expect(formatTimestamp('')).toBe('');
+    expect(formatTimestamp(0)).toMatch(/^1970-01-01 /);
+  });
+
+  test('buildAppRows returns abnormal log rows for one app', () => {
+    const rows = buildAppRows('APP_A', [
+      {
+        appType: 'APP_A',
+        formTitle: '项目线索',
+        formUuid: 'FORM-A',
+        name: '分配负责人',
+        processCode: 'LPROC-A',
+        status: 'y',
+        eventName: '表单更新成功',
+        abnormalLogCount: 1,
+        logs: [
+          {
+            procInstId: 'PROC-1',
+            formInstId: 'FORMINST-1',
+            status: '2',
+            exceptionEntity: '目标列不存在',
+            elapsedTime: 20,
+          },
+        ],
+      },
+      {
+        appType: 'APP_B',
+        name: '其他应用',
+        processCode: 'LPROC-B',
+        abnormalLogCount: 1,
+        logs: [{ exceptionEntity: '不应出现' }],
+      },
+    ]);
+
+    expect(rows).toHaveLength(2);
+    expect(rows[1]).toEqual(expect.arrayContaining(['APP_A', '项目线索', '分配负责人', '目标列不存在']));
+  });
+
+  test('buildAppRows records no-abnormal and app-error rows', () => {
+    expect(buildAppRows('APP_EMPTY', [])[1][14]).toBe('未发现执行异常日志');
+    expect(buildAppRows('APP_ERR', [], [{ appType: 'APP_ERR', message: '登录态失效' }])[1][14]).toBe('应用检查失败：登录态失效');
+  });
+
+  test('buildXlsxWorkbook creates an xlsx zip buffer', () => {
+    const buffer = buildXlsxWorkbook([{ name: 'APP_A', rows: buildAppRows('APP_A', []) }]);
+    expect(buffer.slice(0, 2).toString()).toBe('PK');
+    expect(buffer.includes(Buffer.from('xl/workbook.xml'))).toBe(true);
+    expect(buffer.includes(Buffer.from('xl/worksheets/sheet1.xml'))).toBe(true);
+  });
+
+  test('exportResultToExcel writes one workbook file', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'openyida-integration-check-'));
+    const file = path.join(dir, 'result.xlsx');
+    const exportedPath = exportResultToExcel({
+      checkedApps: ['APP_A'],
+      totalFlows: 0,
+      abnormalFlows: [],
+      errors: [],
+    }, file);
+
+    const buffer = fs.readFileSync(exportedPath);
+    expect(exportedPath).toBe(file);
+    expect(buffer.slice(0, 2).toString()).toBe('PK');
   });
 
   test('collectFlowsFromListResponse flattens grouped flowList items and deduplicates processCode', () => {

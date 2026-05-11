@@ -67,7 +67,7 @@ description: 宜搭集成&自动化配置技能。支持创建/查询/开启/关
 
 ```bash
 openyida integration create <appType> <formUuid> <flowName> [选项]
-openyida integration check <appType...> [--json] [--no-progress]
+openyida integration check <appType...> [--json] [--output result.xlsx] [--no-progress]
 ```
 
 ### 参数说明
@@ -172,12 +172,14 @@ openyida integration create APP_XXX FORM-A-XXX "表单A新增后同步到表单B
 
 ```bash
 openyida integration check APP_XXX --json
+openyida integration check APP_XXX APP_YYY --output project/output/自动化异常.xlsx
 ```
 
 - 会分页查询指定应用下的全部集成自动化，默认覆盖 `1/2/3/5/6` 五类触发类型。
 - 对每条自动化调用运行日志接口，并按 `status=2` 筛选“执行异常”。
 - 批量查询时只显示单行进度，不逐条输出 HTTP 200。
 - JSON 结果包含 `totalFlows`、`abnormalFlows[].processCode`、自动化名称、触发表单和异常日志列表。
+- 传入 `--output <file.xlsx>` 时导出 Excel，一个应用一个 sheet；无异常的应用会写入“未发现执行异常日志”，检查失败的应用会写入失败原因。
 
 ## 调用流程
 
